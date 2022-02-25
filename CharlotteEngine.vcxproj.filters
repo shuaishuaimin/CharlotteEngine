@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\BaseCode">
+      <UniqueIdentifier>{04fecf5c-0bc0-43aa-ba4e-4507eea42b7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Data">
+      <UniqueIdentifier>{2520c562-da71-46cf-84cb-f47f960d5b64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Actor">
+      <UniqueIdentifier>{62b022eb-6393-4d5f-b269-36fe2893461f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Actor\Camera">
+      <UniqueIdentifier>{55e83973-17ce-4d76-93d0-8a9776e3fe17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BaseClass">
+      <UniqueIdentifier>{9cbccfca-dcb7-49f1-aed4-8a2997649bec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BaseCode">
+      <UniqueIdentifier>{73a67ee2-ed87-4449-893f-3a81f6b4af5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Actor">
+      <UniqueIdentifier>{0b309fa1-ce88-4e49-90ea-c8d2e61b0242}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Actor\Camera">
+      <UniqueIdentifier>{2d8a5653-c578-41d4-a3a1-ac0500d02b5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Data">
+      <UniqueIdentifier>{30800343-1e23-40b2-a508-bb7e9db5cb56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game">
+      <UniqueIdentifier>{2b6a2b6b-1107-4400-9388-b9050bedbcc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game">
+      <UniqueIdentifier>{762603f3-3c10-4ec1-9b81-ae6d53fbb602}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BaseClass">
+      <UniqueIdentifier>{54bafcae-44ce-4186-8c01-e26057839e0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MainFunction">
+      <UniqueIdentifier>{4073d2b4-c898-48e4-af66-3120c5e43c97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Platform">
+      <UniqueIdentifier>{360519da-81fa-455d-96d8-9fa8e2b94504}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Platform\Windows">
+      <UniqueIdentifier>{ee783c91-6e12-4751-a5fa-415278e867fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Platform\Windows\WindowsAPI">
+      <UniqueIdentifier>{a07bc809-0503-4ddb-a2ff-e9e8fe16dce4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Platform\App">
+      <UniqueIdentifier>{fdb246d8-673c-4106-bb8e-9aaebb5c4461}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Platform">
+      <UniqueIdentifier>{83a100d5-4deb-423a-9523-1187e28d41f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Platform\App">
+      <UniqueIdentifier>{7991a8bd-621a-4260-9156-4868ac2bc53b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Platform\Windows">
+      <UniqueIdentifier>{2dde04f9-daf3-4e69-94a9-567285490cf4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Platform\Windows\WindowsAPI">
+      <UniqueIdentifier>{ab83ffa0-4f5d-4115-b290-d355bdc67878}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Platform\Windows\WindowsAPI\WinApp">
+      <UniqueIdentifier>{bcefa897-75ff-4d6b-817b-fa766bed6c66}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FApp.h">
+      <Filter>Header Files\Platform\App</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\d3dx12.h">
+      <Filter>Header Files\BaseCode</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FUtil.h">
+      <Filter>Header Files\BaseCode</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DDSTextureLoader.h">
+      <Filter>Header Files\BaseCode</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FMathHelper.h">
+      <Filter>Header Files\BaseCode</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\BaseData.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FDataProcessor.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FGraphicsAPI.h">
+      <Filter>Header Files\Platform\Windows\WindowsAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FGameTimer.h">
+      <Filter>Header Files\BaseClass</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FUploadBuffer.h">
+      <Filter>Header Files\BaseClass</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FCamera.h">
+      <Filter>Header Files\Actor\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FGameProcess.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\MainWindow.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FWin32Window.h">
+      <Filter>Header Files\Platform\Windows\WindowsAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FWinApp.h">
+      <Filter>Header Files\Platform\Windows\WindowsAPI\WinApp</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Engine\FApp.cpp">
+      <Filter>Source Files\Platform\App</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\DDSTextureLoader.cpp">
+      <Filter>Source Files\BaseCode</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FUtil.cpp">
+      <Filter>Source Files\BaseCode</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FMathHelper.cpp">
+      <Filter>Source Files\BaseCode</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FCamera.cpp">
+      <Filter>Source Files\Actor\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FDataProcessor.cpp">
+      <Filter>Source Files\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FGameProcess.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FGameTimer.cpp">
+      <Filter>Source Files\BaseClass</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FGraphicsAPI.cpp">
+      <Filter>Source Files\Platform\Windows\WindowsAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files\MainFunction</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files\MainFunction</Filter>
+    </ClCompile>
+    <ClCompile Include="WinMain.cpp">
+      <Filter>Source Files\MainFunction</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

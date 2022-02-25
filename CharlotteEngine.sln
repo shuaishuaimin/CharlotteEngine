@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31613.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CharlotteEngine", "CharlotteEngine.vcxproj", "{B31191F6-D550-4B1C-9137-95BEB9A5F84D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B31191F6-D550-4B1C-9137-95BEB9A5F84D}.Debug|x64.ActiveCfg = Debug|x64
+		{B31191F6-D550-4B1C-9137-95BEB9A5F84D}.Debug|x64.Build.0 = Debug|x64
+		{B31191F6-D550-4B1C-9137-95BEB9A5F84D}.Debug|x86.ActiveCfg = Debug|Win32
+		{B31191F6-D550-4B1C-9137-95BEB9A5F84D}.Debug|x86.Build.0 = Debug|Win32
+		{B31191F6-D550-4B1C-9137-95BEB9A5F84D}.Release|x64.ActiveCfg = Release|x64
+		{B31191F6-D550-4B1C-9137-95BEB9A5F84D}.Release|x64.Build.0 = Release|x64
+		{B31191F6-D550-4B1C-9137-95BEB9A5F84D}.Release|x86.ActiveCfg = Release|Win32
+		{B31191F6-D550-4B1C-9137-95BEB9A5F84D}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {50317141-060A-431F-BC9A-DD355E2CF368}
+	EndGlobalSection
+EndGlobal
