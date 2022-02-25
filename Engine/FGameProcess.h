@@ -51,6 +51,7 @@ private:
 	std::unique_ptr<MeshGeometry> mMeshGeo = nullptr;
 	std::vector<Charalotte::FMeshsInEnviroument> mEnviroument;
 	std::unordered_map<std::string, SubmeshGeometry> NameMeshDir;
+	std::unordered_map<std::string, uint32_t> RepeatName;
 
 	std::vector<DirectX::XMFLOAT4> TestColors;
 

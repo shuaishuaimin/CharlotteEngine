@@ -14,10 +14,15 @@ FGameProcess::FGameProcess(HINSTANCE hInstance) : FApp(hInstance), ColorIndex(0)
 {
 	TestColors.push_back(XMFLOAT4(Colors::Blue));
 	TestColors.push_back(XMFLOAT4(Colors::DarkGray));
-	TestColors.push_back(XMFLOAT4(Colors::LightPink));
+	TestColors.push_back(XMFLOAT4(Colors::DarkCyan));
 	TestColors.push_back(XMFLOAT4(Colors::Green));
 	TestColors.push_back(XMFLOAT4(Colors::Yellow));
-	TestColors.push_back(XMFLOAT4(Colors::Purple));
+	TestColors.push_back(XMFLOAT4(Colors::Aqua));
+	TestColors.push_back(XMFLOAT4(Colors::Black));
+	TestColors.push_back(XMFLOAT4(Colors::White));
+	TestColors.push_back(XMFLOAT4(Colors::DarkMagenta));
+	TestColors.push_back(XMFLOAT4(Colors::Bisque));
+	TestColors.push_back(XMFLOAT4(Colors::BlanchedAlmond));
 }
 FGameProcess::~FGameProcess()
 {
@@ -347,8 +352,27 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 	submesh.IndexCount = (UINT)(MeshInfo.LodInfos[0].Indices.size());
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
-
-	NameMeshDir.insert(std::make_pair(Name, submesh));
+	if (Name.size() <= 4)
+	{
+		return;
+	}
+	std::string RealActorName = Name.erase(Name.size() - 4, 4);
+	if (NameMeshDir.find(RealActorName) != NameMeshDir.end())
+	{
+		auto RepeatNameIter = RepeatName.find(RealActorName);
+		uint32_t RepeatActorAdd = 0;;
+		if (RepeatNameIter != RepeatName.end())
+		{
+			RepeatNameIter->second += 1;
+			RepeatActorAdd = RepeatNameIter->second;
+		}
+		else
+		{
+			RepeatName.insert(std::make_pair(RealActorName, 0));
+		}
+		RealActorName += std::to_string(static_cast<int>(RepeatActorAdd)) ;
+	}
+	NameMeshDir.insert(std::make_pair(RealActorName, submesh));
 }
 
 void FGameProcess::BuildMeshGeometrys()
