@@ -16,10 +16,7 @@ public:
 
 	virtual bool InitMainWindow()override;
 
-	FWin32Window* GetWindow();
-
 protected:
-	FWin32Window* Win32Window;
 	WNDPROC MainWndProcIns;
 	HINSTANCE mhAppInst = nullptr; // application instance handle
 	HWND	  mhMainWnd = nullptr; // main window handle

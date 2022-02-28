@@ -4,8 +4,7 @@
 FWin32Window::FWin32Window(WNDPROC MainWndProcs, HINSTANCE Instance) : MainWndProcIns(MainWndProcs),
 				mhAppInst(Instance)
 {
-	assert(Win32Window == nullptr);
-	Win32Window = this;
+	
 }
 
 FWin32Window::~FWin32Window()
@@ -62,10 +61,4 @@ bool FWin32Window::InitMainWindow()
 	UpdateWindow(mhMainWnd);
 
 	return true;
-}
-
-
-FWin32Window* FWin32Window::GetWindow()
-{
-	return Win32Window;
 }

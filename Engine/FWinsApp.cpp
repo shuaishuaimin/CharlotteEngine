@@ -104,6 +104,13 @@ int FWinsApp::Run()
 
 bool FWinsApp::Initialize()
 {
+	if (mWindowIns == nullptr)
+	{
+		std::stringstream ss;
+		ss << "No Window";
+		OutputDebugStringA(ss.str().c_str());
+		return false;
+	}
 	// only mainwindow or directx3D is not inited, return initialize failed;
 	if (!InitMainWindow()) return false;
 
@@ -386,7 +393,7 @@ LRESULT FWinsApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 bool FWinsApp::InitMainWindow()
 {
-	mWindowIns = std::make_unique<FWin32Window>(MainWndProc, mhAppInst);
+	//mWindowIns = std::make_unique<FWin32Window>(MainWndProc, mhAppInst);
 	bool InitWindowResult = mWindowIns->InitMainWindow();
 	mhMainWnd = mWindowIns->MainWnd();
 	return InitWindowResult;
@@ -653,11 +660,10 @@ void FWinsApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 	}
 }
 
-FWindow* FWinsApp::CreateMainWindow()
+std::shared_ptr<FWindow> FWinsApp::CreateMainWindow()
 {
-	/*mWindowIns = std::make_shared<FWin32Window>(MainWndProc, mhAppInst);
-	return this->mWindowIns;*/
-	return nullptr;
+	mWindowIns = std::make_shared<FWin32Window>(MainWndProc, mhAppInst);
+	return mWindowIns;
 }
 FApp* FWinsApp::GetOwnApp()
 {

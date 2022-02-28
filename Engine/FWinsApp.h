@@ -30,7 +30,7 @@ public:
 	static FWinsApp* GetApp();
 
 	HINSTANCE AppInst()const;
-	HWND MainWnd()const;
+	//HWND MainWnd()const;
 	float AspectRatio()const;
 
 	//************************************
@@ -49,7 +49,7 @@ public:
 
 	virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	virtual FWindow* CreateMainWindow()override;
+	virtual std::shared_ptr<FWindow> CreateMainWindow()override;
 	virtual FApp* GetOwnApp()override;
 
 protected:
@@ -86,7 +86,7 @@ protected:
 
 	static FWinsApp* mApp;
 
-	std::unique_ptr<FWin32Window> mWindowIns;
+	std::shared_ptr<FWin32Window> mWindowIns;
 
 	HINSTANCE mhAppInst = nullptr; // application instance handle
 	HWND	  mhMainWnd = nullptr; // main window handle
