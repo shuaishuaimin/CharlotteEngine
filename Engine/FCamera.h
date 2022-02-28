@@ -2,6 +2,7 @@
 
 #include "FWinsApp.h"
 #include "BaseData.h"
+#include "FMathHelper.h"
 
 class Camera
 {

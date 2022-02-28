@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "FWin32Window.h"
 
-FWin32Window::FWin32Window(WNDPROC MainWndProcs)
+FWin32Window::FWin32Window(WNDPROC MainWndProcs, HINSTANCE Instance) : MainWndProcIns(MainWndProcs),
+				mhAppInst(Instance)
 {
 	assert(Win32Window == nullptr);
 	Win32Window = this;
@@ -18,7 +19,7 @@ HWND FWin32Window::MainWnd()const
 }
 float FWin32Window::AspectRatio()const
 {
-	return 0.0f;
+	return static_cast<float>(mClientWidth) / mClientHeight;
 }
 
 bool FWin32Window::InitMainWindow()
