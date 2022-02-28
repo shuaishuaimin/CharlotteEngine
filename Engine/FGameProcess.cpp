@@ -10,7 +10,7 @@ using Microsoft::WRL::ComPtr;
 using namespace DirectX::PackedVector;
 using std::string;
 
-FGameProcess::FGameProcess(HINSTANCE hInstance) : FApp(hInstance), ColorIndex(0), VertexNumDrawed(0)
+FGameProcess::FGameProcess(HINSTANCE hInstance) : FWinsApp(hInstance), ColorIndex(0), VertexNumDrawed(0)
 {
 	TestColors.push_back(XMFLOAT4(Colors::Blue));
 	TestColors.push_back(XMFLOAT4(Colors::DarkGray));
@@ -31,7 +31,7 @@ FGameProcess::~FGameProcess()
 
 bool FGameProcess::Initialize()
 {
-	if (!FApp::Initialize())
+	if (!FWinsApp::Initialize())
 		return false;
 
 	// reset
@@ -55,7 +55,7 @@ bool FGameProcess::Initialize()
 
 void FGameProcess::OnResize()
 {
-	FApp::OnResize();
+	FWinsApp::OnResize();
 	ConstructProjectionMatrix();
 }
 

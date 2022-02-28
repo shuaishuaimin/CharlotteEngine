@@ -1,11 +1,11 @@
 #pragma once
 
-#include "FApp.h"
+#include "FWinsApp.h"
 #include "FMathHelper.h"
 #include "FUploadBuffer.h"
 #include "BaseData.h"
 
-class FGameProcess : public FApp
+class FGameProcess : public FWinsApp
 {
 public:
 	FGameProcess(HINSTANCE hInstance);

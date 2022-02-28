@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FApp.h"
+#include "FWinsApp.h"
 #include <WindowsX.h>
 
 using Microsoft::WRL::ComPtr;
@@ -11,23 +11,23 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	// forward hwnd on because we can get message (e.g: WM_CREATE)
 	// before CreateWindow returns, and thus before mhMainWnd is valid.
-	return FApp::GetApp()->MsgProc(hwnd, msg, wParam, lParam);
+	return FWinsApp::GetApp()->MsgProc(hwnd, msg, wParam, lParam);
 }
 
-FApp* FApp::mApp = nullptr;
-FApp* FApp::GetApp()
+FWinsApp* FWinsApp::mApp = nullptr;
+FWinsApp* FWinsApp::GetApp()
 {
 	return mApp;
 }
 
-FApp::FApp(HINSTANCE hInstance) : mhAppInst(hInstance)
+FWinsApp::FWinsApp(HINSTANCE hInstance) : mhAppInst(hInstance)
 {
 	// only one D3DApp can be construct
 	assert(mApp == nullptr);
 	mApp = this;
 }
 
-FApp::~FApp()
+FWinsApp::~FWinsApp()
 {
 	// if device is empty, flush the command list(queue)
 	if (md3dDevice != nullptr)
@@ -36,25 +36,25 @@ FApp::~FApp()
 	}
 }
 
-HINSTANCE FApp::AppInst()const
+HINSTANCE FWinsApp::AppInst()const
 {
 	return mhAppInst;
 }
-HWND FApp::MainWnd()const
+HWND FWinsApp::MainWnd()const
 {
 	return mhMainWnd;
 }
-float FApp::AspectRatio()const
+float FWinsApp::AspectRatio()const
 {
 	return static_cast<float>(mClientWidth) / mClientHeight;
 }
 
-bool FApp::Get4xMsaaState()const
+bool FWinsApp::Get4xMsaaState()const
 {
 	return m4xMsaaState;
 }
 
-void FApp::Set4xMsaaState(bool value)
+void FWinsApp::Set4xMsaaState(bool value)
 {
 	if (m4xMsaaState != value)
 	{
@@ -67,7 +67,7 @@ void FApp::Set4xMsaaState(bool value)
 }
 
 // main thread
-int FApp::Run()
+int FWinsApp::Run()
 {
 	MSG msg = { 0 };
 
@@ -105,7 +105,7 @@ int FApp::Run()
 	return (int)msg.wParam;
 }
 
-bool FApp::Initialize()
+bool FWinsApp::Initialize()
 {
 	// only mainwindow or directx3D is not inited, return initialize failed;
 	if (!InitMainWindow()) return false;
@@ -122,7 +122,7 @@ bool FApp::Initialize()
 // their type is D3D12_DESCRIPTOR_HEAP_DESC
 // we should create description and its own information, that is way to explain heap 
 //	data in heap can not be explained by computer without explain
-void FApp::CreateRtvAndDsvDescriptorHeaps()
+void FWinsApp::CreateRtvAndDsvDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
 	rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
@@ -146,7 +146,7 @@ void FApp::CreateRtvAndDsvDescriptorHeaps()
 
 // resize
 // we must create device, swapchain and directcmdlist
-void FApp::OnResize()
+void FWinsApp::OnResize()
 {
 	assert(md3dDevice);
 	assert(mSwapChain);
@@ -250,7 +250,7 @@ void FApp::OnResize()
 }
 
 
-LRESULT FApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT FWinsApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -387,7 +387,7 @@ LRESULT FApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-bool FApp::InitMainWindow()
+bool FWinsApp::InitMainWindow()
 {
 	WNDCLASS wc;
 	wc.style = CS_HREDRAW | CS_VREDRAW;
@@ -429,7 +429,7 @@ bool FApp::InitMainWindow()
 	return true;
 }
 
-bool FApp::InitDirect3D()
+bool FWinsApp::InitDirect3D()
 {
 #if defined(DEBUG) || defined(_DEBUG)
 	//enable the d3d12 debug layer
@@ -495,7 +495,7 @@ bool FApp::InitDirect3D()
 	return true;
 }
 
-void FApp::CreateCommandObjects()
+void FWinsApp::CreateCommandObjects()
 {
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
@@ -519,7 +519,7 @@ void FApp::CreateCommandObjects()
 
 }
 
-void FApp::CreateSwapChain()
+void FWinsApp::CreateSwapChain()
 {
 	// Release the previous swapchain we will be recreating
 	mSwapChain.Reset();
@@ -546,7 +546,7 @@ void FApp::CreateSwapChain()
 		mCommandQueue.Get(), &sd, mSwapChain.GetAddressOf()));
 }
 
-void FApp::FlushCommandQueue()
+void FWinsApp::FlushCommandQueue()
 {
 	// advance the fence value to mark commands up to this fence point
 	mCurrentFence++;
@@ -570,24 +570,24 @@ void FApp::FlushCommandQueue()
 	}
 
 }
-ID3D12Resource* FApp::CurrentBackBuffer()const
+ID3D12Resource* FWinsApp::CurrentBackBuffer()const
 {
 	return mSwapChainBuffer[mCurrBackBuffer].Get();
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE FApp::CurrentBackBufferView()const
+D3D12_CPU_DESCRIPTOR_HANDLE FWinsApp::CurrentBackBufferView()const
 {
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE(
 		mRtvHeap->GetCPUDescriptorHandleForHeapStart(),
 		mCurrBackBuffer, mRtvDescriptorSize);
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE FApp::DepthStencilView()const
+D3D12_CPU_DESCRIPTOR_HANDLE FWinsApp::DepthStencilView()const
 {
 	return mDsvHeap->GetCPUDescriptorHandleForHeapStart();
 }
 
-void FApp::CalculateFrameStats()
+void FWinsApp::CalculateFrameStats()
 {
 	static int frameCnt = 0;
 	static float timeElapsed = 0.0f;
@@ -616,7 +616,7 @@ void FApp::CalculateFrameStats()
 
 }
 
-void FApp::LogAdapters()
+void FWinsApp::LogAdapters()
 {
 	UINT i = 0;
 	IDXGIAdapter* adapter = nullptr;
@@ -643,7 +643,7 @@ void FApp::LogAdapters()
 		ReleaseCom(adapterList[i]);
 	}
 }
-void FApp::LogAdapterOutputs(IDXGIAdapter* adapter)
+void FWinsApp::LogAdapterOutputs(IDXGIAdapter* adapter)
 {
 	UINT i = 0;
 	IDXGIOutput* output = nullptr;
@@ -665,7 +665,7 @@ void FApp::LogAdapterOutputs(IDXGIAdapter* adapter)
 	}
 }
 
-void FApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
+void FWinsApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 {
 	UINT count = 0;
 	UINT flags = 0;
@@ -692,4 +692,15 @@ void FApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 
 
 
+FWindow* FWinsApp::CreateMainWindow()
+{
+	return nullptr;
+}
+FApp* FWinsApp::GetOwnApp()
+{
+	return this;
+}
+void FWinsApp::Init()
+{
 
+}

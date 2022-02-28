@@ -144,6 +144,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Engine\FApp.h" />
+    <ClInclude Include="Engine\FWindow.h" />
+    <ClInclude Include="Engine\FWinsApp.h" />
     <ClInclude Include="Engine\BaseData.h" />
     <ClInclude Include="Engine\d3dx12.h" />
     <ClInclude Include="Engine\FCamera.h" />
@@ -155,14 +157,13 @@
     <ClInclude Include="Engine\FUploadBuffer.h" />
     <ClInclude Include="Engine\FMathHelper.h" />
     <ClInclude Include="Engine\FUtil.h" />
-    <ClInclude Include="Engine\FWinApp.h" />
-    <ClInclude Include="Engine\MainWindow.h" />
     <ClInclude Include="Engine\FWin32Window.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\DDSTextureLoader.cpp" />
-    <ClCompile Include="Engine\FApp.cpp" />
+    <ClCompile Include="Engine\FWin32Window.cpp" />
+    <ClCompile Include="Engine\FWinsApp.cpp" />
     <ClCompile Include="Engine\FCamera.cpp" />
     <ClCompile Include="Engine\FDataProcessor.cpp" />
     <ClCompile Include="Engine\FGameProcess.cpp" />

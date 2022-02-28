@@ -84,9 +84,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FApp.h">
-      <Filter>Header Files\Platform\App</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\d3dx12.h">
       <Filter>Header Files\BaseCode</Filter>
     </ClInclude>
@@ -120,20 +117,20 @@
     <ClInclude Include="Engine\FGameProcess.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\MainWindow.h">
-      <Filter>Header Files\Platform</Filter>
+    <ClInclude Include="Engine\FWinsApp.h">
+      <Filter>Header Files\Platform\Windows\WindowsAPI\WinApp</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FApp.h">
+      <Filter>Header Files\Platform\App</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FWindow.h">
+      <Filter>Header Files\Platform\App</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FWin32Window.h">
-      <Filter>Header Files\Platform\Windows\WindowsAPI</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\FWinApp.h">
-      <Filter>Header Files\Platform\Windows\WindowsAPI\WinApp</Filter>
+      <Filter>Header Files\Platform\Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Engine\FApp.cpp">
-      <Filter>Source Files\Platform\App</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\DDSTextureLoader.cpp">
       <Filter>Source Files\BaseCode</Filter>
     </ClCompile>
@@ -166,6 +163,12 @@
     </ClCompile>
     <ClCompile Include="WinMain.cpp">
       <Filter>Source Files\MainFunction</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FWinsApp.cpp">
+      <Filter>Source Files\Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FWin32Window.cpp">
+      <Filter>Source Files\Platform\Windows</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
