@@ -136,7 +136,7 @@ void FGameProcess::Draw(const FGameTimer& gt)
 	{
 		auto count = mMeshGeo->DrawArgs[MeshName.first].IndexCount;
 		mCommandList->DrawIndexedInstanced(
-			mMeshGeo->DrawArgs[MeshName.first].IndexCount,
+			mMeshGeo->DrawArgs[MeshName.first].IndexCount*3,
 			1, 0, 0, 0);
 	}
 

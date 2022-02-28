@@ -26,7 +26,6 @@ protected:
 	virtual ~FWinsApp();
 
 public:
-
 	static FWinsApp* GetApp();
 
 	HINSTANCE AppInst()const;
