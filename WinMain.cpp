@@ -13,11 +13,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 
 	try
 	{
-		FGameProcess theApp(hInstance);
-		if (!theApp.Initialize())
-			return 0;
-
-		return theApp.Run();
+		std::shared_ptr<FApp> theApp = std::make_shared<FGameProcess>(hInstance);
+		
+		return FPlatformAPI::InitResult(theApp);
 	}
 	catch (DxException& e)
 	{

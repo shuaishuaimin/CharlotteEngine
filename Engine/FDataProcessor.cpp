@@ -21,7 +21,7 @@ void FDataProcessor::LoadMesh(const std::string& FileName, Charalotte::FMeshInfo
 	Charalotte::FMeshInfoForPrint& TempMeshInfo = MeshInfo;
 	ifstream file("BinaryMeshFiles/" + FileName, ios::in | ios::binary);
 	if (!file)
-	{
+	{	
 		return;
 	}
 	int MeshNameLength;

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FWin32Window.h"
 
-FWin32Window::FWin32Window(HINSTANCE hInstance, WNDPROC MainWndProcs)
+FWin32Window::FWin32Window(WNDPROC MainWndProcs)
 {
 	assert(Win32Window == nullptr);
 	Win32Window = this;

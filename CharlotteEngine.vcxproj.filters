@@ -79,6 +79,9 @@
     <Filter Include="Header Files\Platform\Windows\WindowsAPI\WinApp">
       <UniqueIdentifier>{bcefa897-75ff-4d6b-817b-fa766bed6c66}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Platform\API">
+      <UniqueIdentifier>{b7b2e2b4-f415-466b-b795-e1a1304cdd00}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -129,6 +132,9 @@
     <ClInclude Include="Engine\FWin32Window.h">
       <Filter>Header Files\Platform\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\FPlatformAPI.h">
+      <Filter>Header Files\Platform\API</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\DDSTextureLoader.cpp">
@@ -169,6 +175,9 @@
     </ClCompile>
     <ClCompile Include="Engine\FWin32Window.cpp">
       <Filter>Source Files\Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FPlatformAPI.cpp">
+      <Filter>Source Files\Platform</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

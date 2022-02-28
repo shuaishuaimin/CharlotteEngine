@@ -10,6 +10,8 @@
 #include <fstream>
 #include <sstream>
 #include <cassert>
+#include "FApp.h"
+#include "FPlatformAPI.h"
 
 #if PLATFORM_WINDOWS
 #include <windows.h>

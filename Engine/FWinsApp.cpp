@@ -389,6 +389,8 @@ LRESULT FWinsApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 bool FWinsApp::InitMainWindow()
 {
+	/*mWindowIns = std::make_unique<FWin32Window>(MainWndProc);
+	return mWindowIns->InitMainWindow();*/
 	WNDCLASS wc;
 	wc.style = CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = MainWndProc;
@@ -699,8 +701,4 @@ FWindow* FWinsApp::CreateMainWindow()
 FApp* FWinsApp::GetOwnApp()
 {
 	return this;
-}
-void FWinsApp::Init()
-{
-
 }

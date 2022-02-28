@@ -35,6 +35,7 @@ bool FGameProcess::Initialize()
 		return false;
 
 	// reset
+
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 	BuildDescriptorHeaps();
 	BulidConstantBuffers();
@@ -286,16 +287,26 @@ void FGameProcess::BuildShadersAndInputLayOut()
 }
 void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
 {
-
 	Charalotte::FMeshInfoForPrint MeshInfo;
-	FDataProcessor::LoadMesh(GeometryName, MeshInfo);
+	// save mesh data buffer
+	auto MeshInfoFind = MeshInfoDir.find(GeometryName);
+	if (MeshInfoFind != MeshInfoDir.end())
+	{
+		MeshInfo = MeshInfoFind->second;
+	}
+	else
+	{
+		FDataProcessor::LoadMesh(GeometryName, MeshInfo);
+		MeshInfoDir.insert(std::make_pair(GeometryName, MeshInfo));
+	}
+	
 	std::string Name = GeometryName;
 	if (MeshInfo.LodInfos.size() <= 0)
 	{
-		return;
 		std::stringstream ss;
 		ss << GeometryName << "No result";
 		OutputDebugStringA(ss.str().c_str());
+		return;
 	}
 	auto ArrayData = MeshInfo.LodInfos[0].VerticesLocation.data();
 	XMFLOAT4 VertexColor;

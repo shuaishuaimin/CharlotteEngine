@@ -6,7 +6,7 @@ class FWin32Window : public FWindow
 {
 public: 
 
-	FWin32Window(HINSTANCE hInstance, WNDPROC MainWndProcs);
+	FWin32Window(WNDPROC MainWndProcs);
 	FWin32Window(const FWin32Window& rhs) = delete;
 	FWin32Window& operator=(const FWin32Window& rhs) = delete;
 	virtual ~FWin32Window();

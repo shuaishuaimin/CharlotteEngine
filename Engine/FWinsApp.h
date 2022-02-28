@@ -9,6 +9,7 @@
 #include "FUtil.h"
 #include "FApp.h"
 #include "FGameTimer.h"
+#include "FWin32Window.h"
 
 // link necessary lib
 #pragma comment(lib,"d3dcompiler.lib")
@@ -42,15 +43,14 @@ public:
 	bool Get4xMsaaState()const;
 	void Set4xMsaaState(bool value);
 
-	int Run();
+	virtual int Run() override;
 
-	virtual bool Initialize();
+	virtual bool Initialize()override;
 
 	virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	virtual FWindow* CreateMainWindow()override;
 	virtual FApp* GetOwnApp()override;
-	virtual void Init()override;
 
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
@@ -85,6 +85,8 @@ protected:
 protected:
 
 	static FWinsApp* mApp;
+
+	std::unique_ptr<FWin32Window> mWindowIns;
 
 	HINSTANCE mhAppInst = nullptr; // application instance handle
 	HWND	  mhMainWnd = nullptr; // main window handle
