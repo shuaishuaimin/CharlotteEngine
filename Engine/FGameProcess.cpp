@@ -126,16 +126,16 @@ void FGameProcess::Draw(const FGameTimer& gt)
 
 	for (auto& MeshGeo : MeshGeoArray)
 	{
-		auto VertexBufferView = MeshGeo.VertexBufferView();
-		auto IndexBufferView = MeshGeo.IndexBufferView();
+		auto VertexBufferView = MeshGeo->VertexBufferView();
+		auto IndexBufferView = MeshGeo->IndexBufferView();
 		mCommandList->IASetVertexBuffers(0, 1, &VertexBufferView);
 		mCommandList->IASetIndexBuffer(&IndexBufferView);
 		mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		mCommandList->SetName(L"COOL");
 		mCommandList->SetGraphicsRootDescriptorTable(0, mCbvHeap->GetGPUDescriptorHandleForHeapStart());
-		auto count = MeshGeo.DrawArgs[MeshGeo.Name].IndexCount;
+		auto count = MeshGeo->DrawArgs[MeshGeo->Name].IndexCount;
 		mCommandList->DrawIndexedInstanced(
-			MeshGeo.DrawArgs[MeshGeo.Name].IndexCount,
+			MeshGeo->DrawArgs[MeshGeo->Name].IndexCount,
 			1, 0, 0, 0);
 	}
 
@@ -310,7 +310,7 @@ void FGameProcess::BuildShadersAndInputLayOut()
 void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
 {
 	Charalotte::FMeshInfoForPrint MeshInfo;
-	MeshGeometry MeshGeo;
+	std::shared_ptr<MeshGeometry> MeshGeo = std::make_shared<MeshGeometry>();
 	// save mesh data buffer
 	auto MeshInfoFind = MeshInfoDir.find(GeometryName);
 	if (MeshInfoFind != MeshInfoDir.end())
@@ -380,20 +380,20 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 		vertex.Pos = Float3;
 		if (IsUseNormalToColor)
 		{
-			VertexColor.x = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].x * 0.5 + 0.5;
-			VertexColor.y = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].y * 0.5 + 0.5;
-			VertexColor.z = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].z * 0.5 + 0.5;
-			VertexColor.w = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].w * 0.5 + 0.5;
+			VertexColor.x = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].x * 0.5f + 0.5f;
+			VertexColor.y = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].y * 0.5f + 0.5f;
+			VertexColor.z = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].z * 0.5f + 0.5f;
+			VertexColor.w = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].w * 0.5f + 0.5f;
 		}
 		vertex.Color = VertexColor;
-		MeshGeo.vertices.push_back(vertex);
+		MeshGeo->vertices.push_back(vertex);
 		VertexIndex ++;
 	}
 
 	for (const auto& index : MeshInfo.LodInfos[0].Indices)
 	{
 		int32_t VertexIndex = index;
-		MeshGeo.indices.push_back(static_cast<int16_t>(VertexIndex));
+		MeshGeo->indices.push_back(static_cast<int16_t>(VertexIndex));
 	}
 
 	SubmeshGeometry submesh;
@@ -401,8 +401,8 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
 
-	MeshGeo.DrawArgs[GeometryName] = submesh;
-	MeshGeo.Name = GeometryName;
+	MeshGeo->DrawArgs[GeometryName] = submesh;
+	MeshGeo->Name = GeometryName;
 
 	MeshGeoArray.push_back(MeshGeo);
 }
@@ -411,24 +411,24 @@ void FGameProcess::BuildMeshGeometrys()
 {
 	for (auto& MeshGeo : MeshGeoArray)
 	{
-		const UINT vbByteSize = (UINT)MeshGeo.vertices.size() * sizeof(Charalotte::Vertex);
-		const UINT ibByteSize = (UINT)MeshGeo.indices.size() * sizeof(int);
-		ThrowIfFailed(D3DCreateBlob(vbByteSize, &MeshGeo.VertexBufferCPU));
-		CopyMemory(MeshGeo.VertexBufferCPU->GetBufferPointer(), MeshGeo.vertices.data(), vbByteSize);
+		const UINT vbByteSize = (UINT)MeshGeo->vertices.size() * sizeof(Charalotte::Vertex);
+		const UINT ibByteSize = (UINT)MeshGeo->indices.size() * sizeof(int);
+		ThrowIfFailed(D3DCreateBlob(vbByteSize, &MeshGeo->VertexBufferCPU));
+		CopyMemory(MeshGeo->VertexBufferCPU->GetBufferPointer(), MeshGeo->vertices.data(), vbByteSize);
 
-		ThrowIfFailed(D3DCreateBlob(ibByteSize, &MeshGeo.IndexBufferCPU));
-		CopyMemory(MeshGeo.IndexBufferCPU->GetBufferPointer(), MeshGeo.indices.data(), ibByteSize);
+		ThrowIfFailed(D3DCreateBlob(ibByteSize, &MeshGeo->IndexBufferCPU));
+		CopyMemory(MeshGeo->IndexBufferCPU->GetBufferPointer(), MeshGeo->indices.data(), ibByteSize);
 
-		MeshGeo.VertexBufferGPU = FUtil::CreateDefaultBuffer(md3dDevice.Get(),
-			mCommandList.Get(), MeshGeo.vertices.data(), vbByteSize, MeshGeo.VertexBufferUploader);
+		MeshGeo->VertexBufferGPU = FUtil::CreateDefaultBuffer(md3dDevice.Get(),
+			mCommandList.Get(), MeshGeo->vertices.data(), vbByteSize, MeshGeo->VertexBufferUploader);
 
-		MeshGeo.IndexBufferGPU = FUtil::CreateDefaultBuffer(md3dDevice.Get(),
-			mCommandList.Get(), MeshGeo.indices.data(), ibByteSize, MeshGeo.IndexBufferUploader);
+		MeshGeo->IndexBufferGPU = FUtil::CreateDefaultBuffer(md3dDevice.Get(),
+			mCommandList.Get(), MeshGeo->indices.data(), ibByteSize, MeshGeo->IndexBufferUploader);
 
-		MeshGeo.VertexByteStride = sizeof(Charalotte::Vertex);
-		MeshGeo.VertexBufferByteSize = vbByteSize;
-		MeshGeo.IndexFormat = DXGI_FORMAT_R16_UINT;
-		MeshGeo.IndexBufferByteSize = ibByteSize;
+		MeshGeo->VertexByteStride = sizeof(Charalotte::Vertex);
+		MeshGeo->VertexBufferByteSize = vbByteSize;
+		MeshGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
+		MeshGeo->IndexBufferByteSize = ibByteSize;
 	}
 
 

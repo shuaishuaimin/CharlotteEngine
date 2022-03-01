@@ -51,7 +51,7 @@ private:
 	std::unique_ptr<UploadBuffer<Charalotte::ObjectConstants>> mObjectCB = nullptr;
 
 	std::unique_ptr<MeshGeometry> mMeshGeo = nullptr;
-	std::vector<MeshGeometry> MeshGeoArray;
+	std::vector<std::shared_ptr<MeshGeometry>> MeshGeoArray;
 	std::unordered_map<std::string, SubmeshGeometry> NameMeshDir;
 	std::unordered_map<std::string, uint32_t> RepeatName;
 
