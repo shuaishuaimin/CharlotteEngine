@@ -104,12 +104,6 @@ namespace Charalotte
 		std::vector<Charalotte::FActorInfo> ActorsInfo;
 	};
 
-	struct FMeshsInEnviroument
-	{
-		std::string AssetName;
-		std::unique_ptr<MeshGeometry> MeshGeometryIns = nullptr;
-	};
-
 	struct CameraData
 	{
 		DirectX::XMVECTOR Location = DirectX::XMVectorZero();
@@ -121,13 +115,12 @@ namespace Charalotte
 		float Far = 1000.0f;
 	};
 
-	struct MVPTransformData
+	struct VPTransformData
 	{
-		DirectX::XMMATRIX WorldTransform;
 		DirectX::XMMATRIX ViewTransform;
 		DirectX::XMMATRIX ProjectionTransform;
 
-		DirectX::XMMATRIX MVPMatrix;
+		DirectX::XMMATRIX VPMatrix;
 	};
 
 	struct CameraTransform

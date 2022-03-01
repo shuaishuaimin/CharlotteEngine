@@ -4,74 +4,72 @@
 
 using namespace DirectX;
 
-Camera::Camera(const Charalotte::CameraData& Data) : MainCameraData(Data), Sensitivity(0.25)
+FCamera::FCamera(const Charalotte::CameraData& Data) : MainCameraData(Data), Sensitivity(0.25)
 {
-	cameraTransform.WorldTransform = XMLoadFloat4x4(&mWorld);
-	cameraTransform.ViewTransform = XMLoadFloat4x4(&mView);
-	cameraTransform.ProjectionTransform = XMLoadFloat4x4(&mProj);
+	VPTransform.ViewTransform = XMLoadFloat4x4(&mView);
+	VPTransform.ProjectionTransform = XMLoadFloat4x4(&mProj);
 	MVPMatrix = XMLoadFloat4x4(&mMVP);
-	CalcMVPMatrix();
+	CalcVPMatrix();
 }
-Camera::~Camera()
+FCamera::~FCamera()
 {
 
 }
 
-void Camera::GetMVPTransform(DirectX::XMMATRIX& Matrix)
+void FCamera::GetVPTransform(DirectX::XMMATRIX& Matrix)
 {
 	Matrix = MVPMatrix;
 }
 
-void Camera::TransformCamera(const Charalotte::CameraTransform& Transform, DirectX::XMMATRIX& NewMvpMatrix)
+// Can not use
+void FCamera::TransformCamera(const Charalotte::CameraTransform& Transform)
 {
 	XMMATRIX DisplacementMatrix = XMMatrixTranslation(Transform.Translation.x, Transform.Translation.y, Transform.Translation.z);
-	MainCameraData.Location = FMathHelper::VectorMultipyMatrix(MainCameraData.Location, XMMatrixTranspose(DisplacementMatrix));
+	MainCameraData.Location = FMathHelper::VectorMultipyMatrix(MainCameraData.Location, DisplacementMatrix);
 	XMMATRIX RotateMatrix = XMMatrixRotationRollPitchYaw(Transform.pitch, Transform.yaw, Transform.row);
-
-	XMFLOAT4 LocationFloat;
-	XMStoreFloat4(&LocationFloat, MainCameraData.Location);
-	XMMATRIX TransToZero = XMMatrixTranslation(-1.0f * LocationFloat.x, -1.0f * LocationFloat.y, -1.0f * LocationFloat.z);
-	XMMATRIX TransZeroToBack = XMMatrixTranslation(LocationFloat.x, LocationFloat.y, LocationFloat.z);
+	MainCameraData.Target = FMathHelper::VectorMultipyMatrix(MainCameraData.Target, RotateMatrix);
+	MainCameraData.Up = FMathHelper::VectorMultipyMatrix(MainCameraData.Up, RotateMatrix);
+	CalcVPMatrix();
 }
 
-void Camera::ChangeAspectRatio(float NewAspectRatio)
+void FCamera::ChangeAspectRatio(float NewAspectRatio)
 {
 	MainCameraData.AspectRatio = NewAspectRatio;
-	CalcMVPMatrix();
+	CalcVPMatrix();
 }
 
-void Camera::ChangeFovAngle(float NewFovAngle)
+void FCamera::ChangeFovAngle(float NewFovAngle)
 {
 	MainCameraData.FovAngleY = NewFovAngle;
-	CalcMVPMatrix();
+	CalcVPMatrix();
 }
 
-void Camera::AddFovAngle(float AngleForAdd)
+void FCamera::AddFovAngle(float AngleForAdd)
 {
 	MainCameraData.FovAngleY += AngleForAdd;
-	CalcMVPMatrix();
+	CalcVPMatrix();
 }
 
-void Camera::GetCameraData(Charalotte::CameraData& Data)
+void FCamera::GetCameraData(Charalotte::CameraData& Data)
 {
 	Data = MainCameraData;
-	CalcMVPMatrix();
+	CalcVPMatrix();
 }
 
-void Camera::CalcMVPMatrix()
+void FCamera::CalcVPMatrix()
 {
-	XMMATRIX world = XMLoadFloat4x4(&mWorld);
 	XMMATRIX view = XMMatrixLookAtLH(MainCameraData.Location,
 		MainCameraData.Target, MainCameraData.Up);
 	XMStoreFloat4x4(&mView, view);
-	cameraTransform.ViewTransform = view;
+	VPTransform.ViewTransform = view;
 
 	XMMATRIX proj;
 	proj = XMMatrixPerspectiveFovLH(MainCameraData.FovAngleY,
 		MainCameraData.AspectRatio, MainCameraData.Near, MainCameraData.Far);
-	cameraTransform.ProjectionTransform = proj;
+	VPTransform.ProjectionTransform = proj;
 	XMStoreFloat4x4(&mProj, proj);
 
-	cameraTransform.MVPMatrix = world * view * proj;
+	VPTransform.VPMatrix = view * proj;
+	MVPMatrix =view * proj;
 }
 

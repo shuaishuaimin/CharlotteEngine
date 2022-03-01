@@ -4,6 +4,7 @@
 #include "FMathHelper.h"
 #include "FUploadBuffer.h"
 #include "BaseData.h"
+#include "FCamera.h"
 
 class FGameProcess : public FWinsApp
 {
@@ -25,6 +26,7 @@ private:
 	virtual void OnMouseDown(WPARAM btnState, int x, int y)override;
 	virtual void OnMouseUp(WPARAM btnState, int x, int y)override;
 	virtual void OnMouseMove(WPARAM btnState, int x, int y)override;
+	virtual void OnKeyBoardInput(const FGameTimer& gt)override;
 
 	// Help function
 	void ConstructProjectionMatrix();
@@ -49,7 +51,7 @@ private:
 	std::unique_ptr<UploadBuffer<Charalotte::ObjectConstants>> mObjectCB = nullptr;
 
 	std::unique_ptr<MeshGeometry> mMeshGeo = nullptr;
-	std::vector<Charalotte::FMeshsInEnviroument> mEnviroument;
+	std::vector<MeshGeometry> MeshGeoArray;
 	std::unordered_map<std::string, SubmeshGeometry> NameMeshDir;
 	std::unordered_map<std::string, uint32_t> RepeatName;
 
@@ -66,9 +68,15 @@ private:
 	DirectX::XMFLOAT4X4 mView = FMathHelper::Identity4x4();
 	DirectX::XMFLOAT4X4 mProj = FMathHelper::Identity4x4();
 
+	std::unique_ptr<FCamera> MainCamera;
+	Charalotte::CameraTransform CameraTrans;
+	Charalotte::CameraTransform DefaultCameraTrans;
 	// this num we can change
+	//float mTheta = 1.5f * DirectX::XM_PI;	//??
+	//float mPhi = DirectX::XM_PIDIV2;
 	float mTheta = 1.5f * DirectX::XM_PI;	//??
-	float mPhi = DirectX::XM_PIDIV4;
+	float mPhi = DirectX::XM_PIDIV2;
+	//DirectX::XM_PIDIV4
 	float mRadius = 50.0f;
 
 	float mSensitivity = 0.25f;

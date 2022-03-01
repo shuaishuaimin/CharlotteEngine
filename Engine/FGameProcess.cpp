@@ -12,6 +12,16 @@ using std::string;
 
 FGameProcess::FGameProcess(HINSTANCE hInstance) : FWinsApp(hInstance), ColorIndex(0), VertexNumDrawed(0)
 {
+	Charalotte::CameraData CameraData;
+	CameraData.Near = 1.0f;
+	CameraData.Far = 1000.0f;
+	CameraData.FovAngleY = 0.25f * FMathHelper::Pi;
+	CameraData.AspectRatio = AspectRatio();
+	CameraData.Location = XMVectorSet(-50.0f, 0.0f, 0.0f, 1.0f);
+	CameraData.Target = XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f);
+	CameraData.Up = XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f);
+
+	MainCamera = std::make_unique<FCamera>(CameraData);
 	TestColors.push_back(XMFLOAT4(Colors::Blue));
 	TestColors.push_back(XMFLOAT4(Colors::DarkGray));
 	TestColors.push_back(XMFLOAT4(Colors::DarkCyan));
@@ -40,9 +50,10 @@ bool FGameProcess::Initialize()
 	BuildDescriptorHeaps();
 	BulidConstantBuffers();
 	BuildRootSignature();
-	BuildShadersAndInputLayOut();
+	//BuildShadersAndInputLayOut();
 	//BuildBoxGeometry("MatineeCam_SM.dat");
 	BuildEnviroument("ThirdPersonExampleMap.dat");
+	BuildShadersAndInputLayOut();
 	BuildPSO();
 	TestFunc();
 
@@ -69,26 +80,29 @@ void FGameProcess::ConstructProjectionMatrix()
 
 void FGameProcess::Update(const FGameTimer& gt)
 {
-	// Convert spherical to cartesian coordinates
-	float x = mRadius * sinf(mPhi) * cosf(mTheta);
-	float z = mRadius * sinf(mPhi) * sinf(mTheta);
-	float y = mRadius * cosf(mPhi);
+	OnKeyBoardInput(gt);
+	//// Convert spherical to cartesian coordinates
+	//float x = mRadius * sinf(mPhi) * cosf(mTheta);
+	//float z = mRadius * sinf(mPhi) * sinf(mTheta);
+	//float y = mRadius * cosf(mPhi);
 
-	// build the view matrix
-	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	//// build the view matrix
+	//XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
+	//XMVECTOR target = XMVectorZero();
+	//XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
-	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&mView, view);
+	//XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
+	//XMStoreFloat4x4(&mView, view);
 
-	XMMATRIX world = XMLoadFloat4x4(&mWorld);
-	XMMATRIX proj = XMLoadFloat4x4(&mProj);
-	XMMATRIX worldViewProj = world * view * proj;
+	//XMMATRIX world = XMLoadFloat4x4(&mWorld);
+	//XMMATRIX proj = XMLoadFloat4x4(&mProj);
+	//XMMATRIX worldViewProj = world * view * proj;
 
 	// update the constant buffer with the latest worldviewproj matrix
 	Charalotte::ObjectConstants objConstants;
-	XMStoreFloat4x4(&objConstants.TransMatrix, XMMatrixTranspose(worldViewProj));
+	XMMATRIX MVPTrans;
+	MainCamera->GetVPTransform(MVPTrans);
+	XMStoreFloat4x4(&objConstants.TransMatrix, XMMatrixTranspose(MVPTrans));
 	mObjectCB->CopyData(0, objConstants);
 }
 
@@ -126,17 +140,18 @@ void FGameProcess::Draw(const FGameTimer& gt)
 	// IA
 	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
-	auto VertexBufferView = mMeshGeo->VertexBufferView();
-	auto IndexBufferView = mMeshGeo->IndexBufferView();
-	mCommandList->IASetVertexBuffers(0, 1, &VertexBufferView);
-	mCommandList->IASetIndexBuffer(&IndexBufferView);
-	mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	mCommandList->SetGraphicsRootDescriptorTable(0, mCbvHeap->GetGPUDescriptorHandleForHeapStart());
-	for (const auto& MeshName : NameMeshDir)
+	for (auto& MeshGeo : MeshGeoArray)
 	{
-		auto count = mMeshGeo->DrawArgs[MeshName.first].IndexCount;
+		auto VertexBufferView = MeshGeo.VertexBufferView();
+		auto IndexBufferView = MeshGeo.IndexBufferView();
+		mCommandList->IASetVertexBuffers(0, 1, &VertexBufferView);
+		mCommandList->IASetIndexBuffer(&IndexBufferView);
+		mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		mCommandList->SetName(L"COOL");
+		mCommandList->SetGraphicsRootDescriptorTable(0, mCbvHeap->GetGPUDescriptorHandleForHeapStart());
+		auto count = MeshGeo.DrawArgs[MeshGeo.Name].IndexCount;
 		mCommandList->DrawIndexedInstanced(
-			mMeshGeo->DrawArgs[MeshName.first].IndexCount*3,
+			MeshGeo.DrawArgs[MeshGeo.Name].IndexCount,
 			1, 0, 0, 0);
 	}
 
@@ -147,7 +162,7 @@ void FGameProcess::Draw(const FGameTimer& gt)
 
 	// Done recording commands ! important ,otherwise gpu instantce will stop
 	ThrowIfFailed(mCommandList->Close());
-
+	
 	// Add the command list to the queue for execution.
 	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
 	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
@@ -177,31 +192,54 @@ void FGameProcess::OnMouseMove(WPARAM btnState, int x, int y)
 	if ((btnState & MK_LBUTTON) != 0)
 	{
 		// make each pixel correspond to a quarter of a degree
-		float dx = -1.0f * XMConvertToRadians(mSensitivity * static_cast<float>(x - mLastMousePos.x));
-		float dy = -1.0f * XMConvertToRadians(mSensitivity * static_cast<float>(y - mLastMousePos.y));
-
-		// update angles based on input to orbit camera around box;
-		mTheta += dx;
-		mPhi += dy;
-
-		// Restrict the angle mPhi
-		mPhi = FMathHelper::Clamp(mPhi, 0.1f, FMathHelper::Pi - 0.1f);
+		float dx = -0.0001f * static_cast<float>(x - mLastMousePos.x);
+		float dy = -0.1f * static_cast<float>(y - mLastMousePos.y);
+		CameraTrans.pitch += dx;
+		//CameraTrans.row += dy;
+		MainCamera->TransformCamera(CameraTrans);
+		CameraTrans = DefaultCameraTrans;
 	}
 	else if ((btnState & MK_RBUTTON) != 0)
 	{
 		// Make each pixel correspond to 0.005 unit in the scene
 		float dx = 0.005f * static_cast<float>(x - mLastMousePos.x);
 		float dy = 0.005f * static_cast<float>(y - mLastMousePos.y);
-
-		// update the camera radius based on input
-		mRadius += dx - dy;
-
-		// Restrict the radius
-		mRadius = FMathHelper::Clamp(mRadius, 30.0f, 150.0f);
+		CameraTrans.Translation.x += (dx + dy);
+		MainCamera->TransformCamera(CameraTrans);
+		CameraTrans = DefaultCameraTrans;
 	}
 
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
+}
+void FGameProcess::OnKeyBoardInput(const FGameTimer& gt)
+{
+	if (GetAsyncKeyState('A') & 0x8000)
+	{
+		CameraTrans.Translation.y += 0.01f;
+		MainCamera->TransformCamera(CameraTrans);
+		CameraTrans = DefaultCameraTrans;
+	}
+	if (GetAsyncKeyState('D') & 0x8000)
+	{
+		CameraTrans.Translation.y -= 0.01f;
+		MainCamera->TransformCamera(CameraTrans);
+		CameraTrans = DefaultCameraTrans;
+	}
+
+	if (GetAsyncKeyState('W') & 0x8000)
+	{
+		CameraTrans.Translation.z -= 0.01f;
+		MainCamera->TransformCamera(CameraTrans);
+		CameraTrans = DefaultCameraTrans;
+	}
+
+	if (GetAsyncKeyState('S') & 0x8000)
+	{
+		CameraTrans.Translation.z += 0.01f;
+		MainCamera->TransformCamera(CameraTrans);
+		CameraTrans = DefaultCameraTrans;
+	}
 }
 
 void FGameProcess::BuildDescriptorHeaps()
@@ -288,6 +326,7 @@ void FGameProcess::BuildShadersAndInputLayOut()
 void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
 {
 	Charalotte::FMeshInfoForPrint MeshInfo;
+	MeshGeometry MeshGeo;
 	// save mesh data buffer
 	auto MeshInfoFind = MeshInfoDir.find(GeometryName);
 	if (MeshInfoFind != MeshInfoDir.end())
@@ -308,7 +347,6 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 		OutputDebugStringA(ss.str().c_str());
 		return;
 	}
-	auto ArrayData = MeshInfo.LodInfos[0].VerticesLocation.data();
 	XMFLOAT4 VertexColor;
 	if (ColorIndex < TestColors.size())
 	{
@@ -330,13 +368,13 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 		// rotation and scale but i need some time to come true
 
 		// execute scale transport
-		XMMATRIX ScaleTrans = XMMatrixScaling(Transform.Scale3D.x, Transform.Scale3D.y, Transform.Scale3D.z);
+		XMMATRIX ScaleTrans = XMMatrixScaling(Transform.Scale3D.x,  Transform.Scale3D.y, Transform.Scale3D.z);
 		XMFLOAT4 NowLocation{ VertexLocation.x, VertexLocation.y, VertexLocation.z, 1.0f };
 		XMVECTOR MeshLocationVector = XMLoadFloat4(&NowLocation);
 
 		// execute rotate transport
 		XMMATRIX RotateTrans = XMMatrixRotationRollPitchYaw(Transform.Rotation.y, Transform.Rotation.z, Transform.Rotation.x);
-		Transport = ScaleTrans;
+		Transport = RotateTrans* ScaleTrans;
 
 		MeshLocationVector = FMathHelper::VectorMultipyMatrix(MeshLocationVector, XMMatrixTranspose(Transport));
 		XMStoreFloat4(&NowLocation, MeshLocationVector);
@@ -348,14 +386,13 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 
 		vertex.Pos = Float3;
 		vertex.Color = VertexColor;
-		vertices.push_back(vertex);
+		MeshGeo.vertices.push_back(vertex);
 	}
 
 	for (const auto& index : MeshInfo.LodInfos[0].Indices)
 	{
 		int32_t VertexIndex = index;
-		VertexIndex += VertexNumDrawed;
-		indices.push_back(static_cast<int16_t>(VertexIndex));
+		MeshGeo.indices.push_back(static_cast<int16_t>(VertexIndex));
 	}
 	VertexNumDrawed += MeshInfo.LodInfos[0].VerticesNum;
 
@@ -363,59 +400,38 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 	submesh.IndexCount = (UINT)(MeshInfo.LodInfos[0].Indices.size());
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
-	if (Name.size() <= 4)
-	{
-		return;
-	}
-	std::string RealActorName = Name.erase(Name.size() - 4, 4);
-	if (NameMeshDir.find(RealActorName) != NameMeshDir.end())
-	{
-		auto RepeatNameIter = RepeatName.find(RealActorName);
-		uint32_t RepeatActorAdd = 0;;
-		if (RepeatNameIter != RepeatName.end())
-		{
-			RepeatNameIter->second += 1;
-			RepeatActorAdd = RepeatNameIter->second;
-		}
-		else
-		{
-			RepeatName.insert(std::make_pair(RealActorName, 0));
-		}
-		RealActorName += std::to_string(static_cast<int>(RepeatActorAdd)) ;
-	}
-	NameMeshDir.insert(std::make_pair(RealActorName, submesh));
+
+	MeshGeo.DrawArgs[GeometryName] = submesh;
+	MeshGeo.Name = GeometryName;
+
+	MeshGeoArray.push_back(MeshGeo);
 }
 
 void FGameProcess::BuildMeshGeometrys()
 {
-	const UINT vbByteSize = (UINT)vertices.size() * sizeof(Charalotte::Vertex);
-	const UINT ibByteSize = (UINT)indices.size() * sizeof(int);
-
-
-	mMeshGeo = std::make_unique<MeshGeometry>();
-	mMeshGeo->Name = "meshGeo";
-
-	ThrowIfFailed(D3DCreateBlob(vbByteSize, &mMeshGeo->VertexBufferCPU));
-	CopyMemory(mMeshGeo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
-
-	ThrowIfFailed(D3DCreateBlob(ibByteSize, &mMeshGeo->IndexBufferCPU));
-	CopyMemory(mMeshGeo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
-
-	mMeshGeo->VertexBufferGPU = FUtil::CreateDefaultBuffer(md3dDevice.Get(),
-		mCommandList.Get(), vertices.data(), vbByteSize, mMeshGeo->VertexBufferUploader);
-
-	mMeshGeo->IndexBufferGPU = FUtil::CreateDefaultBuffer(md3dDevice.Get(),
-		mCommandList.Get(), indices.data(), ibByteSize, mMeshGeo->IndexBufferUploader);
-
-	mMeshGeo->VertexByteStride = sizeof(Charalotte::Vertex);
-	mMeshGeo->VertexBufferByteSize = vbByteSize;
-	mMeshGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
-	mMeshGeo->IndexBufferByteSize = ibByteSize;
-
-	for (const auto& MeshNameDir : NameMeshDir)
+	for (auto& MeshGeo : MeshGeoArray)
 	{
-		mMeshGeo->DrawArgs[MeshNameDir.first] = MeshNameDir.second;
+		const UINT vbByteSize = (UINT)MeshGeo.vertices.size() * sizeof(Charalotte::Vertex);
+		const UINT ibByteSize = (UINT)MeshGeo.indices.size() * sizeof(int);
+		ThrowIfFailed(D3DCreateBlob(vbByteSize, &MeshGeo.VertexBufferCPU));
+		CopyMemory(MeshGeo.VertexBufferCPU->GetBufferPointer(), MeshGeo.vertices.data(), vbByteSize);
+
+		ThrowIfFailed(D3DCreateBlob(ibByteSize, &MeshGeo.IndexBufferCPU));
+		CopyMemory(MeshGeo.IndexBufferCPU->GetBufferPointer(), MeshGeo.indices.data(), ibByteSize);
+
+		MeshGeo.VertexBufferGPU = FUtil::CreateDefaultBuffer(md3dDevice.Get(),
+			mCommandList.Get(), MeshGeo.vertices.data(), vbByteSize, MeshGeo.VertexBufferUploader);
+
+		MeshGeo.IndexBufferGPU = FUtil::CreateDefaultBuffer(md3dDevice.Get(),
+			mCommandList.Get(), MeshGeo.indices.data(), ibByteSize, MeshGeo.IndexBufferUploader);
+
+		MeshGeo.VertexByteStride = sizeof(Charalotte::Vertex);
+		MeshGeo.VertexBufferByteSize = vbByteSize;
+		MeshGeo.IndexFormat = DXGI_FORMAT_R16_UINT;
+		MeshGeo.IndexBufferByteSize = ibByteSize;
 	}
+
+
 }
 void FGameProcess::BuildEnviroument(const std::string& GeometryName)
 {

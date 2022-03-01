@@ -2,6 +2,7 @@
 
 
 #include "stdafx.h"
+#include "BaseData.h"
 
 extern const int gNumFrameResources;
 
@@ -135,6 +136,8 @@ struct MeshGeometry
 {
 	// Give it a name so we can look it up by name.
 	std::string Name;
+	std::vector<Charalotte::Vertex> vertices;
+	std::vector<int16_t> indices;
 
 	// System memory copies.  Use Blobs because the vertex/index format can be generic.
 	// It is up to the client to cast appropriately.  
