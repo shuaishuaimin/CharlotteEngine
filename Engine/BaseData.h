@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include "FMathHelper.h"
 
 namespace Charalotte
 {
@@ -33,30 +34,6 @@ namespace Charalotte
 			return os;
 		}
 	};
-
-	struct FLODInfo
-	{
-
-		int VerticesNum;
-
-		int TrianglesNum;
-
-		int IndicesNum;
-
-		std::vector<Charalotte::FVector> VerticesLocation;
-
-		std::vector<int> Indices;
-	};
-
-	struct FMeshInfoForPrint
-	{
-		std::string MeshName;
-
-		int LODNums;
-
-		std::vector<Charalotte::FLODInfo> LodInfos;
-	};
-
 	struct FVector4
 	{
 		float x = 0.0f;
@@ -70,6 +47,33 @@ namespace Charalotte
 			return os;
 		}
 	};
+
+	struct FLODInfo
+	{
+
+		int VerticesNum;
+
+		int TrianglesNum;
+
+		int IndicesNum;
+
+		std::vector<Charalotte::FVector> VerticesLocation;
+
+		std::vector<int> Indices;
+
+		std::vector<Charalotte::FVector4> VerticesNormal;
+	};
+
+	struct FMeshInfoForPrint
+	{
+		std::string MeshName;
+
+		int LODNums;
+
+		std::vector<Charalotte::FLODInfo> LodInfos;
+	};
+
+
 
 	struct FTransform
 	{

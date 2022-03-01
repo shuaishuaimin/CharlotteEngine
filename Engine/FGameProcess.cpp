@@ -10,7 +10,7 @@ using Microsoft::WRL::ComPtr;
 using namespace DirectX::PackedVector;
 using std::string;
 
-FGameProcess::FGameProcess(HINSTANCE hInstance) : FWinsApp(hInstance), ColorIndex(0), VertexNumDrawed(0)
+FGameProcess::FGameProcess(HINSTANCE hInstance) : FWinsApp(hInstance), ColorIndex(0)
 {
 	Charalotte::CameraData CameraData;
 	CameraData.Near = 1.0f;
@@ -81,28 +81,12 @@ void FGameProcess::ConstructProjectionMatrix()
 void FGameProcess::Update(const FGameTimer& gt)
 {
 	OnKeyBoardInput(gt);
-	//// Convert spherical to cartesian coordinates
-	//float x = mRadius * sinf(mPhi) * cosf(mTheta);
-	//float z = mRadius * sinf(mPhi) * sinf(mTheta);
-	//float y = mRadius * cosf(mPhi);
-
-	//// build the view matrix
-	//XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
-	//XMVECTOR target = XMVectorZero();
-	//XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	//XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
-	//XMStoreFloat4x4(&mView, view);
-
-	//XMMATRIX world = XMLoadFloat4x4(&mWorld);
-	//XMMATRIX proj = XMLoadFloat4x4(&mProj);
-	//XMMATRIX worldViewProj = world * view * proj;
 
 	// update the constant buffer with the latest worldviewproj matrix
 	Charalotte::ObjectConstants objConstants;
-	XMMATRIX MVPTrans;
-	MainCamera->GetVPTransform(MVPTrans);
-	XMStoreFloat4x4(&objConstants.TransMatrix, XMMatrixTranspose(MVPTrans));
+	XMMATRIX NowVPTrans;
+	MainCamera->GetVPTransform(NowVPTrans);
+	XMStoreFloat4x4(&objConstants.TransMatrix, XMMatrixTranspose(NowVPTrans));
 	mObjectCB->CopyData(0, objConstants);
 }
 
@@ -347,20 +331,29 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 		OutputDebugStringA(ss.str().c_str());
 		return;
 	}
-	XMFLOAT4 VertexColor;
-	if (ColorIndex < TestColors.size())
+	//XMFLOAT4 VertexColor;
+	//if (ColorIndex < TestColors.size())
+	//{
+	//	VertexColor = TestColors[ColorIndex];
+	//	ColorIndex++;
+	//}
+	//else
+	//{
+	//	ColorIndex = 0;
+	//	VertexColor = TestColors[ColorIndex];
+	//}
+	int VertexIndex = 0;
+	// use normal to vertex color
+	bool IsUseNormalToColor = false;
+	if (MeshInfo.LodInfos[0].VerticesLocation.size() == MeshInfo.LodInfos[0].VerticesNormal.size())
 	{
-		VertexColor = TestColors[ColorIndex];
-		ColorIndex++;
-	}
-	else
-	{
-		ColorIndex = 0;
-		VertexColor = TestColors[ColorIndex];
+		IsUseNormalToColor = true;
 	}
 
 	for (const auto& VertexLocation : MeshInfo.LodInfos[0].VerticesLocation)
 	{
+		XMFLOAT4 VertexColor = XMFLOAT4(Colors::DarkGray);
+
 		Charalotte::Vertex vertex;
 		XMFLOAT3 Float3;
 		XMMATRIX Transport;
@@ -385,8 +378,16 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 		Float3.z = (NowLocation.z + Transform.Translation.z) / 100.0f;
 
 		vertex.Pos = Float3;
+		if (IsUseNormalToColor)
+		{
+			VertexColor.x = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].x * 0.5 + 0.5;
+			VertexColor.y = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].y * 0.5 + 0.5;
+			VertexColor.z = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].z * 0.5 + 0.5;
+			VertexColor.w = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].w * 0.5 + 0.5;
+		}
 		vertex.Color = VertexColor;
 		MeshGeo.vertices.push_back(vertex);
+		VertexIndex ++;
 	}
 
 	for (const auto& index : MeshInfo.LodInfos[0].Indices)
@@ -394,7 +395,6 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 		int32_t VertexIndex = index;
 		MeshGeo.indices.push_back(static_cast<int16_t>(VertexIndex));
 	}
-	VertexNumDrawed += MeshInfo.LodInfos[0].VerticesNum;
 
 	SubmeshGeometry submesh;
 	submesh.IndexCount = (UINT)(MeshInfo.LodInfos[0].Indices.size());
@@ -471,6 +471,7 @@ void FGameProcess::BuildPSO()
 			mpsByteCode->GetBufferSize()
 	};
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	psoDesc.RasterizerState.FrontCounterClockwise = TRUE;
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	psoDesc.SampleMask = UINT_MAX;

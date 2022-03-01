@@ -85,7 +85,6 @@ private:
 	std::vector<int16_t> indices;
 	POINT mLastMousePos;
 	int ColorIndex;
-	int VertexNumDrawed;
 
 	std::unordered_map<std::string, Charalotte::FMeshInfoForPrint> MeshInfoDir;
 };
