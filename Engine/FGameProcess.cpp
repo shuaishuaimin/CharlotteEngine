@@ -331,17 +331,7 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 		OutputDebugStringA(ss.str().c_str());
 		return;
 	}
-	//XMFLOAT4 VertexColor;
-	//if (ColorIndex < TestColors.size())
-	//{
-	//	VertexColor = TestColors[ColorIndex];
-	//	ColorIndex++;
-	//}
-	//else
-	//{
-	//	ColorIndex = 0;
-	//	VertexColor = TestColors[ColorIndex];
-	//}
+
 	int VertexIndex = 0;
 	// use normal to vertex color
 	bool IsUseNormalToColor = false;
