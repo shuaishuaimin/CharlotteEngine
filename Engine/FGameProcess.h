@@ -6,6 +6,17 @@
 #include "BaseData.h"
 #include "FCamera.h"
 
+struct FActorAsset
+{
+	std::shared_ptr<MeshGeometry> MeshAsset = nullptr;
+	Charalotte::FTransform Transform;
+	std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>> ObjectCB = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CbvHeap = nullptr;
+
+	DirectX::XMMATRIX VPTrans = DirectX::XMMatrixIdentity();
+	DirectX::XMMATRIX MTrans = DirectX::XMMatrixIdentity();
+};
+
 class FGameProcess : public FWinsApp
 {
 public:
@@ -28,12 +39,12 @@ private:
 	virtual void OnMouseMove(WPARAM btnState, int x, int y)override;
 	virtual void OnKeyBoardInput(const FGameTimer& gt)override;
 
-	// Help function
-	void ConstructProjectionMatrix();
-
 	// render pipeline
-	void BuildDescriptorHeaps();
-	void BulidConstantBuffers();
+	void BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap);
+	void BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap,
+		std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>>& ObjectCb);
+	void LoadMeshs(const std::string& GeometryName);
+	void LoadActors(const Charalotte::FActorsInfoForPrint& Actor);
 	void BuildRootSignature();
 	void BuildShadersAndInputLayOut();
 	void CalcVerticesAndIndices(const std::string& GeometryName = "", const Charalotte::FTransform& Transform = Charalotte::FTransform());
@@ -41,19 +52,18 @@ private:
 	void BuildEnviroument(const std::string& MapName = "");
 	void BuildPSO();
 
-	void TestFunc();
-
 private:
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mCbvHeap = nullptr;
+	//std::vector<Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>> mCbvHeap;
 
-	std::unique_ptr<UploadBuffer<Charalotte::ObjectConstants>> mObjectCB = nullptr;
+	//std::vector<std::unique_ptr<UploadBuffer<Charalotte::ObjectConstants>>> mObjectCB;
 
-	std::unique_ptr<MeshGeometry> mMeshGeo = nullptr;
+	std::vector<std::shared_ptr<FActorAsset>> ActorArray;
+
 	std::vector<std::shared_ptr<MeshGeometry>> MeshGeoArray;
-	std::unordered_map<std::string, SubmeshGeometry> NameMeshDir;
-	std::unordered_map<std::string, uint32_t> RepeatName;
+	//std::unordered_map<std::string, SubmeshGeometry> NameMeshDir;
+	//std::unordered_map<std::string, uint32_t> RepeatName;
 
 	std::vector<DirectX::XMFLOAT4> TestColors;
 
@@ -64,27 +74,17 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> mPSO = nullptr;
 
-	DirectX::XMFLOAT4X4 mWorld = FMathHelper::Identity4x4();
-	DirectX::XMFLOAT4X4 mView = FMathHelper::Identity4x4();
-	DirectX::XMFLOAT4X4 mProj = FMathHelper::Identity4x4();
-
 	std::unique_ptr<FCamera> MainCamera;
 	Charalotte::CameraTransform CameraTrans;
 	Charalotte::CameraTransform DefaultCameraTrans;
 	// this num we can change
-	//float mTheta = 1.5f * DirectX::XM_PI;	//??
-	//float mPhi = DirectX::XM_PIDIV2;
-	float mTheta = 1.5f * DirectX::XM_PI;	//??
-	float mPhi = DirectX::XM_PIDIV2;
-	//DirectX::XM_PIDIV4
-	float mRadius = 50.0f;
-
-	float mSensitivity = 0.25f;
 
 	std::vector<Charalotte::Vertex> vertices;
 	std::vector<int16_t> indices;
 	POINT mLastMousePos;
 	int ColorIndex;
+
+	Charalotte::FActorsInfoForPrint ActorInfos;
 
 	std::unordered_map<std::string, Charalotte::FMeshInfoForPrint> MeshInfoDir;
 };

@@ -2,6 +2,7 @@
 #include <DirectXColors.h>
 #include "FGameProcess.h"
 #include "FDataProcessor.h"
+#include "FSceneAsset.h"
 #include <cstdint>
 
 
@@ -14,25 +15,14 @@ FGameProcess::FGameProcess(HINSTANCE hInstance) : FWinsApp(hInstance), ColorInde
 {
 	Charalotte::CameraData CameraData;
 	CameraData.Near = 1.0f;
-	CameraData.Far = 1000.0f;
+	CameraData.Far = 7000.0f;
 	CameraData.FovAngleY = 0.25f * FMathHelper::Pi;
 	CameraData.AspectRatio = AspectRatio();
-	CameraData.Location = XMVectorSet(-50.0f, 0.0f, 0.0f, 1.0f);
+	CameraData.Location = XMVectorSet(-5000.0f, 0.0f, 0.0f, 1.0f);
 	CameraData.Target = XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f);
 	CameraData.Up = XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f);
 
 	MainCamera = std::make_unique<FCamera>(CameraData);
-	TestColors.push_back(XMFLOAT4(Colors::Blue));
-	TestColors.push_back(XMFLOAT4(Colors::DarkGray));
-	TestColors.push_back(XMFLOAT4(Colors::DarkCyan));
-	TestColors.push_back(XMFLOAT4(Colors::Green));
-	TestColors.push_back(XMFLOAT4(Colors::Yellow));
-	TestColors.push_back(XMFLOAT4(Colors::Aqua));
-	TestColors.push_back(XMFLOAT4(Colors::Black));
-	TestColors.push_back(XMFLOAT4(Colors::White));
-	TestColors.push_back(XMFLOAT4(Colors::DarkMagenta));
-	TestColors.push_back(XMFLOAT4(Colors::Bisque));
-	TestColors.push_back(XMFLOAT4(Colors::BlanchedAlmond));
 }
 FGameProcess::~FGameProcess()
 {
@@ -47,15 +37,12 @@ bool FGameProcess::Initialize()
 	// reset
 
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
-	BuildDescriptorHeaps();
-	BulidConstantBuffers();
+
 	BuildRootSignature();
-	//BuildShadersAndInputLayOut();
-	//BuildBoxGeometry("MatineeCam_SM.dat");
-	BuildEnviroument("ThirdPersonExampleMap.dat");
+	LoadMeshs("ThirdPersonExampleMap.dat");
+	LoadActors(ActorInfos);
 	BuildShadersAndInputLayOut();
 	BuildPSO();
-	TestFunc();
 
 	ThrowIfFailed(mCommandList->Close());
 	ID3D12CommandList* cmdLists[] = { mCommandList.Get() };
@@ -68,26 +55,22 @@ bool FGameProcess::Initialize()
 void FGameProcess::OnResize()
 {
 	FWinsApp::OnResize();
-	ConstructProjectionMatrix();
-}
-
-void FGameProcess::ConstructProjectionMatrix()
-{
-	// The windows resized, so update the aspect ratio and recompute the projection matrix.
-	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * FMathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
-	XMStoreFloat4x4(&mProj, P);
 }
 
 void FGameProcess::Update(const FGameTimer& gt)
 {
 	OnKeyBoardInput(gt);
-
-	// update the constant buffer with the latest worldviewproj matrix
-	Charalotte::ObjectConstants objConstants;
-	XMMATRIX NowVPTrans;
-	MainCamera->GetVPTransform(NowVPTrans);
-	XMStoreFloat4x4(&objConstants.TransMatrix, XMMatrixTranspose(NowVPTrans));
-	mObjectCB->CopyData(0, objConstants);
+	for (auto& ActorIns : ActorArray)
+	{
+		// update the constant buffer with the latest worldviewproj matrix
+		Charalotte::ObjectConstants objConstants;
+		XMMATRIX NowVPTrans;
+		MainCamera->GetVPTransform(NowVPTrans);
+		XMMATRIX NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorIns->Transform);
+		XMMATRIX NowMVPTrans = NowWorldTrans * NowVPTrans;
+		XMStoreFloat4x4(&objConstants.TransMatrix, XMMatrixTranspose(NowMVPTrans));
+		ActorIns->ObjectCB->CopyData(0, objConstants);
+	}
 }
 
 void FGameProcess::Draw(const FGameTimer& gt)
@@ -118,21 +101,26 @@ void FGameProcess::Draw(const FGameTimer& gt)
 	auto DSV = DepthStencilView();
 	mCommandList->OMSetRenderTargets(1, &CBV, true, &DSV);
 
-	ID3D12DescriptorHeap* descriptorHeaps[] = { mCbvHeap.Get() };
-	mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-
 	// IA
 	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
-	for (auto& MeshGeo : MeshGeoArray)
+	for (auto& ActorIns : ActorArray)
 	{
+		auto MeshGeo = ActorIns->MeshAsset;
+		if (MeshGeo == nullptr)
+		{
+			continue;
+		}
+		ID3D12DescriptorHeap* descriptorHeaps[] = { ActorIns->CbvHeap.Get() };
+		mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
 		auto VertexBufferView = MeshGeo->VertexBufferView();
 		auto IndexBufferView = MeshGeo->IndexBufferView();
 		mCommandList->IASetVertexBuffers(0, 1, &VertexBufferView);
 		mCommandList->IASetIndexBuffer(&IndexBufferView);
 		mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		mCommandList->SetName(L"COOL");
-		mCommandList->SetGraphicsRootDescriptorTable(0, mCbvHeap->GetGPUDescriptorHandleForHeapStart());
+		mCommandList->SetGraphicsRootDescriptorTable(0, ActorIns->CbvHeap->GetGPUDescriptorHandleForHeapStart());
 		auto count = MeshGeo->DrawArgs[MeshGeo->Name].IndexCount;
 		mCommandList->DrawIndexedInstanced(
 			MeshGeo->DrawArgs[MeshGeo->Name].IndexCount,
@@ -198,35 +186,36 @@ void FGameProcess::OnMouseMove(WPARAM btnState, int x, int y)
 }
 void FGameProcess::OnKeyBoardInput(const FGameTimer& gt)
 {
+	float Se = 0.3f;
 	if (GetAsyncKeyState('A') & 0x8000)
 	{
-		CameraTrans.Translation.y += 0.01f;
+		CameraTrans.Translation.y += Se;
 		MainCamera->TransformCamera(CameraTrans);
 		CameraTrans = DefaultCameraTrans;
 	}
 	if (GetAsyncKeyState('D') & 0x8000)
 	{
-		CameraTrans.Translation.y -= 0.01f;
+		CameraTrans.Translation.y -= Se;
 		MainCamera->TransformCamera(CameraTrans);
 		CameraTrans = DefaultCameraTrans;
 	}
 
 	if (GetAsyncKeyState('W') & 0x8000)
 	{
-		CameraTrans.Translation.z -= 0.01f;
+		CameraTrans.Translation.z -= Se;
 		MainCamera->TransformCamera(CameraTrans);
 		CameraTrans = DefaultCameraTrans;
 	}
 
 	if (GetAsyncKeyState('S') & 0x8000)
 	{
-		CameraTrans.Translation.z += 0.01f;
+		CameraTrans.Translation.z += Se;
 		MainCamera->TransformCamera(CameraTrans);
 		CameraTrans = DefaultCameraTrans;
 	}
 }
 
-void FGameProcess::BuildDescriptorHeaps()
+void FGameProcess::BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap)
 {
 	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
 	cbvHeapDesc.NumDescriptors = 1;
@@ -234,15 +223,16 @@ void FGameProcess::BuildDescriptorHeaps()
 	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	cbvHeapDesc.NodeMask = 0;
 	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&cbvHeapDesc,
-		IID_PPV_ARGS(&mCbvHeap)));
+		IID_PPV_ARGS(&CbvHeap)));
 }
-void FGameProcess::BulidConstantBuffers()
+void FGameProcess::BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap,
+	std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>>& ObjectCb)
 {
-	mObjectCB = std::make_unique<UploadBuffer<Charalotte::ObjectConstants>>(md3dDevice.Get(), 1, true);
+	ObjectCb = std::make_shared<UploadBuffer<Charalotte::ObjectConstants>>(md3dDevice.Get(), 1, true);
 
 	UINT objCBByteSize = FUtil::CalcConstantBufferByteSize(sizeof(Charalotte::ObjectConstants));
 
-	D3D12_GPU_VIRTUAL_ADDRESS cbAddress = mObjectCB->Resource()->GetGPUVirtualAddress();
+	D3D12_GPU_VIRTUAL_ADDRESS cbAddress = ObjectCb->Resource()->GetGPUVirtualAddress();
 	// Offset to the ith object constant buffer in the buffer.
 
 	// why we use 0??
@@ -256,8 +246,9 @@ void FGameProcess::BulidConstantBuffers()
 
 	md3dDevice->CreateConstantBufferView(
 		&cbvDesc,
-		mCbvHeap->GetCPUDescriptorHandleForHeapStart());
+		CbvHeap->GetCPUDescriptorHandleForHeapStart());
 }
+
 void FGameProcess::BuildRootSignature()
 {
 	// Shader programs typically require resources as input (constant buffers,
@@ -307,6 +298,8 @@ void FGameProcess::BuildShadersAndInputLayOut()
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 	};
 }
+
+
 void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
 {
 	Charalotte::FMeshInfoForPrint MeshInfo;
@@ -316,6 +309,7 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 	if (MeshInfoFind != MeshInfoDir.end())
 	{
 		MeshInfo = MeshInfoFind->second;
+		return;
 	}
 	else
 	{
@@ -346,26 +340,10 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 
 		Charalotte::Vertex vertex;
 		XMFLOAT3 Float3;
-		XMMATRIX Transport;
-		// now we only use translation, because i have some idea to deal with the 
-		// rotation and scale but i need some time to come true
-
 		// execute scale transport
-		XMMATRIX ScaleTrans = XMMatrixScaling(Transform.Scale3D.x,  Transform.Scale3D.y, Transform.Scale3D.z);
-		XMFLOAT4 NowLocation{ VertexLocation.x, VertexLocation.y, VertexLocation.z, 1.0f };
-		XMVECTOR MeshLocationVector = XMLoadFloat4(&NowLocation);
-
-		// execute rotate transport
-		XMMATRIX RotateTrans = XMMatrixRotationRollPitchYaw(Transform.Rotation.y, Transform.Rotation.z, Transform.Rotation.x);
-		Transport = RotateTrans* ScaleTrans;
-
-		MeshLocationVector = FMathHelper::VectorMultipyMatrix(MeshLocationVector, XMMatrixTranspose(Transport));
-		XMStoreFloat4(&NowLocation, MeshLocationVector);
-
-		// execute  transport
-		Float3.x = (NowLocation.x + Transform.Translation.x) / 100.0f;
-		Float3.y = (NowLocation.y + Transform.Translation.y) / 100.0f;
-		Float3.z = (NowLocation.z + Transform.Translation.z) / 100.0f;
+		Float3.x = VertexLocation.x;
+		Float3.y = VertexLocation.y;
+		Float3.z = VertexLocation.z;
 
 		vertex.Pos = Float3;
 		if (IsUseNormalToColor)
@@ -394,13 +372,16 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 	MeshGeo->DrawArgs[GeometryName] = submesh;
 	MeshGeo->Name = GeometryName;
 
-	MeshGeoArray.push_back(MeshGeo);
+	FSceneAsset::AddMeshData(GeometryName, MeshGeo);
+
+	//MeshGeoArray.push_back(MeshGeo);
 }
 
 void FGameProcess::BuildMeshGeometrys()
 {
-	for (auto& MeshGeo : MeshGeoArray)
+	for (auto& MeshGeoIter : FSceneAsset::GetMeshAssets())
 	{
+		auto MeshGeo = MeshGeoIter.second;
 		const UINT vbByteSize = (UINT)MeshGeo->vertices.size() * sizeof(Charalotte::Vertex);
 		const UINT ibByteSize = (UINT)MeshGeo->indices.size() * sizeof(int);
 		ThrowIfFailed(D3DCreateBlob(vbByteSize, &MeshGeo->VertexBufferCPU));
@@ -420,8 +401,6 @@ void FGameProcess::BuildMeshGeometrys()
 		MeshGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
 		MeshGeo->IndexBufferByteSize = ibByteSize;
 	}
-
-
 }
 void FGameProcess::BuildEnviroument(const std::string& GeometryName)
 {
@@ -475,10 +454,44 @@ void FGameProcess::BuildPSO()
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
 }
 
-void FGameProcess::TestFunc()
+void FGameProcess::LoadMeshs(const std::string& GeometryName)
 {
-	XMMATRIX Test = XMMatrixTranslation(1.0F, 2.0F, 3.0F);
+	FDataProcessor::LoadActors(GeometryName, ActorInfos);
+	if (ActorInfos.ActorsInfo.size() <= 0) return;
+	for (const auto& EnviroumentActor : ActorInfos.ActorsInfo)
+	{
+		std::string assetName = EnviroumentActor.AssetName;
+		if (assetName.size() <= 0)
+		{
+			continue;
+		}
+		assetName.erase(assetName.size() - 1, 1);
+		assetName += ".dat";
+		//OutputDebugStringA(assetName.c_str());
+		CalcVerticesAndIndices(assetName, EnviroumentActor.Transform);
+	}
+	BuildMeshGeometrys();
 }
 
+void FGameProcess::LoadActors(const Charalotte::FActorsInfoForPrint& ActorInfoIn)
+{
+	if (ActorInfoIn.ActorsInfo.size() <= 0) return;
+	for (const auto& EnviroumentActor : ActorInfoIn.ActorsInfo)
+	{
+		std::string assetName = EnviroumentActor.AssetName;
+		if (assetName.size() <= 0)
+		{
+			continue;
+		}
+		assetName.erase(assetName.size() - 1, 1);
+		assetName += ".dat";
+		std::shared_ptr<FActorAsset> ActorAsset = std::make_shared<FActorAsset>();
+		ActorAsset->MeshAsset = FSceneAsset::GetMeshAsset(assetName);
+		ActorAsset->Transform = EnviroumentActor.Transform;
+	
+		BuildDescriptorHeaps(ActorAsset->CbvHeap);
+		BulidConstantBuffers(ActorAsset->CbvHeap, ActorAsset->ObjectCB);
 
-
+		ActorArray.push_back(ActorAsset);
+	}
+}

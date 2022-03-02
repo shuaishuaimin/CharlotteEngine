@@ -189,6 +189,8 @@ struct MeshGeometry
 	}
 };
 
+
+
 struct Light
 {
 	DirectX::XMFLOAT3 Strength = { 0.5f, 0.5f, 0.5f };

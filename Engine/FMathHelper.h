@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <DirectXMath.h>
 #include <cstdint>
+#include "BaseStructAllPlatform.h"
 
 class FMathHelper
 {
@@ -83,6 +84,7 @@ public:
 	}
 
 	static DirectX::XMVECTOR VectorMultipyMatrix(const DirectX::XMVECTOR& Vector, const DirectX::XMMATRIX& Matrix);
+	static DirectX::XMMATRIX GetWorldTransMatrix(const Charalotte::FTransform& Transform);
 
 	static DirectX::XMVECTOR RandUnitVec3();
 	static DirectX::XMVECTOR RandHemisphereUnitVec3(DirectX::XMVECTOR n);

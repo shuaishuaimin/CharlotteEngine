@@ -25,6 +25,7 @@
 #include <DirectXCollision.h>
 #include "d3dx12.h"
 #include "DDSTextureLoader.h"
+#include "BaseStructAllPlatform.h"
 #include "FMathHelper.h"
 #include "FWinsApp.h"
 #endif

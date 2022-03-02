@@ -106,4 +106,17 @@ DirectX::XMVECTOR FMathHelper::VectorMultipyMatrix(const DirectX::XMVECTOR& Vect
 }
 
 
+DirectX::XMMATRIX FMathHelper::GetWorldTransMatrix(const Charalotte::FTransform& Transform)
+{
+	DirectX::XMMATRIX Transport;
 
+	DirectX::XMMATRIX ScaleTrans = XMMatrixScaling(Transform.Scale3D.x, Transform.Scale3D.y, Transform.Scale3D.z);
+	
+	DirectX::XMVECTOR Quater = XMVectorSet(Transform.Rotation.X, Transform.Rotation.Y, Transform.Rotation.Z, Transform.Rotation.W);
+	DirectX::XMMATRIX RotateTrans = XMMatrixRotationQuaternion(Quater);
+
+	DirectX::XMMATRIX DisplaymentTrans = XMMatrixTranslation(Transform.Translation.x, Transform.Translation.y, Transform.Translation.z);
+	Transport = ScaleTrans * RotateTrans * DisplaymentTrans;
+
+	return Transport;
+}

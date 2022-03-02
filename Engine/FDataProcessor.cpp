@@ -102,10 +102,10 @@ void FDataProcessor::LoadActors(const std::string& FileName, Charalotte::FActors
 	for (int i = 0; i < ActorsNum; i++)
 	{
 		Charalotte::FActorInfo ActorInfo;
-		file.read((char*)&(ActorInfo.Transform.Rotation.x), sizeof(float));
-		file.read((char*)&(ActorInfo.Transform.Rotation.y), sizeof(float));
-		file.read((char*)&(ActorInfo.Transform.Rotation.z), sizeof(float));
-		file.read((char*)&(ActorInfo.Transform.Rotation.w), sizeof(float));
+		file.read((char*)&(ActorInfo.Transform.Rotation.X), sizeof(float));
+		file.read((char*)&(ActorInfo.Transform.Rotation.Y), sizeof(float));
+		file.read((char*)&(ActorInfo.Transform.Rotation.Z), sizeof(float));
+		file.read((char*)&(ActorInfo.Transform.Rotation.W), sizeof(float));
 		file.read((char*)&(ActorInfo.Transform.Translation.x), sizeof(float));
 		file.read((char*)&(ActorInfo.Transform.Translation.y), sizeof(float));
 		file.read((char*)&(ActorInfo.Transform.Translation.z), sizeof(float));

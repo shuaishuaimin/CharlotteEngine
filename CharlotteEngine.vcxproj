@@ -143,8 +143,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\BaseStructAllPlatform.h" />
     <ClInclude Include="Engine\FApp.h" />
     <ClInclude Include="Engine\FPlatformAPI.h" />
+    <ClInclude Include="Engine\FSceneAsset.h" />
     <ClInclude Include="Engine\FWindow.h" />
     <ClInclude Include="Engine\FWinsApp.h" />
     <ClInclude Include="Engine\BaseData.h" />

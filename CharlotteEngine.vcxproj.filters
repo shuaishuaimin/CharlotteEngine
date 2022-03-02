@@ -82,6 +82,18 @@
     <Filter Include="Header Files\Platform\API">
       <UniqueIdentifier>{b7b2e2b4-f415-466b-b795-e1a1304cdd00}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{a0a5fe08-60d3-47ae-9fb1-d98d71f05fd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering">
+      <UniqueIdentifier>{47fe6987-0da4-405a-97d3-e04530543680}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene">
+      <UniqueIdentifier>{e49a4560-e62a-40ff-b8d7-d1612c3fee9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Platform\Windows\WinAsset">
+      <UniqueIdentifier>{20936cfc-8553-48ee-a017-dbce236e1da2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -100,9 +112,6 @@
       <Filter>Header Files\BaseCode</Filter>
     </ClInclude>
     <ClInclude Include="Engine\BaseData.h">
-      <Filter>Header Files\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\FDataProcessor.h">
       <Filter>Header Files\Data</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FGraphicsAPI.h">
@@ -134,6 +143,15 @@
     </ClInclude>
     <ClInclude Include="Engine\FPlatformAPI.h">
       <Filter>Header Files\Platform\API</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FDataProcessor.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FSceneAsset.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\BaseStructAllPlatform.h">
+      <Filter>Header Files\Data</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
