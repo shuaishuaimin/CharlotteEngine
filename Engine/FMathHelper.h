@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include <cstdint>
 #include "BaseStructAllPlatform.h"
+#include "glm.hpp"
 
 class FMathHelper
 {
