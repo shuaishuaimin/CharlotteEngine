@@ -9,6 +9,7 @@ namespace Charalotte
 	{
 		DirectX::XMFLOAT3 Pos;
 		DirectX::XMFLOAT4 Color;
+		DirectX::XMFLOAT4 Normal;
 	};
 
 	struct ObjectConstants

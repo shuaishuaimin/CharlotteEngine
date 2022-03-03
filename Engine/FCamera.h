@@ -17,6 +17,7 @@ public:
 	void AddFovAngle(float AngleForAdd);
 
 	void GetCameraData(Charalotte::CameraData& Data);
+	void BackCameraLocation(const DirectX::XMVECTOR& CameraLocation, const DirectX::XMVECTOR& Target, const DirectX::XMVECTOR& Up);
 
 protected:
 	void CalcVPMatrix();

@@ -15,7 +15,7 @@ FGameProcess::FGameProcess(HINSTANCE hInstance) : FWinsApp(hInstance), ColorInde
 {
 	Charalotte::CameraData CameraData;
 	CameraData.Near = 1.0f;
-	CameraData.Far = 7000.0f;
+	CameraData.Far = 20000.0f;
 	CameraData.FovAngleY = 0.25f * FMathHelper::Pi;
 	CameraData.AspectRatio = AspectRatio();
 	CameraData.Location = XMVectorSet(-5000.0f, 0.0f, 0.0f, 1.0f);
@@ -164,19 +164,19 @@ void FGameProcess::OnMouseMove(WPARAM btnState, int x, int y)
 	if ((btnState & MK_LBUTTON) != 0)
 	{
 		// make each pixel correspond to a quarter of a degree
-		float dx = -0.0001f * static_cast<float>(x - mLastMousePos.x);
-		float dy = -0.1f * static_cast<float>(y - mLastMousePos.y);
-		CameraTrans.pitch += dx;
-		//CameraTrans.row += dy;
+		float dx = -0.0000001f * static_cast<float>(x - mLastMousePos.x);
+		float dy = -0.0000001f * static_cast<float>(y - mLastMousePos.y);
+		CameraTrans.yaw += (dx + dy);
 		MainCamera->TransformCamera(CameraTrans);
 		CameraTrans = DefaultCameraTrans;
 	}
 	else if ((btnState & MK_RBUTTON) != 0)
 	{
+		
 		// Make each pixel correspond to 0.005 unit in the scene
-		float dx = 0.005f * static_cast<float>(x - mLastMousePos.x);
-		float dy = 0.005f * static_cast<float>(y - mLastMousePos.y);
-		CameraTrans.Translation.x += (dx + dy);
+		float dx = 0.000001f * static_cast<float>(x - mLastMousePos.x);
+		float dy = 0.000001f * static_cast<float>(y - mLastMousePos.y);
+		CameraTrans.pitch += (dx + dy);
 		MainCamera->TransformCamera(CameraTrans);
 		CameraTrans = DefaultCameraTrans;
 	}
@@ -189,29 +189,51 @@ void FGameProcess::OnKeyBoardInput(const FGameTimer& gt)
 	float Se = 0.3f;
 	if (GetAsyncKeyState('A') & 0x8000)
 	{
-		CameraTrans.Translation.y += Se;
+		CameraTrans.Translation.y -= Se;
 		MainCamera->TransformCamera(CameraTrans);
 		CameraTrans = DefaultCameraTrans;
 	}
 	if (GetAsyncKeyState('D') & 0x8000)
 	{
-		CameraTrans.Translation.y -= Se;
+		CameraTrans.Translation.y += Se;
 		MainCamera->TransformCamera(CameraTrans);
 		CameraTrans = DefaultCameraTrans;
 	}
 
 	if (GetAsyncKeyState('W') & 0x8000)
 	{
-		CameraTrans.Translation.z -= Se;
+		CameraTrans.Translation.x += Se;
 		MainCamera->TransformCamera(CameraTrans);
 		CameraTrans = DefaultCameraTrans;
 	}
 
 	if (GetAsyncKeyState('S') & 0x8000)
 	{
+		CameraTrans.Translation.x -= Se;
+		MainCamera->TransformCamera(CameraTrans);
+		CameraTrans = DefaultCameraTrans;
+	}
+
+	if (GetAsyncKeyState('Q') & 0x8000)
+	{
+		CameraTrans.Translation.z -= Se;
+		MainCamera->TransformCamera(CameraTrans);
+		CameraTrans = DefaultCameraTrans;
+	}
+
+	if (GetAsyncKeyState('E') & 0x8000)
+	{
 		CameraTrans.Translation.z += Se;
 		MainCamera->TransformCamera(CameraTrans);
 		CameraTrans = DefaultCameraTrans;
+	}
+
+	if (GetAsyncKeyState('O') & 0x8000)
+	{
+		XMVECTOR Location = XMVectorSet(-5000.0f, 0.0f, 0.0f, 1.0f);
+		XMVECTOR Target = XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f);
+		XMVECTOR Up = XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f);
+		MainCamera->BackCameraLocation(Location, Target, Up);
 	}
 }
 
@@ -295,7 +317,8 @@ void FGameProcess::BuildShadersAndInputLayOut()
 	mInputLayout =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 	};
 }
 
@@ -353,7 +376,8 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 			VertexColor.z = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].z * 0.5f + 0.5f;
 			VertexColor.w = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].w * 0.5f + 0.5f;
 		}
-		vertex.Color = VertexColor;
+		vertex.Color = XMFLOAT4(Colors::Aqua);
+		vertex.Normal = VertexColor;
 		MeshGeo->vertices.push_back(vertex);
 		VertexIndex ++;
 	}
