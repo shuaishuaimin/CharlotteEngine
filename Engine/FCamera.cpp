@@ -1,14 +1,10 @@
 #include "stdafx.h"
 #include "FCamera.h"
 
-
-using namespace DirectX;
-
 FCamera::FCamera(const Charalotte::CameraData& Data) : MainCameraData(Data), Sensitivity(0.25)
 {
-	VPTransform.ViewTransform = XMLoadFloat4x4(&mView);
-	VPTransform.ProjectionTransform = XMLoadFloat4x4(&mProj);
-	MVPMatrix = XMLoadFloat4x4(&mMVP);
+	VPTransform.ViewTransform = glm::mat4(1.0f);
+	VPTransform.ProjectionTransform = glm::mat4(1.0f);;
 	CalcVPMatrix();
 }
 FCamera::~FCamera()
@@ -16,28 +12,24 @@ FCamera::~FCamera()
 
 }
 
-void FCamera::GetVPTransform(DirectX::XMMATRIX& Matrix)
+void FCamera::GetVPTransform(glm::mat4& Matrix)
 {
-	Matrix = MVPMatrix;
+	Matrix = VPTransform.VPMatrix;
 }
 
 // Can not use
 void FCamera::TransformCamera(const Charalotte::CameraTransform& Transform)
 {
-	XMMATRIX DisplacementMatrix = XMMatrixTranslation(Transform.Translation.x, Transform.Translation.y, Transform.Translation.z);
-	MainCameraData.Location = FMathHelper::VectorMultipyMatrix(MainCameraData.Location, DisplacementMatrix);
+	auto Result = MainCameraData.Target;
+	glm::mat4 DisplacementMatrix = glm::mat4(1.0f);
+	DisplacementMatrix = glm::translate(DisplacementMatrix, glm::vec3(Transform.Translation.x, Transform.Translation.y, Transform.Translation.z));
+	MainCameraData.Location = FMathHelper::Vec4MultipyMat(MainCameraData.Location, glm::transpose(DisplacementMatrix));
 
-	XMMATRIX RotateMatrix = XMMatrixRotationRollPitchYaw(Transform.pitch, Transform.yaw, Transform.row);
-	XMFLOAT4 LocationFloat;
-	XMVECTOR Location = MainCameraData.Location;
-	XMStoreFloat4(&LocationFloat, Location);
-	XMMATRIX BackToZeroMatrix = XMMatrixTranslation(LocationFloat.x * -1.0f, LocationFloat.y * -1.0f, LocationFloat.z * -1.0f);
-	XMMATRIX BackToStartMatrix = XMMatrixTranslation(LocationFloat.x, LocationFloat.y, LocationFloat.z);
-	
-	XMMATRIX FinalRotateMatrix = BackToZeroMatrix * RotateMatrix * BackToStartMatrix;
+	glm::mat4 RotateMatrix = FMathHelper::GetRotateMatrix(Transform.pitch, Transform.row, Transform.yaw, 
+								MainCameraData.Target, MainCameraData.Up, MainCameraData.Location);
 
-	MainCameraData.Target = FMathHelper::VectorMultipyMatrix(MainCameraData.Target, FinalRotateMatrix);
-	//MainCameraData.Up = FMathHelper::VectorMultipyMatrix(MainCameraData.Up, FinalRotateMatrix);
+	MainCameraData.Target = FMathHelper::Vec4MultipyMat(MainCameraData.Target, glm::transpose(RotateMatrix));
+	MainCameraData.Up = FMathHelper::Vec4MultipyMat(MainCameraData.Up, glm::transpose(RotateMatrix));
 	CalcVPMatrix();
 }
 
@@ -62,27 +54,26 @@ void FCamera::AddFovAngle(float AngleForAdd)
 void FCamera::GetCameraData(Charalotte::CameraData& Data)
 {
 	Data = MainCameraData;
-	CalcVPMatrix();
 }
 
 void FCamera::CalcVPMatrix()
 {
-	XMMATRIX view = XMMatrixLookAtLH(MainCameraData.Location,
-		MainCameraData.Location + MainCameraData.Target, MainCameraData.Up);
-	XMStoreFloat4x4(&mView, view);
+	glm::vec3 Location3 = MainCameraData.Location;
+	glm::vec3 Center3 = MainCameraData.Target;
+	glm::vec3 Up3 = MainCameraData.Up;
+	glm::mat4 view = glm::lookAtLH(Location3, Location3 + Center3, Up3);
+
 	VPTransform.ViewTransform = view;
 
-	XMMATRIX proj;
-	proj = XMMatrixPerspectiveFovLH(MainCameraData.FovAngleY,
-		MainCameraData.AspectRatio, MainCameraData.Near, MainCameraData.Far);
+	glm::mat4 proj;
+	proj = glm::perspectiveFovLH(MainCameraData.FovAngleY,
+		MainCameraData.Width, MainCameraData.Height,MainCameraData.Near, MainCameraData.Far);
 	VPTransform.ProjectionTransform = proj;
-	XMStoreFloat4x4(&mProj, proj);
 
-	VPTransform.VPMatrix = view * proj;
-	MVPMatrix =view * proj;
+	VPTransform.VPMatrix = proj * view;
 }
 
-void FCamera::BackCameraLocation(const DirectX::XMVECTOR& CameraLocation, const DirectX::XMVECTOR& Target, const DirectX::XMVECTOR& Up)
+void FCamera::BackCameraLocation(const glm::vec4& CameraLocation, const glm::vec4& Target, const glm::vec4& Up)
 {
 	MainCameraData.Location = CameraLocation;
 	MainCameraData.Target = Target;

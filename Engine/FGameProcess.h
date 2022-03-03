@@ -13,8 +13,8 @@ struct FActorAsset
 	std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>> ObjectCB = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CbvHeap = nullptr;
 
-	DirectX::XMMATRIX VPTrans = DirectX::XMMatrixIdentity();
-	DirectX::XMMATRIX MTrans = DirectX::XMMatrixIdentity();
+	glm::mat4 VPTrans = glm::mat4(1.0f);
+	glm::mat4 MTrans = glm::mat4(1.0f);
 };
 
 class FGameProcess : public FWinsApp
@@ -55,17 +55,10 @@ private:
 private:
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
-	//std::vector<Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>> mCbvHeap;
-
-	//std::vector<std::unique_ptr<UploadBuffer<Charalotte::ObjectConstants>>> mObjectCB;
 
 	std::vector<std::shared_ptr<FActorAsset>> ActorArray;
 
 	std::vector<std::shared_ptr<MeshGeometry>> MeshGeoArray;
-	//std::unordered_map<std::string, SubmeshGeometry> NameMeshDir;
-	//std::unordered_map<std::string, uint32_t> RepeatName;
-
-	std::vector<DirectX::XMFLOAT4> TestColors;
 
 	Microsoft::WRL::ComPtr<ID3DBlob> mvsByteCode = nullptr;
 	Microsoft::WRL::ComPtr<ID3DBlob> mpsByteCode = nullptr;
@@ -74,17 +67,14 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> mPSO = nullptr;
 
+	// camera data
 	std::unique_ptr<FCamera> MainCamera;
 	Charalotte::CameraTransform CameraTrans;
 	Charalotte::CameraTransform DefaultCameraTrans;
-	// this num we can change
 
-	std::vector<Charalotte::Vertex> vertices;
-	std::vector<int16_t> indices;
 	POINT mLastMousePos;
-	int ColorIndex;
-
 	Charalotte::FActorsInfoForPrint ActorInfos;
 
+	// store mesh data to prevent repeating read the same file
 	std::unordered_map<std::string, Charalotte::FMeshInfoForPrint> MeshInfoDir;
 };

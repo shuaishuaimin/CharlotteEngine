@@ -31,92 +31,67 @@ float FMathHelper::AngleFromXY(float x, float y)
 	return theta;
 }
 
-XMVECTOR FMathHelper::RandUnitVec3()
+
+glm::mat4 FMathHelper::GetWorldTransMatrix(const Charalotte::FTransform& Transform)
 {
-	XMVECTOR One = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-	XMVECTOR Zero = XMVectorZero();
-
-	// Keep trying until we get a point on/in the hemisphere.
-	while (true)
-	{
-		// Generate random point in the cube [-1,1]^3.
-		XMVECTOR v = XMVectorSet(FMathHelper::RandF(-1.0f, 1.0f), FMathHelper::RandF(-1.0f, 1.0f), FMathHelper::RandF(-1.0f, 1.0f), 0.0f);
-
-		// Ignore points outside the unit sphere in order to get an even distribution 
-		// over the unit sphere.  Otherwise points will clump more on the sphere near 
-		// the corners of the cube.
-
-		if (XMVector3Greater(XMVector3LengthSq(v), One))
-			continue;
-
-		return XMVector3Normalize(v);
-	}
-}
-
-XMVECTOR FMathHelper::RandHemisphereUnitVec3(XMVECTOR n)
-{
-	XMVECTOR One = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-	XMVECTOR Zero = XMVectorZero();
-
-	// Keep trying until we get a point on/in the hemisphere.
-	while (true)
-	{
-		// Generate random point in the cube [-1,1]^3.
-		XMVECTOR v = XMVectorSet(FMathHelper::RandF(-1.0f, 1.0f), FMathHelper::RandF(-1.0f, 1.0f), FMathHelper::RandF(-1.0f, 1.0f), 0.0f);
-
-		// Ignore points outside the unit sphere in order to get an even distribution 
-		// over the unit sphere.  Otherwise points will clump more on the sphere near 
-		// the corners of the cube.
-
-		if (XMVector3Greater(XMVector3LengthSq(v), One))
-			continue;
-
-		// Ignore points in the bottom hemisphere.
-		if (XMVector3Less(XMVector3Dot(n, v), Zero))
-			continue;
-
-		return XMVector3Normalize(v);
-	}
-}
-
-DirectX::XMVECTOR FMathHelper::VectorMultipyMatrix(const DirectX::XMVECTOR& Vector, const DirectX::XMMATRIX& Matrix)
-{
-	XMVECTOR ResultVector;
-	XMFLOAT4 VectorFloat;
-	XMStoreFloat4(&VectorFloat, Vector);
-
-	XMFLOAT4X4 MatrixFloat;
-	XMStoreFloat4x4(&MatrixFloat, Matrix);
-
-	XMFLOAT4 ResultFloat;
-	ResultFloat.x = VectorFloat.x * MatrixFloat._11 + VectorFloat.y * MatrixFloat._21
-		+ VectorFloat.z * MatrixFloat._31 + VectorFloat.w * MatrixFloat._41;
-
-	ResultFloat.y = VectorFloat.x * MatrixFloat._12 + VectorFloat.y * MatrixFloat._22
-		+ VectorFloat.z * MatrixFloat._32 + VectorFloat.w * MatrixFloat._42;
-
-	ResultFloat.z = VectorFloat.x * MatrixFloat._13 + VectorFloat.y * MatrixFloat._23
-		+ VectorFloat.z * MatrixFloat._33 + VectorFloat.w * MatrixFloat._43;
-
-	ResultFloat.w = VectorFloat.x * MatrixFloat._14 + VectorFloat.y * MatrixFloat._24
-		+ VectorFloat.z * MatrixFloat._34 + VectorFloat.w * MatrixFloat._44;
-
-	ResultVector = XMLoadFloat4(&ResultFloat);
-	return ResultVector;
-}
-
-
-DirectX::XMMATRIX FMathHelper::GetWorldTransMatrix(const Charalotte::FTransform& Transform)
-{
-	DirectX::XMMATRIX Transport;
- 
-	DirectX::XMMATRIX ScaleTrans = XMMatrixScaling(Transform.Scale3D.x, Transform.Scale3D.y, Transform.Scale3D.z);
+	glm::mat4 Transport; 
+	glm::mat4 ScaleTrans = glm::mat4(1.0f);
+	ScaleTrans = glm::scale(ScaleTrans, glm::vec3(Transform.Scale3D.x, Transform.Scale3D.y, Transform.Scale3D.z));
 	
-	DirectX::XMVECTOR Quater = XMVectorSet(Transform.Rotation.X, Transform.Rotation.Y, Transform.Rotation.Z, Transform.Rotation.W);
-	DirectX::XMMATRIX RotateTrans = XMMatrixRotationQuaternion(Quater);
+	glm::qua<float> Quater = glm::qua<float>(Transform.Rotation.W, Transform.Rotation.X, Transform.Rotation.Y, Transform.Rotation.Z);
+	glm::mat4 RotateTrans = glm::mat4_cast(Quater);
 
-	DirectX::XMMATRIX DisplaymentTrans = XMMatrixTranslation(Transform.Translation.x, Transform.Translation.y, Transform.Translation.z);
-	Transport = ScaleTrans * RotateTrans * DisplaymentTrans;
+	glm::mat4 DisplaymentTrans = glm::mat4(1.0f);
+	DisplaymentTrans = glm::translate(DisplaymentTrans, glm::vec3(Transform.Translation.x, Transform.Translation.y, Transform.Translation.z));
+
+	Transport = DisplaymentTrans * RotateTrans * ScaleTrans;
 
 	return Transport;
+}
+
+glm::mat4 FMathHelper::GetRotateMatrix(float Pitch, 
+				float Yaw, float Roll, const glm::vec4& Target, const glm::vec4& Up, const glm::vec4& Location)
+{
+	glm::mat4 ResultMatrix = glm::mat4(1.0f);
+
+	glm::mat4 LocationTransBackZero = glm::mat4(1.0f);
+	LocationTransBackZero = glm::translate(LocationTransBackZero, glm::vec3(Location.x * -1.0f, Location.y * -1.0f, Location.z * -1.0f));
+	glm::mat4 LocationTransBackToStart = glm::mat4(1.0f);
+	LocationTransBackToStart = glm::translate(LocationTransBackZero, glm::vec3(Location.x, Location.y, Location.z));
+
+	glm::vec3 UpXLocation = glm::cross(glm::vec3(Up.x, Up.y, Up.z), glm::vec3(Location.x, Location.y, Location.z));
+
+	glm::mat4 YawTransForm = glm::mat4(1.0f);
+	if (Yaw != 0.0f)
+	{
+		YawTransForm = glm::rotate(YawTransForm, glm::radians(Yaw), glm::vec3(Up.x, Up.y, Up.z));
+	}
+	
+	glm::mat4 RollTransForm = glm::mat4(1.0f);
+	if (Roll != 0.0f)
+	{
+		RollTransForm = glm::rotate(RollTransForm, glm::radians(Roll), glm::vec3(Target.x, Target.y, Target.z));
+	}
+	
+	glm::mat4 PitchTransForm = glm::mat4(1.0f);
+	if (Pitch != 0.0f)
+	{
+		PitchTransForm = glm::rotate(PitchTransForm, glm::radians(Pitch), glm::vec3(UpXLocation.x, UpXLocation.y, UpXLocation.z));
+	}
+	
+	ResultMatrix = glm::transpose(LocationTransBackToStart) * YawTransForm * 
+							RollTransForm * PitchTransForm * glm::transpose(LocationTransBackZero);
+
+	return ResultMatrix;
+}
+
+glm::vec4 FMathHelper::Vec4MultipyMat(const glm::vec4& vector, const glm::mat4& Matrix)
+{
+	glm::vec4 ResultVector = glm::vec4(1.0f);
+	ResultVector.x = vector.x * Matrix[0][0] + vector.y * Matrix[0][1] + vector.z * Matrix[0][2] + vector.w * Matrix[0][3];
+	ResultVector.y = vector.x * Matrix[1][0] + vector.y * Matrix[1][1] + vector.z * Matrix[1][2] + vector.w * Matrix[1][3];
+	ResultVector.z = vector.x * Matrix[2][0] + vector.y * Matrix[2][1] + vector.z * Matrix[2][2] + vector.w * Matrix[2][3];
+	ResultVector.w = vector.x * Matrix[3][0] + vector.y * Matrix[3][1] + vector.z * Matrix[3][2] + vector.w * Matrix[3][3];
+
+	return ResultVector;
 }

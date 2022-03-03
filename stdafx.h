@@ -12,6 +12,10 @@
 #include <cassert>
 #include "FApp.h"
 #include "FPlatformAPI.h"
+#include "glm.hpp"
+#include "gtc/matrix_transform.hpp"
+#include "gtc/quaternion.hpp"
+#include "FMathHelper.h"
 
 #if PLATFORM_WINDOWS
 #include <windows.h>
@@ -26,7 +30,6 @@
 #include "d3dx12.h"
 #include "DDSTextureLoader.h"
 #include "BaseStructAllPlatform.h"
-#include "FMathHelper.h"
 #include "FWinsApp.h"
 #endif
 	

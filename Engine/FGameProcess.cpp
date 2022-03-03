@@ -11,16 +11,18 @@ using Microsoft::WRL::ComPtr;
 using namespace DirectX::PackedVector;
 using std::string;
 
-FGameProcess::FGameProcess(HINSTANCE hInstance) : FWinsApp(hInstance), ColorIndex(0)
+FGameProcess::FGameProcess(HINSTANCE hInstance) : FWinsApp(hInstance)
 {
 	Charalotte::CameraData CameraData;
 	CameraData.Near = 1.0f;
 	CameraData.Far = 20000.0f;
 	CameraData.FovAngleY = 0.25f * FMathHelper::Pi;
 	CameraData.AspectRatio = AspectRatio();
-	CameraData.Location = XMVectorSet(-5000.0f, 0.0f, 0.0f, 1.0f);
-	CameraData.Target = XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f);
-	CameraData.Up = XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f);
+	CameraData.Location = glm::vec4(-5000.0f, 0.0f, 0.0f, 1.0f);
+	CameraData.Target = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	CameraData.Up = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+	CameraData.Width = mClientWidth;
+	CameraData.Height = mClientHeight;
 
 	MainCamera = std::make_unique<FCamera>(CameraData);
 }
@@ -62,13 +64,13 @@ void FGameProcess::Update(const FGameTimer& gt)
 	OnKeyBoardInput(gt);
 	for (auto& ActorIns : ActorArray)
 	{
-		// update the constant buffer with the latest worldviewproj matrix
+		// update the constant buffer with the latest worldviewproj glm::mat4
 		Charalotte::ObjectConstants objConstants;
-		XMMATRIX NowVPTrans;
+		glm::mat4 NowVPTrans;
 		MainCamera->GetVPTransform(NowVPTrans);
-		XMMATRIX NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorIns->Transform);
-		XMMATRIX NowMVPTrans = NowWorldTrans * NowVPTrans;
-		XMStoreFloat4x4(&objConstants.TransMatrix, XMMatrixTranspose(NowMVPTrans));
+		glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorIns->Transform);
+		glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
+		objConstants.TransMatrix = glm::transpose(NowMVPTrans);
 		ActorIns->ObjectCB->CopyData(0, objConstants);
 	}
 }
@@ -161,12 +163,13 @@ void FGameProcess::OnMouseUp(WPARAM btnState, int x, int y)
 }
 void FGameProcess::OnMouseMove(WPARAM btnState, int x, int y)
 {
+	float MouseSe = 0.03f;
 	if ((btnState & MK_LBUTTON) != 0)
 	{
 		// make each pixel correspond to a quarter of a degree
-		float dx = -0.0000001f * static_cast<float>(x - mLastMousePos.x);
-		float dy = -0.0000001f * static_cast<float>(y - mLastMousePos.y);
-		CameraTrans.yaw += (dx + dy);
+		float dx = -MouseSe * static_cast<float>(x - mLastMousePos.x);
+		float dy = -MouseSe * static_cast<float>(y - mLastMousePos.y);
+		CameraTrans.row += (dx + dy);
 		MainCamera->TransformCamera(CameraTrans);
 		CameraTrans = DefaultCameraTrans;
 	}
@@ -174,8 +177,8 @@ void FGameProcess::OnMouseMove(WPARAM btnState, int x, int y)
 	{
 		
 		// Make each pixel correspond to 0.005 unit in the scene
-		float dx = 0.000001f * static_cast<float>(x - mLastMousePos.x);
-		float dy = 0.000001f * static_cast<float>(y - mLastMousePos.y);
+		float dx = MouseSe * static_cast<float>(x - mLastMousePos.x);
+		float dy = MouseSe * static_cast<float>(y - mLastMousePos.y);
 		CameraTrans.pitch += (dx + dy);
 		MainCamera->TransformCamera(CameraTrans);
 		CameraTrans = DefaultCameraTrans;
@@ -230,9 +233,9 @@ void FGameProcess::OnKeyBoardInput(const FGameTimer& gt)
 
 	if (GetAsyncKeyState('O') & 0x8000)
 	{
-		XMVECTOR Location = XMVectorSet(-5000.0f, 0.0f, 0.0f, 1.0f);
-		XMVECTOR Target = XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f);
-		XMVECTOR Up = XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f);
+		glm::vec4 Location = glm::vec4(-5000.0f, 0.0f, 0.0f, 1.0f);
+		glm::vec4 Target = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+		glm::vec4 Up = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 		MainCamera->BackCameraLocation(Location, Target, Up);
 	}
 }
@@ -359,10 +362,10 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 
 	for (const auto& VertexLocation : MeshInfo.LodInfos[0].VerticesLocation)
 	{
-		XMFLOAT4 VertexColor = XMFLOAT4(Colors::DarkGray);
+		glm::vec4 VertexColor = glm::vec4(1.0f);
 
 		Charalotte::Vertex vertex;
-		XMFLOAT3 Float3;
+		glm::vec3 Float3 = glm::vec3(1.0f);
 		// execute scale transport
 		Float3.x = VertexLocation.x;
 		Float3.y = VertexLocation.y;
@@ -376,7 +379,7 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 			VertexColor.z = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].z * 0.5f + 0.5f;
 			VertexColor.w = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].w * 0.5f + 0.5f;
 		}
-		vertex.Color = XMFLOAT4(Colors::Aqua);
+		vertex.Color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) ;
 		vertex.Normal = VertexColor;
 		MeshGeo->vertices.push_back(vertex);
 		VertexIndex ++;
