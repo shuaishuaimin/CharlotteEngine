@@ -33,7 +33,6 @@ public:
 	{
 		return MeshAssets;
 	}
-
 };
 
 std::unordered_map<std::string, std::shared_ptr<MeshGeometry>> FSceneAsset::MeshAssets = std::unordered_map<std::string, std::shared_ptr<MeshGeometry>>();
