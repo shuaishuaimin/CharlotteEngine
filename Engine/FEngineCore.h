@@ -17,14 +17,14 @@ struct FActorAsset
 	glm::mat4 MTrans = glm::mat4(1.0f);
 };
 
-class FGameProcess : public FWinsApp
+class FEngineCore : public FWinsApp
 {
 public:
-	FGameProcess(HINSTANCE hInstance);
+	FEngineCore(HINSTANCE hInstance);
 	// ban copy constructor and assignment
-	FGameProcess(const FGameProcess& dm) = delete;
-	FGameProcess operator= (const FGameProcess& dm) = delete;
-	~FGameProcess();
+	FEngineCore(const FEngineCore& dm) = delete;
+	FEngineCore operator= (const FEngineCore& dm) = delete;
+	~FEngineCore();
 
 	virtual bool Initialize()override;
 

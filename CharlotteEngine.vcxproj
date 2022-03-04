@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClInclude Include="Engine\BaseStructAllPlatform.h" />
     <ClInclude Include="Engine\FApp.h" />
+    <ClInclude Include="Engine\FGame.h" />
     <ClInclude Include="Engine\FPlatformAPI.h" />
     <ClInclude Include="Engine\FSceneAsset.h" />
     <ClInclude Include="Engine\FWindow.h" />
@@ -153,7 +154,7 @@
     <ClInclude Include="Engine\d3dx12.h" />
     <ClInclude Include="Engine\FCamera.h" />
     <ClInclude Include="Engine\FDataProcessor.h" />
-    <ClInclude Include="Engine\FGameProcess.h" />
+    <ClInclude Include="Engine\FEngineCore.h" />
     <ClInclude Include="Engine\FGraphicsAPI.h" />
     <ClInclude Include="Engine\DDSTextureLoader.h" />
     <ClInclude Include="Engine\FGameTimer.h" />
@@ -165,12 +166,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\DDSTextureLoader.cpp" />
+    <ClCompile Include="Engine\FGame.cpp" />
     <ClCompile Include="Engine\FPlatformAPI.cpp" />
     <ClCompile Include="Engine\FWin32Window.cpp" />
     <ClCompile Include="Engine\FWinsApp.cpp" />
     <ClCompile Include="Engine\FCamera.cpp" />
     <ClCompile Include="Engine\FDataProcessor.cpp" />
-    <ClCompile Include="Engine\FGameProcess.cpp" />
+    <ClCompile Include="Engine\FEngineCore.cpp" />
     <ClCompile Include="Engine\FGameTimer.cpp" />
     <ClCompile Include="Engine\FGraphicsAPI.cpp" />
     <ClCompile Include="Engine\FUtil.cpp" />

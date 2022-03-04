@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include <DirectXColors.h>
-#include "FGameProcess.h"
+#include "FEngineCore.h"
 #include "FDataProcessor.h"
 #include "FSceneAsset.h"
 #include <cstdint>
@@ -11,7 +11,7 @@ using Microsoft::WRL::ComPtr;
 using namespace DirectX::PackedVector;
 using std::string;
 
-FGameProcess::FGameProcess(HINSTANCE hInstance) : FWinsApp(hInstance)
+FEngineCore::FEngineCore(HINSTANCE hInstance) : FWinsApp(hInstance)
 {
 	Charalotte::CameraData CameraData;
 	CameraData.Near = 1.0f;
@@ -26,12 +26,12 @@ FGameProcess::FGameProcess(HINSTANCE hInstance) : FWinsApp(hInstance)
 
 	MainCamera = std::make_unique<FCamera>(CameraData);
 }
-FGameProcess::~FGameProcess()
+FEngineCore::~FEngineCore()
 {
 
 }
 
-bool FGameProcess::Initialize()
+bool FEngineCore::Initialize()
 {
 	if (!FWinsApp::Initialize())
 		return false;
@@ -54,12 +54,12 @@ bool FGameProcess::Initialize()
 	return true;
 }
 
-void FGameProcess::OnResize()
+void FEngineCore::OnResize()
 {
 	FWinsApp::OnResize();
 }
 
-void FGameProcess::Update(const FGameTimer& gt)
+void FEngineCore::Update(const FGameTimer& gt)
 {
 	OnKeyBoardInput(gt);
 	for (auto& ActorIns : ActorArray)
@@ -75,7 +75,7 @@ void FGameProcess::Update(const FGameTimer& gt)
 	}
 }
 
-void FGameProcess::Draw(const FGameTimer& gt)
+void FEngineCore::Draw(const FGameTimer& gt)
 {
 	// Reuse the memory associated with command recording.
 	// we can only  reset when the associated command lists have finished execution on the GPU.
@@ -150,18 +150,18 @@ void FGameProcess::Draw(const FGameTimer& gt)
 	FlushCommandQueue();
 }
 
-void FGameProcess::OnMouseDown(WPARAM btnState, int x, int y)
+void FEngineCore::OnMouseDown(WPARAM btnState, int x, int y)
 {
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
 
 	SetCapture(mhMainWnd);
 }
-void FGameProcess::OnMouseUp(WPARAM btnState, int x, int y)
+void FEngineCore::OnMouseUp(WPARAM btnState, int x, int y)
 {
 	ReleaseCapture();
 }
-void FGameProcess::OnMouseMove(WPARAM btnState, int x, int y)
+void FEngineCore::OnMouseMove(WPARAM btnState, int x, int y)
 {
 	float MouseSe = 0.03f;
 	if ((btnState & MK_LBUTTON) != 0)
@@ -187,7 +187,7 @@ void FGameProcess::OnMouseMove(WPARAM btnState, int x, int y)
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
 }
-void FGameProcess::OnKeyBoardInput(const FGameTimer& gt)
+void FEngineCore::OnKeyBoardInput(const FGameTimer& gt)
 {
 	float Se = 0.3f;
 	if (GetAsyncKeyState('A') & 0x8000)
@@ -240,7 +240,7 @@ void FGameProcess::OnKeyBoardInput(const FGameTimer& gt)
 	}
 }
 
-void FGameProcess::BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap)
+void FEngineCore::BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap)
 {
 	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
 	cbvHeapDesc.NumDescriptors = 1;
@@ -250,7 +250,7 @@ void FGameProcess::BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorH
 	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&cbvHeapDesc,
 		IID_PPV_ARGS(&CbvHeap)));
 }
-void FGameProcess::BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap,
+void FEngineCore::BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap,
 	std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>>& ObjectCb)
 {
 	ObjectCb = std::make_shared<UploadBuffer<Charalotte::ObjectConstants>>(md3dDevice.Get(), 1, true);
@@ -274,7 +274,7 @@ void FGameProcess::BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorH
 		CbvHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
-void FGameProcess::BuildRootSignature()
+void FEngineCore::BuildRootSignature()
 {
 	// Shader programs typically require resources as input (constant buffers,
 	// textures, samplers).  The root signature defines the resources the shader
@@ -310,7 +310,7 @@ void FGameProcess::BuildRootSignature()
 		serializeRootSig->GetBufferSize(),
 		IID_PPV_ARGS(&mRootSignature)));
 }
-void FGameProcess::BuildShadersAndInputLayOut()
+void FEngineCore::BuildShadersAndInputLayOut()
 {
 	HRESULT hr = S_OK;
 
@@ -326,7 +326,7 @@ void FGameProcess::BuildShadersAndInputLayOut()
 }
 
 
-void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
+void FEngineCore::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
 {
 	Charalotte::FMeshInfoForPrint MeshInfo;
 	std::shared_ptr<MeshGeometry> MeshGeo = std::make_shared<MeshGeometry>();
@@ -404,7 +404,7 @@ void FGameProcess::CalcVerticesAndIndices(const std::string& GeometryName, const
 	//MeshGeoArray.push_back(MeshGeo);
 }
 
-void FGameProcess::BuildMeshGeometrys()
+void FEngineCore::BuildMeshGeometrys()
 {
 	for (auto& MeshGeoIter : FSceneAsset::GetMeshAssets())
 	{
@@ -429,7 +429,7 @@ void FGameProcess::BuildMeshGeometrys()
 		MeshGeo->IndexBufferByteSize = ibByteSize;
 	}
 }
-void FGameProcess::BuildEnviroument(const std::string& GeometryName)
+void FEngineCore::BuildEnviroument(const std::string& GeometryName)
 {
 	Charalotte::FActorsInfoForPrint ActorInfos;
 	FDataProcessor::LoadActors(GeometryName, ActorInfos);
@@ -449,7 +449,7 @@ void FGameProcess::BuildEnviroument(const std::string& GeometryName)
 	BuildMeshGeometrys();
 }
 
-void FGameProcess::BuildPSO()
+void FEngineCore::BuildPSO()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 	ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
@@ -481,7 +481,7 @@ void FGameProcess::BuildPSO()
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
 }
 
-void FGameProcess::LoadMeshs(const std::string& GeometryName)
+void FEngineCore::LoadMeshs(const std::string& GeometryName)
 {
 	FDataProcessor::LoadActors(GeometryName, ActorInfos);
 	if (ActorInfos.ActorsInfo.size() <= 0) return;
@@ -500,7 +500,7 @@ void FGameProcess::LoadMeshs(const std::string& GeometryName)
 	BuildMeshGeometrys();
 }
 
-void FGameProcess::LoadActors(const Charalotte::FActorsInfoForPrint& ActorInfoIn)
+void FEngineCore::LoadActors(const Charalotte::FActorsInfoForPrint& ActorInfoIn)
 {
 	if (ActorInfoIn.ActorsInfo.size() <= 0) return;
 	for (const auto& EnviroumentActor : ActorInfoIn.ActorsInfo)

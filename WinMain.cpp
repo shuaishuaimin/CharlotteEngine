@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FGameProcess.h"
+#include "FEngineCore.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	PSTR cmdLine, int showCmd)
@@ -13,7 +13,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 
 	try
 	{
-		std::shared_ptr<FApp> theApp = std::make_shared<FGameProcess>(hInstance);
+		std::shared_ptr<FApp> theApp = std::make_shared<FEngineCore>(hInstance);
 		
 		return FPlatformAPI::InitResult(theApp);
 	}
