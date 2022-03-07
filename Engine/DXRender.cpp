@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include <DirectXColors.h>
-#include "FEngineCore.h"
+#include "DXRender.h"
 #include "FDataProcessor.h"
 #include "FSceneAsset.h"
 #include <cstdint>
@@ -11,7 +11,7 @@ using Microsoft::WRL::ComPtr;
 using namespace DirectX::PackedVector;
 using std::string;
 
-FEngineCore::FEngineCore(HINSTANCE hInstance) : FWinsApp(hInstance)
+DXRender::DXRender(HINSTANCE hInstance) : FWinsApp(hInstance)
 {
 	Charalotte::CameraData CameraData;
 	CameraData.Near = 1.0f;
@@ -26,12 +26,12 @@ FEngineCore::FEngineCore(HINSTANCE hInstance) : FWinsApp(hInstance)
 
 	MainCamera = std::make_unique<FCamera>(CameraData);
 }
-FEngineCore::~FEngineCore()
+DXRender::~DXRender()
 {
 
 }
 
-bool FEngineCore::Initialize()
+bool DXRender::Initialize()
 {
 	if (!FWinsApp::Initialize())
 		return false;
@@ -54,12 +54,12 @@ bool FEngineCore::Initialize()
 	return true;
 }
 
-void FEngineCore::OnResize()
+void DXRender::OnResize()
 {
 	FWinsApp::OnResize();
 }
 
-void FEngineCore::Update(const FGameTimer& gt)
+void DXRender::Update(const FGameTimer& gt)
 {
 	OnKeyBoardInput(gt);
 	for (auto& ActorIns : ActorArray)
@@ -67,7 +67,7 @@ void FEngineCore::Update(const FGameTimer& gt)
 		// update the constant buffer with the latest worldviewproj glm::mat4
 		Charalotte::ObjectConstants objConstants;
 		glm::mat4 NowVPTrans;
-		MainCamera->GetVPTransform(NowVPTrans);
+		FScene::GetInstance().GetCamera()->GetVPTransform(NowVPTrans);
 		glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorIns->Transform);
 		glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
 		objConstants.TransMatrix = glm::transpose(NowMVPTrans);
@@ -75,7 +75,7 @@ void FEngineCore::Update(const FGameTimer& gt)
 	}
 }
 
-void FEngineCore::Draw(const FGameTimer& gt)
+void DXRender::Draw(const FGameTimer& gt)
 {
 	// Reuse the memory associated with command recording.
 	// we can only  reset when the associated command lists have finished execution on the GPU.
@@ -150,18 +150,18 @@ void FEngineCore::Draw(const FGameTimer& gt)
 	FlushCommandQueue();
 }
 
-void FEngineCore::OnMouseDown(WPARAM btnState, int x, int y)
+void DXRender::OnMouseDown(WPARAM btnState, int x, int y)
 {
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
 
 	SetCapture(mhMainWnd);
 }
-void FEngineCore::OnMouseUp(WPARAM btnState, int x, int y)
+void DXRender::OnMouseUp(WPARAM btnState, int x, int y)
 {
 	ReleaseCapture();
 }
-void FEngineCore::OnMouseMove(WPARAM btnState, int x, int y)
+void DXRender::OnMouseMove(WPARAM btnState, int x, int y)
 {
 	float MouseSe = 0.03f;
 	if ((btnState & MK_LBUTTON) != 0)
@@ -170,7 +170,7 @@ void FEngineCore::OnMouseMove(WPARAM btnState, int x, int y)
 		float dx = -MouseSe * static_cast<float>(x - mLastMousePos.x);
 		float dy = -MouseSe * static_cast<float>(y - mLastMousePos.y);
 		CameraTrans.row += (dx + dy);
-		MainCamera->TransformCamera(CameraTrans);
+		FScene::GetInstance().GetCamera()->TransformCamera(CameraTrans);
 		CameraTrans = DefaultCameraTrans;
 	}
 	else if ((btnState & MK_RBUTTON) != 0)
@@ -180,67 +180,78 @@ void FEngineCore::OnMouseMove(WPARAM btnState, int x, int y)
 		float dx = MouseSe * static_cast<float>(x - mLastMousePos.x);
 		float dy = MouseSe * static_cast<float>(y - mLastMousePos.y);
 		CameraTrans.pitch += (dx + dy);
-		MainCamera->TransformCamera(CameraTrans);
+		FScene::GetInstance().GetCamera()->TransformCamera(CameraTrans);
 		CameraTrans = DefaultCameraTrans;
 	}
 
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
 }
-void FEngineCore::OnKeyBoardInput(const FGameTimer& gt)
+
+void DXRender::OnKeyBoardInput(const FGameTimer& gt)
 {
-	float Se = 0.3f;
-	if (GetAsyncKeyState('A') & 0x8000)
+	auto test = FWinInputSystem::GetInstance().GetEventKeys();
+	for (const auto& KeyIter : FWinInputSystem::GetInstance().GetEventKeys())
 	{
-		CameraTrans.Translation.y -= Se;
-		MainCamera->TransformCamera(CameraTrans);
-		CameraTrans = DefaultCameraTrans;
-	}
-	if (GetAsyncKeyState('D') & 0x8000)
-	{
-		CameraTrans.Translation.y += Se;
-		MainCamera->TransformCamera(CameraTrans);
-		CameraTrans = DefaultCameraTrans;
+		if (GetAsyncKeyState(KeyIter) & 0x8000)
+		{
+			FWinInputSystem::GetInstance().ExecuteKeyEvent(KeyIter, gt);
+		}
 	}
 
-	if (GetAsyncKeyState('W') & 0x8000)
-	{
-		CameraTrans.Translation.x += Se;
-		MainCamera->TransformCamera(CameraTrans);
-		CameraTrans = DefaultCameraTrans;
-	}
+	//float Se = 0.3f;
 
-	if (GetAsyncKeyState('S') & 0x8000)
-	{
-		CameraTrans.Translation.x -= Se;
-		MainCamera->TransformCamera(CameraTrans);
-		CameraTrans = DefaultCameraTrans;
-	}
+	//if (GetAsyncKeyState('A') & 0x8000)
+	//{
+	//	CameraTrans.Translation.y -= Se;
+	//	MainCamera->TransformCamera(CameraTrans);
+	//	CameraTrans = DefaultCameraTrans;
+	//}
+	//if (GetAsyncKeyState('D') & 0x8000)
+	//{
+	//	CameraTrans.Translation.y += Se;
+	//	MainCamera->TransformCamera(CameraTrans);
+	//	CameraTrans = DefaultCameraTrans;
+	//}
 
-	if (GetAsyncKeyState('Q') & 0x8000)
-	{
-		CameraTrans.Translation.z -= Se;
-		MainCamera->TransformCamera(CameraTrans);
-		CameraTrans = DefaultCameraTrans;
-	}
+	//if (GetAsyncKeyState('W') & 0x8000)
+	//{
+	//	CameraTrans.Translation.x += Se;
+	//	MainCamera->TransformCamera(CameraTrans);
+	//	CameraTrans = DefaultCameraTrans;
+	//}
 
-	if (GetAsyncKeyState('E') & 0x8000)
-	{
-		CameraTrans.Translation.z += Se;
-		MainCamera->TransformCamera(CameraTrans);
-		CameraTrans = DefaultCameraTrans;
-	}
+	//if (GetAsyncKeyState('S') & 0x8000)
+	//{
+	//	CameraTrans.Translation.x -= Se;
+	//	MainCamera->TransformCamera(CameraTrans);
+	//	CameraTrans = DefaultCameraTrans;
+	//}
 
-	if (GetAsyncKeyState('O') & 0x8000)
-	{
-		glm::vec4 Location = glm::vec4(-5000.0f, 0.0f, 0.0f, 1.0f);
-		glm::vec4 Target = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-		glm::vec4 Up = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-		MainCamera->BackCameraLocation(Location, Target, Up);
-	}
+	//if (GetAsyncKeyState('Q') & 0x8000)
+	//{
+	//	CameraTrans.Translation.z -= Se;
+	//	MainCamera->TransformCamera(CameraTrans);
+	//	CameraTrans = DefaultCameraTrans;
+	//}
+
+	//if (GetAsyncKeyState('E') & 0x8000)
+	//{
+	//	CameraTrans.Translation.z += Se;
+	//	MainCamera->TransformCamera(CameraTrans);
+	//	CameraTrans = DefaultCameraTrans;
+	//}
+
+	//if (GetAsyncKeyState('O') & 0x8000)
+	//{
+	//	glm::vec4 Location = glm::vec4(-5000.0f, 0.0f, 0.0f, 1.0f);
+	//	glm::vec4 Target = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	//	glm::vec4 Up = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+	//	MainCamera->BackCameraLocation(Location, Target, Up);
+	//}
 }
 
-void FEngineCore::BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap)
+void DXRender::BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap)
 {
 	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
 	cbvHeapDesc.NumDescriptors = 1;
@@ -250,7 +261,7 @@ void FEngineCore::BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHe
 	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&cbvHeapDesc,
 		IID_PPV_ARGS(&CbvHeap)));
 }
-void FEngineCore::BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap,
+void DXRender::BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap,
 	std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>>& ObjectCb)
 {
 	ObjectCb = std::make_shared<UploadBuffer<Charalotte::ObjectConstants>>(md3dDevice.Get(), 1, true);
@@ -274,7 +285,7 @@ void FEngineCore::BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHe
 		CbvHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
-void FEngineCore::BuildRootSignature()
+void DXRender::BuildRootSignature()
 {
 	// Shader programs typically require resources as input (constant buffers,
 	// textures, samplers).  The root signature defines the resources the shader
@@ -310,7 +321,7 @@ void FEngineCore::BuildRootSignature()
 		serializeRootSig->GetBufferSize(),
 		IID_PPV_ARGS(&mRootSignature)));
 }
-void FEngineCore::BuildShadersAndInputLayOut()
+void DXRender::BuildShadersAndInputLayOut()
 {
 	HRESULT hr = S_OK;
 
@@ -326,7 +337,7 @@ void FEngineCore::BuildShadersAndInputLayOut()
 }
 
 
-void FEngineCore::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
+void DXRender::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
 {
 	Charalotte::FMeshInfoForPrint MeshInfo;
 	std::shared_ptr<MeshGeometry> MeshGeo = std::make_shared<MeshGeometry>();
@@ -404,7 +415,7 @@ void FEngineCore::CalcVerticesAndIndices(const std::string& GeometryName, const 
 	//MeshGeoArray.push_back(MeshGeo);
 }
 
-void FEngineCore::BuildMeshGeometrys()
+void DXRender::BuildMeshGeometrys()
 {
 	for (auto& MeshGeoIter : FSceneAsset::GetMeshAssets())
 	{
@@ -429,7 +440,7 @@ void FEngineCore::BuildMeshGeometrys()
 		MeshGeo->IndexBufferByteSize = ibByteSize;
 	}
 }
-void FEngineCore::BuildEnviroument(const std::string& GeometryName)
+void DXRender::BuildEnviroument(const std::string& GeometryName)
 {
 	Charalotte::FActorsInfoForPrint ActorInfos;
 	FDataProcessor::LoadActors(GeometryName, ActorInfos);
@@ -449,7 +460,7 @@ void FEngineCore::BuildEnviroument(const std::string& GeometryName)
 	BuildMeshGeometrys();
 }
 
-void FEngineCore::BuildPSO()
+void DXRender::BuildPSO()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 	ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
@@ -481,7 +492,7 @@ void FEngineCore::BuildPSO()
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
 }
 
-void FEngineCore::LoadMeshs(const std::string& GeometryName)
+void DXRender::LoadMeshs(const std::string& GeometryName)
 {
 	FDataProcessor::LoadActors(GeometryName, ActorInfos);
 	if (ActorInfos.ActorsInfo.size() <= 0) return;
@@ -500,7 +511,7 @@ void FEngineCore::LoadMeshs(const std::string& GeometryName)
 	BuildMeshGeometrys();
 }
 
-void FEngineCore::LoadActors(const Charalotte::FActorsInfoForPrint& ActorInfoIn)
+void DXRender::LoadActors(const Charalotte::FActorsInfoForPrint& ActorInfoIn)
 {
 	if (ActorInfoIn.ActorsInfo.size() <= 0) return;
 	for (const auto& EnviroumentActor : ActorInfoIn.ActorsInfo)

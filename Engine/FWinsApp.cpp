@@ -253,7 +253,6 @@ void FWinsApp::OnResize()
 	mScissorRect = { 0, 0, mClientWidth, mClientHeight };
 }
 
-
 LRESULT FWinsApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)

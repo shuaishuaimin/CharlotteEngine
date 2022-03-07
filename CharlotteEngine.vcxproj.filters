@@ -13,41 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\BaseCode">
-      <UniqueIdentifier>{04fecf5c-0bc0-43aa-ba4e-4507eea42b7a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Data">
-      <UniqueIdentifier>{2520c562-da71-46cf-84cb-f47f960d5b64}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Actor">
-      <UniqueIdentifier>{62b022eb-6393-4d5f-b269-36fe2893461f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Actor\Camera">
-      <UniqueIdentifier>{55e83973-17ce-4d76-93d0-8a9776e3fe17}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\BaseClass">
-      <UniqueIdentifier>{9cbccfca-dcb7-49f1-aed4-8a2997649bec}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\BaseCode">
-      <UniqueIdentifier>{73a67ee2-ed87-4449-893f-3a81f6b4af5f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Actor">
-      <UniqueIdentifier>{0b309fa1-ce88-4e49-90ea-c8d2e61b0242}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Actor\Camera">
-      <UniqueIdentifier>{2d8a5653-c578-41d4-a3a1-ac0500d02b5d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Data">
-      <UniqueIdentifier>{30800343-1e23-40b2-a508-bb7e9db5cb56}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{2b6a2b6b-1107-4400-9388-b9050bedbcc2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Game">
       <UniqueIdentifier>{762603f3-3c10-4ec1-9b81-ae6d53fbb602}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\BaseClass">
-      <UniqueIdentifier>{54bafcae-44ce-4186-8c01-e26057839e0d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\MainFunction">
       <UniqueIdentifier>{4073d2b4-c898-48e4-af66-3120c5e43c97}</UniqueIdentifier>
@@ -82,9 +52,6 @@
     <Filter Include="Header Files\Platform\API">
       <UniqueIdentifier>{b7b2e2b4-f415-466b-b795-e1a1304cdd00}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Rendering">
-      <UniqueIdentifier>{a0a5fe08-60d3-47ae-9fb1-d98d71f05fd6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Rendering">
       <UniqueIdentifier>{47fe6987-0da4-405a-97d3-e04530543680}</UniqueIdentifier>
     </Filter>
@@ -100,40 +67,73 @@
     <Filter Include="Source Files\Engine">
       <UniqueIdentifier>{55b9b590-d49e-4979-a247-fedbb83f5b09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Public">
+      <UniqueIdentifier>{614fc1ae-d4f8-4269-ab1b-ae32215fe814}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Public\BaseClass">
+      <UniqueIdentifier>{9cbccfca-dcb7-49f1-aed4-8a2997649bec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Public\BaseCode">
+      <UniqueIdentifier>{04fecf5c-0bc0-43aa-ba4e-4507eea42b7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Public\Data">
+      <UniqueIdentifier>{2520c562-da71-46cf-84cb-f47f960d5b64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Public">
+      <UniqueIdentifier>{663f7c34-26bd-4c96-8739-9b21dcfb0573}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Public\Data">
+      <UniqueIdentifier>{30800343-1e23-40b2-a508-bb7e9db5cb56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Public\BaseCode">
+      <UniqueIdentifier>{73a67ee2-ed87-4449-893f-3a81f6b4af5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Public\BaseClass">
+      <UniqueIdentifier>{54bafcae-44ce-4186-8c01-e26057839e0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Actor">
+      <UniqueIdentifier>{62b022eb-6393-4d5f-b269-36fe2893461f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Actor\Camera">
+      <UniqueIdentifier>{55e83973-17ce-4d76-93d0-8a9776e3fe17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Actor">
+      <UniqueIdentifier>{0b309fa1-ce88-4e49-90ea-c8d2e61b0242}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Actor\Camera">
+      <UniqueIdentifier>{2d8a5653-c578-41d4-a3a1-ac0500d02b5d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\d3dx12.h">
-      <Filter>Header Files\BaseCode</Filter>
+      <Filter>Header Files\Public\BaseCode</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FUtil.h">
-      <Filter>Header Files\BaseCode</Filter>
+      <Filter>Header Files\Public\BaseCode</Filter>
     </ClInclude>
     <ClInclude Include="Engine\DDSTextureLoader.h">
-      <Filter>Header Files\BaseCode</Filter>
+      <Filter>Header Files\Public\BaseCode</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FMathHelper.h">
-      <Filter>Header Files\BaseCode</Filter>
+      <Filter>Header Files\Public\BaseCode</Filter>
     </ClInclude>
     <ClInclude Include="Engine\BaseData.h">
-      <Filter>Header Files\Data</Filter>
+      <Filter>Header Files\Public\Data</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FGraphicsAPI.h">
       <Filter>Header Files\Platform\Windows\WindowsAPI</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FGameTimer.h">
-      <Filter>Header Files\BaseClass</Filter>
+      <Filter>Header Files\Public\BaseClass</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FUploadBuffer.h">
-      <Filter>Header Files\BaseClass</Filter>
+      <Filter>Header Files\Public\BaseClass</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FCamera.h">
-      <Filter>Header Files\Actor\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\FEngineCore.h">
-      <Filter>Header Files\Game</Filter>
+      <Filter>Header Files\Game\Actor\Camera</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FWinsApp.h">
       <Filter>Header Files\Platform\Windows\WindowsAPI\WinApp</Filter>
@@ -151,39 +151,54 @@
       <Filter>Header Files\Platform\API</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FDataProcessor.h">
-      <Filter>Header Files\Data</Filter>
+      <Filter>Header Files\Public\Data</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FSceneAsset.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\BaseStructAllPlatform.h">
-      <Filter>Header Files\Data</Filter>
+      <Filter>Header Files\Public\Data</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FGame.h">
+    <ClInclude Include="Engine\DXRender.h">
       <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FWinGame.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Singleton.h">
+      <Filter>Header Files\Public\BaseCode</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FWinInputSystem.h">
+      <Filter>Header Files\Public\BaseClass</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FScene.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\CharlotteEngine.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FInputSystem.h">
+      <Filter>Header Files\Public\BaseClass</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\DDSTextureLoader.cpp">
-      <Filter>Source Files\BaseCode</Filter>
+      <Filter>Source Files\Public\BaseCode</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FUtil.cpp">
-      <Filter>Source Files\BaseCode</Filter>
+      <Filter>Source Files\Public\BaseCode</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FMathHelper.cpp">
-      <Filter>Source Files\BaseCode</Filter>
+      <Filter>Source Files\Public\BaseCode</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FCamera.cpp">
-      <Filter>Source Files\Actor\Camera</Filter>
+      <Filter>Source Files\Game\Actor\Camera</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FDataProcessor.cpp">
-      <Filter>Source Files\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\FEngineCore.cpp">
-      <Filter>Source Files\Game</Filter>
+      <Filter>Source Files\Public\Data</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FGameTimer.cpp">
-      <Filter>Source Files\BaseClass</Filter>
+      <Filter>Source Files\Public\BaseClass</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FGraphicsAPI.cpp">
       <Filter>Source Files\Platform\Windows\WindowsAPI</Filter>
@@ -206,8 +221,14 @@
     <ClCompile Include="Engine\FPlatformAPI.cpp">
       <Filter>Source Files\Platform</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FGame.cpp">
+    <ClCompile Include="Engine\DXRender.cpp">
       <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FWinGame.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FWinInputSystem.cpp">
+      <Filter>Source Files\Public</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -5,6 +5,8 @@
 #include "FUploadBuffer.h"
 #include "BaseData.h"
 #include "FCamera.h"
+#include "FWinInputSystem.h"
+#include "FScene.h"
 
 struct FActorAsset
 {
@@ -17,14 +19,14 @@ struct FActorAsset
 	glm::mat4 MTrans = glm::mat4(1.0f);
 };
 
-class FEngineCore : public FWinsApp
+class DXRender : public FWinsApp
 {
 public:
-	FEngineCore(HINSTANCE hInstance);
+	DXRender(HINSTANCE hInstance);
 	// ban copy constructor and assignment
-	FEngineCore(const FEngineCore& dm) = delete;
-	FEngineCore operator= (const FEngineCore& dm) = delete;
-	~FEngineCore();
+	DXRender(const DXRender& dm) = delete;
+	DXRender operator= (const DXRender& dm) = delete;
+	~DXRender();
 
 	virtual bool Initialize()override;
 
@@ -77,4 +79,5 @@ private:
 
 	// store mesh data to prevent repeating read the same file
 	std::unordered_map<std::string, Charalotte::FMeshInfoForPrint> MeshInfoDir;
+
 };

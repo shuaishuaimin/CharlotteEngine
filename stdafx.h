@@ -10,12 +10,16 @@
 #include <fstream>
 #include <sstream>
 #include <cassert>
+#include <thread>
+#include <chrono>
+#include <mutex>
 #include "FApp.h"
 #include "FPlatformAPI.h"
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
 #include "gtc/quaternion.hpp"
 #include "FMathHelper.h"
+#include "Singleton.h"
 
 #if PLATFORM_WINDOWS
 #include <windows.h>

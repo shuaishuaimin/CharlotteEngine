@@ -1,5 +1,6 @@
 #include "stdafx.h"
-#include "FEngineCore.h"
+#include "DXRender.h"
+#include "FWinGame.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	PSTR cmdLine, int showCmd)
@@ -13,9 +14,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 
 	try
 	{
-		std::shared_ptr<FApp> theApp = std::make_shared<FEngineCore>(hInstance);
-		
-		return FPlatformAPI::InitResult(theApp);
+		std::shared_ptr<FApp> theApp = std::make_shared<DXRender>(hInstance);
+		std::shared_ptr<FWinGame> theGame = std::make_shared<FWinGame>();
+		theGame->Init();
+		theGame->Run();
+
+		return  FPlatformAPI::InitResult(theApp);
 	}
 	catch (DxException& e)
 	{

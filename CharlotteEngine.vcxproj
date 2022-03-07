@@ -144,9 +144,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Engine\BaseStructAllPlatform.h" />
+    <ClInclude Include="Engine\CharlotteEngine.h" />
     <ClInclude Include="Engine\FApp.h" />
-    <ClInclude Include="Engine\FGame.h" />
+    <ClInclude Include="Engine\FWinGame.h" />
+    <ClInclude Include="Engine\FInputSystem.h" />
+    <ClInclude Include="Engine\FWinInputSystem.h" />
     <ClInclude Include="Engine\FPlatformAPI.h" />
+    <ClInclude Include="Engine\FScene.h" />
     <ClInclude Include="Engine\FSceneAsset.h" />
     <ClInclude Include="Engine\FWindow.h" />
     <ClInclude Include="Engine\FWinsApp.h" />
@@ -154,7 +158,7 @@
     <ClInclude Include="Engine\d3dx12.h" />
     <ClInclude Include="Engine\FCamera.h" />
     <ClInclude Include="Engine\FDataProcessor.h" />
-    <ClInclude Include="Engine\FEngineCore.h" />
+    <ClInclude Include="Engine\DXRender.h" />
     <ClInclude Include="Engine\FGraphicsAPI.h" />
     <ClInclude Include="Engine\DDSTextureLoader.h" />
     <ClInclude Include="Engine\FGameTimer.h" />
@@ -162,17 +166,19 @@
     <ClInclude Include="Engine\FMathHelper.h" />
     <ClInclude Include="Engine\FUtil.h" />
     <ClInclude Include="Engine\FWin32Window.h" />
+    <ClInclude Include="Engine\Singleton.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\DDSTextureLoader.cpp" />
-    <ClCompile Include="Engine\FGame.cpp" />
+    <ClCompile Include="Engine\FWinGame.cpp" />
+    <ClCompile Include="Engine\FWinInputSystem.cpp" />
     <ClCompile Include="Engine\FPlatformAPI.cpp" />
     <ClCompile Include="Engine\FWin32Window.cpp" />
     <ClCompile Include="Engine\FWinsApp.cpp" />
     <ClCompile Include="Engine\FCamera.cpp" />
     <ClCompile Include="Engine\FDataProcessor.cpp" />
-    <ClCompile Include="Engine\FEngineCore.cpp" />
+    <ClCompile Include="Engine\DXRender.cpp" />
     <ClCompile Include="Engine\FGameTimer.cpp" />
     <ClCompile Include="Engine\FGraphicsAPI.cpp" />
     <ClCompile Include="Engine\FUtil.cpp" />
