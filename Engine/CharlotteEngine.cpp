@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CharlotteEngine.h"
+#include "FScene.h"
 
 #if PLATFORM_WINDOWS
 CharalotteEngine::CharalotteEngine(HINSTANCE hInstance) {
@@ -34,4 +35,7 @@ int CharalotteEngine::Update() {
 void CharalotteEngine::Destory()
 {
 	Sleep(1000);
+	WindowIns = nullptr;
+
+	RenderIns = nullptr;
 }

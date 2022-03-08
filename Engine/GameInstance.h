@@ -14,6 +14,8 @@ public:
 #else
 	GameInstance();
 #endif
+	~GameInstance();
+
 	bool Init();
 
 	int Update();

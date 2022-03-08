@@ -6,6 +6,10 @@
 class FSceneAsset
 {
 public:
+	FSceneAsset(){}
+	~FSceneAsset(){
+		MeshAssets = std::unordered_map<std::string, std::shared_ptr<MeshGeometry>>();
+	}
 	static std::unordered_map<std::string, std::shared_ptr<MeshGeometry>> MeshAssets;
 	static void AddMeshData(const std::string& AssetName, std::shared_ptr<MeshGeometry> MeshAsset)
 	{
@@ -33,6 +37,8 @@ public:
 	{
 		return MeshAssets;
 	}
+
+	
 };
 
 std::unordered_map<std::string, std::shared_ptr<MeshGeometry>> FSceneAsset::MeshAssets = std::unordered_map<std::string, std::shared_ptr<MeshGeometry>>();

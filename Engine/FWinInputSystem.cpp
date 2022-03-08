@@ -12,7 +12,8 @@ FWinInputSystem::FWinInputSystem()
 }
 FWinInputSystem::~FWinInputSystem()
 {
-	
+	KeyBEvents.clear();
+	MouseEvents.clear();
 }
 
 void FWinInputSystem::RegisterKeyInput(char Key, const std::function<void()>& Function)

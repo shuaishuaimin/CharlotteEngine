@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AActor.h" />
     <ClInclude Include="Engine\BaseStructAllPlatform.h" />
     <ClInclude Include="Engine\CharlotteEngine.h" />
     <ClInclude Include="Engine\FApp.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="Engine\FWin32Window.h" />
     <ClInclude Include="Engine\Singleton.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="UStaticMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\CharlotteEngine.cpp" />
@@ -194,6 +196,7 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="UStaticMesh.cpp" />
     <ClCompile Include="WinMain.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>

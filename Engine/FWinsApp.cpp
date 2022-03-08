@@ -98,6 +98,14 @@ int FWinsApp::Run()
 			}
 		}
 	}
+#if defined(DEBUG) || defined(_DEBUG)
+{
+	ID3D12DebugDevice* pDebugDevice = nullptr;
+	md3dDevice->QueryInterface(&pDebugDevice);
+	pDebugDevice->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
+	pDebugDevice->Release();
+}
+#endif
 
 	return (int)msg.wParam;
 }

@@ -18,6 +18,7 @@
 #include "gtc/matrix_transform.hpp"
 #include "gtc/quaternion.hpp"
 #include "FMathHelper.h"
+#include "BaseStructAllPlatform.h"
 #include "Singleton.h"
 
 #if PLATFORM_WINDOWS
@@ -26,7 +27,6 @@
 #include <dxgi1_4.h>
 #include <d3d12.h>
 #include <D3Dcompiler.h>
-#include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 #include <DirectXColors.h>
 #include <DirectXCollision.h>

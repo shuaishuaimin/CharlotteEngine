@@ -8,6 +8,7 @@ class GameLogic
 {
 public:
 	GameLogic(){};
+	~GameLogic(){};
 	// register mouse and keyboard event
 	void RegisterEvent();
 

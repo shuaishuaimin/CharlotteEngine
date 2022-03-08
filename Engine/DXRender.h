@@ -26,9 +26,11 @@ public:
 	// ban copy constructor and assignment
 	DXRender(const DXRender& dm) = delete;
 	DXRender operator= (const DXRender& dm) = delete;
-	~DXRender();
+	virtual ~DXRender();
 
 	virtual bool Initialize()override;
+
+	void Destory(){};
 
 private:
 	virtual void OnResize()override;

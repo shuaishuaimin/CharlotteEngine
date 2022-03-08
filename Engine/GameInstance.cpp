@@ -16,6 +16,11 @@ GameInstance::GameInstance()
 }
 #endif
 
+GameInstance::~GameInstance()
+{
+
+}
+
 bool GameInstance::Init()
 {
 	FScene::GetInstance().GetAssetSystem()->LoadMap("ThirdPersonExampleMap.dat");

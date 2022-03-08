@@ -18,7 +18,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 		{
 			return 0;
 		}
-		
 		int r = GameIns->Update();
 		GameIns->Destory();
 		return r;

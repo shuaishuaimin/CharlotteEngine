@@ -32,7 +32,9 @@ public:
 		IsCanResizing = false;
 	}
 	~FScene(){
-		
+		GameTimer = nullptr;
+		AssetSystemIns = nullptr;
+		MainCamera = nullptr;
 	}
 
 	FCamera* GetCamera()

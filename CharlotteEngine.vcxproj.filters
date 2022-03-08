@@ -103,6 +103,9 @@
     <Filter Include="Source Files\Scene">
       <UniqueIdentifier>{c40f488d-90e8-4403-9e8f-bcb3a8e1def1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Game\Mesh">
+      <UniqueIdentifier>{b8a805cb-9908-4836-8f46-c4d335828e4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -183,6 +186,12 @@
     <ClInclude Include="Engine\GameInstance.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
+    <ClInclude Include="AActor.h">
+      <Filter>Header Files\Game\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="UStaticMesh.h">
+      <Filter>Header Files\Game\Mesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\DDSTextureLoader.cpp">
@@ -241,6 +250,9 @@
     </ClCompile>
     <ClCompile Include="Engine\CharlotteEngine.cpp">
       <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="UStaticMesh.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
