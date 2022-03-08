@@ -19,9 +19,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 			return 0;
 		}
 		
-		return GameIns->Update();
+		int r = GameIns->Update();
 		GameIns->Destory();
-		
+		return r;
 	}
 	catch (DxException& e)
 	{
