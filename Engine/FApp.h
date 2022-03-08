@@ -6,6 +6,7 @@ class FApp
 {
 public:
 	FApp() {}
+	virtual ~FApp(){}
 	virtual std::shared_ptr<FWindow> CreateMainWindow() = 0;
 	virtual FApp* GetOwnApp() = 0;
 	virtual bool Initialize() = 0;
