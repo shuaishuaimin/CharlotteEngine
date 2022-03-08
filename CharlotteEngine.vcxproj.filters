@@ -52,9 +52,6 @@
     <Filter Include="Header Files\Platform\API">
       <UniqueIdentifier>{b7b2e2b4-f415-466b-b795-e1a1304cdd00}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Rendering">
-      <UniqueIdentifier>{47fe6987-0da4-405a-97d3-e04530543680}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Scene">
       <UniqueIdentifier>{e49a4560-e62a-40ff-b8d7-d1612c3fee9e}</UniqueIdentifier>
     </Filter>
@@ -102,6 +99,9 @@
     </Filter>
     <Filter Include="Source Files\Game\Actor\Camera">
       <UniqueIdentifier>{2d8a5653-c578-41d4-a3a1-ac0500d02b5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene">
+      <UniqueIdentifier>{c40f488d-90e8-4403-9e8f-bcb3a8e1def1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -156,7 +156,7 @@
     <ClInclude Include="Engine\DXRender.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FGame.h">
+    <ClInclude Include="Engine\GameLogic.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Singleton.h">
@@ -176,6 +176,12 @@
     </ClInclude>
     <ClInclude Include="Engine\FSceneAsset.h">
       <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FAssetSystem.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GameInstance.h">
+      <Filter>Header Files\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -218,11 +224,23 @@
     <ClCompile Include="Engine\DXRender.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FGame.cpp">
+    <ClCompile Include="Engine\GameLogic.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FWinInputSystem.cpp">
       <Filter>Source Files\Public\BaseClass</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GameInstance.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FScene.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FAssetSystem.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\CharlotteEngine.cpp">
+      <Filter>Source Files\Engine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

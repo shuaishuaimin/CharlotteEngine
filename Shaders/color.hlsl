@@ -20,7 +20,7 @@ struct VertexOut
 {
 	float4 PosH  : SV_POSITION;
     float4 Color : COLOR;
-	float4 Normal : NORMAL;
+	//float4 Normal : NORMAL;
 };
 
 VertexOut VS(VertexIn vin)

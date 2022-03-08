@@ -1,12 +1,29 @@
 #pragma once
+#include "FWindow.h"
+#include "FApp.h"
+#include "FAssetSystem.h"
+#if PLATFORM_WINDOWS
 #include "DXRender.h"
+#endif
 
 class CharalotteEngine
 {
 public:
-	bool Init(){}
+#if PLATFORM_WINDOWS
+	CharalotteEngine(HINSTANCE hInstance);
+#else
+	CharalotteEngine();
+#endif
+	~CharalotteEngine(){}
 
-	bool Looping(){}
+	bool Init();
 
-	void Destory(){};
+	int Update();
+
+	void Destory();
+
+private:
+	std::unique_ptr<FApp> RenderIns;
+	std::shared_ptr<FWindow> WindowIns;
 };
+

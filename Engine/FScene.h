@@ -4,6 +4,7 @@
 #include "Singleton.h"
 #include "FCamera.h"
 #include "BaseData.h"
+#include "FAssetSystem.h"
 
 class FScene : public Singleton<FScene>
 {
@@ -26,11 +27,13 @@ public:
 
 		GameTimer = std::make_unique<FGameTimer>();
 		IsAppPaused = false;
-
+		AssetSystemIns = std::make_unique<FAssetSystem>();
 		IsDeviceSucceed = false;
 		IsCanResizing = false;
 	}
-	~FScene(){}
+	~FScene(){
+		
+	}
 
 	FCamera* GetCamera()
 	{
@@ -81,6 +84,11 @@ public:
 	{
 		IsCanResizing = IsCan;
 	}
+
+	FAssetSystem* GetAssetSystem()
+	{
+		return AssetSystemIns.get();
+	}
 private:
 	std::vector<std::shared_ptr<FCamera>> Cameras;
 	std::shared_ptr<FCamera> MainCamera;
@@ -88,6 +96,8 @@ private:
 	Charalotte::CameraTransform DefaultCameraTrans;
 
 	std::unique_ptr<FGameTimer> GameTimer;
+
+	std::unique_ptr<FAssetSystem> AssetSystemIns;
 	// connect app and window
 	bool IsAppPaused;
 

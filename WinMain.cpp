@@ -1,6 +1,5 @@
 #include "stdafx.h"
-#include "DXRender.h"
-#include "FGame.h"
+#include "GameInstance.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	PSTR cmdLine, int showCmd)
@@ -14,20 +13,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 
 	try
 	{
-		std::shared_ptr<FApp> theApp = std::make_shared<DXRender>(hInstance);
-		std::shared_ptr<FGame> theGame = std::make_shared<FGame>();
-		theGame->Init();
-		theGame->Run();
-
-		if (theApp->CreateMainWindow() == nullptr)
+		std::unique_ptr<GameInstance> GameIns = std::make_unique<GameInstance>(hInstance);
+		if (!GameIns->Init())
 		{
 			return 0;
 		}
-		if (!theApp->Initialize())
-			return 0;
-
-		return theApp->Run();
-
+		
+		return GameIns->Update();
+		GameIns->Destory();
+		
 	}
 	catch (DxException& e)
 	{

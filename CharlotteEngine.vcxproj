@@ -146,7 +146,9 @@
     <ClInclude Include="Engine\BaseStructAllPlatform.h" />
     <ClInclude Include="Engine\CharlotteEngine.h" />
     <ClInclude Include="Engine\FApp.h" />
-    <ClInclude Include="Engine\FGame.h" />
+    <ClInclude Include="Engine\FAssetSystem.h" />
+    <ClInclude Include="Engine\GameInstance.h" />
+    <ClInclude Include="Engine\GameLogic.h" />
     <ClInclude Include="Engine\FInputSystem.h" />
     <ClInclude Include="Engine\FWinInputSystem.h" />
     <ClInclude Include="Engine\FScene.h" />
@@ -169,8 +171,12 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\CharlotteEngine.cpp" />
     <ClCompile Include="Engine\DDSTextureLoader.cpp" />
-    <ClCompile Include="Engine\FGame.cpp" />
+    <ClCompile Include="Engine\FAssetSystem.cpp" />
+    <ClCompile Include="Engine\FScene.cpp" />
+    <ClCompile Include="Engine\GameInstance.cpp" />
+    <ClCompile Include="Engine\GameLogic.cpp" />
     <ClCompile Include="Engine\FWinInputSystem.cpp" />
     <ClCompile Include="Engine\FWin32Window.cpp" />
     <ClCompile Include="Engine\FWinsApp.cpp" />

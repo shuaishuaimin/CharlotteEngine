@@ -112,7 +112,6 @@ bool FWinsApp::Initialize()
 		return false;
 	}
 	// only mainwindow or directx3D is not inited, return initialize failed;
-	if (!InitMainWindow()) return false;
 
 	if (!InitDirect3D()) return false;
 
@@ -253,13 +252,6 @@ void FWinsApp::OnResize()
 	mScissorRect = { 0, 0, mClientWidth, mClientHeight };
 }
 
-bool FWinsApp::InitMainWindow()
-{
-	//mWindowIns = std::make_unique<FWin32Window>(MainWndProc, mhAppInst);
-	bool InitWindowResult = mWindowIns->InitMainWindow();
-	mhMainWnd = mWindowIns->MainWnd();
-	return InitWindowResult;
-}
 
 bool FWinsApp::InitDirect3D()
 {
@@ -376,7 +368,7 @@ void FWinsApp::CreateSwapChain()
 	sd.SampleDesc.Quality = m4xMsaaQuality ? (m4xMsaaQuality - 1) : 0;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.BufferCount = SwapChainBufferCount;
-	sd.OutputWindow = mhMainWnd;
+	sd.OutputWindow = mWindowIns->MainWnd();
 	sd.Windowed = true;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -447,7 +439,7 @@ void FWinsApp::CalculateFrameStats()
 			L" FPS : " + fpsstr +
 			L" MSPF: " + mspfstr;
 
-		SetWindowText(mhMainWnd, windowText.c_str());
+		SetWindowText(mWindowIns->MainWnd(), windowText.c_str());
 
 		// reset
 		frameCnt = 0;
