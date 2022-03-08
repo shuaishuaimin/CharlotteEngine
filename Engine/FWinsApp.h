@@ -28,8 +28,10 @@ protected:
 public:
 	static FWinsApp* GetApp();
 
+	FWin32Window* GetWindow();
+
 	HINSTANCE AppInst()const;
-	//HWND MainWnd()const;
+
 	float AspectRatio()const;
 
 	//************************************
@@ -46,21 +48,14 @@ public:
 
 	virtual bool Initialize()override;
 
-	virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 	virtual std::shared_ptr<FWindow> CreateMainWindow()override;
 	virtual FApp* GetOwnApp()override;
 
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
 	virtual void OnResize();
-	virtual void Update(const FGameTimer& gt) = 0;
-	virtual void Draw(const FGameTimer& gt) = 0;
-
-	virtual void OnMouseDown(WPARAM btnState, int x, int y) {}
-	virtual void OnMouseUp(WPARAM btnState, int x, int y) {}
-	virtual void OnMouseMove(WPARAM btnState, int x, int y) {}
-	virtual void OnKeyBoardInput(const FGameTimer& gt) {}
+	virtual void Update() = 0;
+	virtual void Draw() = 0;
 
 protected:
 
@@ -90,10 +85,6 @@ protected:
 
 	HINSTANCE mhAppInst = nullptr; // application instance handle
 	HWND	  mhMainWnd = nullptr; // main window handle
-	bool	  mAppPaused = false; // is the application paused?
-	bool	  mMinimized = false; // is the application min?
-	bool	  mMaximized = false; // is the application max?
-	bool	  mResizing = false; // are the resize bars being dragged?
 	bool	  mFullscreenState = false; // full screen enabled
 
 	// set true to use 4X MSAA ,the default is false

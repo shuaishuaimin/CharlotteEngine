@@ -14,7 +14,6 @@
 #include <chrono>
 #include <mutex>
 #include "FApp.h"
-#include "FPlatformAPI.h"
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
 #include "gtc/quaternion.hpp"

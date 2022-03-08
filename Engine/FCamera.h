@@ -19,8 +19,10 @@ public:
 	void GetCameraData(Charalotte::CameraData& Data);
 	void BackCameraLocation(const glm::vec4& CameraLocation, const glm::vec4& Target, const glm::vec4& Up);
 
+	static Charalotte::FPoint2D LastCameraMousePos;
 protected:
 	void CalcVPMatrix();
+	void RegisterCameraInput();
 
 private:
 	Charalotte::VPTransformData VPTransform;
@@ -32,3 +34,4 @@ private:
 
 	float Sensitivity;
 };
+

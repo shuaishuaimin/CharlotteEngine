@@ -4,10 +4,10 @@
 #include "FGameTimer.h"
 #include "FScene.h"
 
-class FWinGame
+class FGame
 {
 public:
-	FWinGame(){};
+	FGame(){};
 	// register mouse and keyboard event
 	void RegisterEvent();
 

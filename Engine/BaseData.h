@@ -83,5 +83,19 @@ namespace Charalotte
 		float pitch = 0.0f;
 		float yaw = 0.0f;
 	};
+
+	enum WindowsAction
+	{
+		Move,
+		MouseDown,
+		MouseUp
+	};
+	struct WindowsInputData
+	{
+		WPARAM btnState;
+		int x;
+		int y;
+		WindowsAction Action;
+	};
 }
 

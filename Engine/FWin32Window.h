@@ -6,7 +6,7 @@ class FWin32Window : public FWindow
 {
 public: 
 
-	FWin32Window(WNDPROC MainWndProcs, HINSTANCE Instance);
+	FWin32Window(HINSTANCE Instance);
 	FWin32Window(const FWin32Window& rhs) = delete;
 	FWin32Window& operator=(const FWin32Window& rhs) = delete;
 	virtual ~FWin32Window();
@@ -16,7 +16,18 @@ public:
 
 	virtual bool InitMainWindow()override;
 
+	LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+	static FWin32Window* GetMainWindow();
+
+	void OnMouseDown(WPARAM btnState, int x, int y);
+	void OnMouseUp(WPARAM btnState, int x, int y);
+	void OnMouseMove(WPARAM btnState, int x, int y);
+	void OnKeyBoardInput();
+
 protected:
+	static FWin32Window* MainWindow;
+
 	WNDPROC MainWndProcIns;
 	HINSTANCE mhAppInst = nullptr; // application instance handle
 	HWND	  mhMainWnd = nullptr; // main window handle

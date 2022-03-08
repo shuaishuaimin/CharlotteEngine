@@ -23,6 +23,12 @@ public:
 		Cameras.push_back(MainCamera);
 		CameraTrans = Charalotte::CameraTransform();
 		DefaultCameraTrans = Charalotte::CameraTransform();
+
+		GameTimer = std::make_unique<FGameTimer>();
+		IsAppPaused = false;
+
+		IsDeviceSucceed = false;
+		IsCanResizing = false;
 	}
 	~FScene(){}
 
@@ -40,9 +46,52 @@ public:
 	{
 		CameraTrans = DefaultCameraTrans;
 	}
+
+	FGameTimer* GetTimer()
+	{
+		return GameTimer.get();
+	}
+
+	bool GetIsAppPaused()
+	{
+		return IsAppPaused;
+	}
+
+	void SetIsAppPaused(bool IsPaused)
+	{
+		IsAppPaused = IsPaused;
+	}
+
+	bool GetIsDeviceSucceed()
+	{
+		return IsDeviceSucceed;
+	}
+
+	void SetIsDeviceSucceed(bool IsSucceed)
+	{
+		IsDeviceSucceed = IsSucceed;
+	}
+
+	bool GetIsCanResizing()
+	{
+		return IsCanResizing;
+	}
+
+	void SetIsCanResizing(bool IsCan)
+	{
+		IsCanResizing = IsCan;
+	}
 private:
 	std::vector<std::shared_ptr<FCamera>> Cameras;
 	std::shared_ptr<FCamera> MainCamera;
 	Charalotte::CameraTransform CameraTrans;
 	Charalotte::CameraTransform DefaultCameraTrans;
+
+	std::unique_ptr<FGameTimer> GameTimer;
+	// connect app and window
+	bool IsAppPaused;
+
+	bool IsDeviceSucceed;
+
+	bool IsCanResizing;
 };

@@ -4,7 +4,7 @@
 FWinInputSystem::FWinInputSystem()
 {
 	KeyBEvents = std::unordered_map<char, Charalotte::KeyInputType>();
-	MouseEvents = std::unordered_map<Charalotte::MouseAction, Charalotte::MouseInputType>();
+	MouseEvents = std::unordered_map<Charalotte::WindowsAction, Charalotte::WindowsInputType>();
 	IsExecuteKeyEvent = false;
 	EventKeys = {};
 	ActionMouses = {};
@@ -15,7 +15,7 @@ FWinInputSystem::~FWinInputSystem()
 	
 }
 
-void FWinInputSystem::RegisterKeyInput(char Key, const std::function<void(const FGameTimer& gt)>& Function)
+void FWinInputSystem::RegisterKeyInput(char Key, const std::function<void()>& Function)
 {
 	KeyBEvents.insert({ Key, Function });
 	EventKeys.insert(Key);
@@ -27,13 +27,13 @@ void FWinInputSystem::UnKeyRegisterInput(char Key)
 	EventKeys.erase(Key);
 }
 
-void FWinInputSystem::ExecuteKeyEvent(char Key, const FGameTimer& gt)
+void FWinInputSystem::ExecuteKeyEvent(char Key)
 {
 	IsExecuteKeyEvent = true;
 	auto KeyIter = KeyBEvents.find(Key);
 	if (KeyIter != KeyBEvents.end())
 	{
-		KeyIter->second(gt);
+		KeyIter->second();
 		IsExecuteKeyEvent = false;
 		return;
 	}
@@ -46,19 +46,19 @@ std::set<char> FWinInputSystem::GetEventKeys()
 	return EventKeys;
 }
 
-void FWinInputSystem::RegisterMouseInput(const Charalotte::MouseInputData& Action, const Charalotte::MouseInputType& Event)
+void FWinInputSystem::RegisterWindowsInput(Charalotte::WindowsAction Action, const Charalotte::WindowsInputType& Event)
 {
-	MouseEvents.insert({ Action.Action, Event });
-	ActionMouses.insert(Action.Action);
+	MouseEvents.insert({ Action, Event });
+	ActionMouses.insert(Action);
 }
 
-void FWinInputSystem::UnRegisterMouseInput(const Charalotte::MouseInputData& Action)
+void FWinInputSystem::UnRegisterWindowsInput(Charalotte::WindowsAction Action)
 {
-	MouseEvents.erase(Action.Action);
-	ActionMouses.erase(Action.Action);
+	MouseEvents.erase(Action);
+	ActionMouses.erase(Action);
 }
 
-void FWinInputSystem::ExecuteMouseEvent(const Charalotte::MouseInputData& Input)
+void FWinInputSystem::ExecuteWindowsEvent(const Charalotte::WindowsInputData& Input)
 {
 	IsExecuteMouseEvent = true;
 	auto KeyIter = MouseEvents.find(Input.Action);
@@ -71,3 +71,4 @@ void FWinInputSystem::ExecuteMouseEvent(const Charalotte::MouseInputData& Input)
 	IsExecuteKeyEvent = false;
 	return;
 }
+

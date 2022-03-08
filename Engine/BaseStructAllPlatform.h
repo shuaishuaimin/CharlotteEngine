@@ -39,4 +39,10 @@ namespace Charalotte
 		Charalotte::FVector Translation;
 		Charalotte::FVector Scale3D;
 	};
+
+	struct FPoint2D
+	{
+		float x;
+		float y;
+	};
 }

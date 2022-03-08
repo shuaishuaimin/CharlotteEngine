@@ -1,23 +1,21 @@
 #include "stdafx.h"
 #include "FWinsApp.h"
+#include "FScene.h"
 #include <WindowsX.h>
 
 using Microsoft::WRL::ComPtr;
 using namespace std;
 using namespace DirectX;
 
-LRESULT CALLBACK
-MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	// forward hwnd on because we can get message (e.g: WM_CREATE)
-	// before CreateWindow returns, and thus before mhMainWnd is valid.
-	return FWinsApp::GetApp()->MsgProc(hwnd, msg, wParam, lParam);
-}
-
 FWinsApp* FWinsApp::mApp = nullptr;
 FWinsApp* FWinsApp::GetApp()
 {
 	return mApp;
+}
+
+FWin32Window* FWinsApp::GetWindow()
+{
+	return mWindowIns.get();
 }
 
 FWinsApp::FWinsApp(HINSTANCE hInstance) : mhAppInst(hInstance)
@@ -33,7 +31,9 @@ FWinsApp::~FWinsApp()
 	if (md3dDevice != nullptr)
 	{
 		FlushCommandQueue();
+		FScene::GetInstance().SetIsDeviceSucceed(false);
 	}
+	FScene::GetInstance().SetIsDeviceSucceed(false);
 }
 
 HINSTANCE FWinsApp::AppInst()const
@@ -68,7 +68,7 @@ int FWinsApp::Run()
 {
 	MSG msg = { 0 };
 
-	mTimer.Reset();
+	FScene::GetInstance().GetTimer()->Reset();
 
 	// if message is not wm_quit. Refresh the window
 	while (msg.message != WM_QUIT)
@@ -82,15 +82,15 @@ int FWinsApp::Run()
 		// otherwise, do animation/game stuff
 		else
 		{
-			mTimer.Tick();
+			FScene::GetInstance().GetTimer()->Tick();
 
 			// if game pause sleep for wait
 			// else calculate frame states and update timer, draw timer to screen
-			if (!mAppPaused)
+			if (!FScene::GetInstance().GetIsAppPaused())
 			{
 				CalculateFrameStats();
-				Update(mTimer);
-				Draw(mTimer);
+				Update();
+				Draw();
 			}
 			else
 			{
@@ -253,143 +253,6 @@ void FWinsApp::OnResize()
 	mScissorRect = { 0, 0, mClientWidth, mClientHeight };
 }
 
-LRESULT FWinsApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
-	{
-		// WM_ACTIVATE is sent when the window is activated or deactivated.  
-		// We pause the game when the window is deactivated and unpause it 
-		// when it becomes active.  
-	case WM_ACTIVATE:
-		if (LOWORD(wParam) == WA_INACTIVE)
-		{
-			mAppPaused = true;
-			mTimer.Stop();
-		}
-		else
-		{
-			mAppPaused = false;
-			mTimer.Start();
-		}
-		return 0;
-
-		// WM_SIZE is sent when the user resizes the window.  
-	case WM_SIZE:
-		// Save the new client area dimensions.
-		mClientWidth = LOWORD(lParam);
-		mClientHeight = HIWORD(lParam);
-		if (md3dDevice)
-		{
-			if (wParam == SIZE_MINIMIZED)
-			{
-				mAppPaused = true;
-				mMinimized = true;
-				mMaximized = false;
-			}
-			else if (wParam == SIZE_MAXIMIZED)
-			{
-				mAppPaused = false;
-				mMinimized = false;
-				mMaximized = true;
-				OnResize();
-			}
-			else if (wParam == SIZE_RESTORED)
-			{
-
-				// Restoring from minimized state?
-				if (mMinimized)
-				{
-					mAppPaused = false;
-					mMinimized = false;
-					OnResize();
-				}
-
-				// Restoring from maximized state?
-				else if (mMaximized)
-				{
-					mAppPaused = false;
-					mMaximized = false;
-					OnResize();
-				}
-				else if (mResizing)
-				{
-					// If user is dragging the resize bars, we do not resize 
-					// the buffers here because as the user continuously 
-					// drags the resize bars, a stream of WM_SIZE messages are
-					// sent to the window, and it would be pointless (and slow)
-					// to resize for each WM_SIZE message received from dragging
-					// the resize bars.  So instead, we reset after the user is 
-					// done resizing the window and releases the resize bars, which 
-					// sends a WM_EXITSIZEMOVE message.
-				}
-				else // API call such as SetWindowPos or mSwapChain->SetFullscreenState.
-				{
-					OnResize();
-				}
-			}
-		}
-		return 0;
-
-		// WM_EXITSIZEMOVE is sent when the user grabs the resize bars.
-	case WM_ENTERSIZEMOVE:
-		mAppPaused = true;
-		mResizing = true;
-		mTimer.Stop();
-		return 0;
-
-		// WM_EXITSIZEMOVE is sent when the user releases the resize bars.
-		// Here we reset everything based on the new window dimensions.
-	case WM_EXITSIZEMOVE:
-		mAppPaused = false;
-		mResizing = false;
-		mTimer.Start();
-		OnResize();
-		return 0;
-
-		// WM_DESTROY is sent when the window is being destroyed.
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
-
-		// The WM_MENUCHAR message is sent when a menu is active and the user presses 
-		// a key that does not correspond to any mnemonic or accelerator key. 
-	case WM_MENUCHAR:
-		// Don't beep when we alt-enter.
-		return MAKELRESULT(0, MNC_CLOSE);
-
-		// Catch this message so to prevent the window from becoming too small.
-	case WM_GETMINMAXINFO:
-		((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
-		((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
-		return 0;
-
-	case WM_LBUTTONDOWN:
-	case WM_MBUTTONDOWN:
-	case WM_RBUTTONDOWN:
-		OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		return 0;
-	case WM_LBUTTONUP:
-	case WM_MBUTTONUP:
-	case WM_RBUTTONUP:
-		OnMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		return 0;
-	case WM_MOUSEMOVE:
-		OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		return 0;
-	case WM_KEYUP:
-		if (wParam == VK_ESCAPE)
-		{
-			PostQuitMessage(0);
-		}
-		else if ((int)wParam == VK_F2)
-			Set4xMsaaState(!m4xMsaaState);
-
-		return 0;
-	}
-
-	return DefWindowProc(hwnd, msg, wParam, lParam);
-}
-
 bool FWinsApp::InitMainWindow()
 {
 	//mWindowIns = std::make_unique<FWin32Window>(MainWndProc, mhAppInst);
@@ -430,6 +293,14 @@ bool FWinsApp::InitDirect3D()
 
 	ThrowIfFailed(md3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE,
 		IID_PPV_ARGS(&mFence)));
+	if (md3dDevice)
+	{
+		FScene::GetInstance().SetIsDeviceSucceed(true);
+	}
+	else
+	{
+		FScene::GetInstance().SetIsDeviceSucceed(false);
+	}
 
 	mRtvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	mDsvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
@@ -564,7 +435,7 @@ void FWinsApp::CalculateFrameStats()
 	frameCnt++;
 
 	// Compute averages over one second period.
-	if ((mTimer.TotalTime() - timeElapsed) >= 1.0f)
+	if ((FScene::GetInstance().GetTimer()->TotalTime() - timeElapsed) >= 1.0f)
 	{
 		float fps = (float)frameCnt; // fps = frameCnt / 1
 		float mspf = 1000.0f / fps;
@@ -661,7 +532,7 @@ void FWinsApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 
 std::shared_ptr<FWindow> FWinsApp::CreateMainWindow()
 {
-	mWindowIns = std::make_shared<FWin32Window>(MainWndProc, mhAppInst);
+	mWindowIns = std::make_shared<FWin32Window>(mhAppInst);
 	return mWindowIns;
 }
 FApp* FWinsApp::GetOwnApp()

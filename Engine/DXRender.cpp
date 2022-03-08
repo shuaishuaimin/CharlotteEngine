@@ -13,18 +13,7 @@ using std::string;
 
 DXRender::DXRender(HINSTANCE hInstance) : FWinsApp(hInstance)
 {
-	Charalotte::CameraData CameraData;
-	CameraData.Near = 1.0f;
-	CameraData.Far = 20000.0f;
-	CameraData.FovAngleY = 0.25f * FMathHelper::Pi;
-	CameraData.AspectRatio = AspectRatio();
-	CameraData.Location = glm::vec4(-5000.0f, 0.0f, 0.0f, 1.0f);
-	CameraData.Target = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	CameraData.Up = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-	CameraData.Width = mClientWidth;
-	CameraData.Height = mClientHeight;
 
-	MainCamera = std::make_unique<FCamera>(CameraData);
 }
 DXRender::~DXRender()
 {
@@ -59,9 +48,14 @@ void DXRender::OnResize()
 	FWinsApp::OnResize();
 }
 
-void DXRender::Update(const FGameTimer& gt)
+void DXRender::Update()
 {
-	OnKeyBoardInput(gt);
+	if (FScene::GetInstance().GetIsCanResizing())
+	{
+		OnResize();
+		FScene::GetInstance().SetIsCanResizing(false);
+	}
+	GetWindow()->OnKeyBoardInput();
 	for (auto& ActorIns : ActorArray)
 	{
 		// update the constant buffer with the latest worldviewproj glm::mat4
@@ -75,7 +69,7 @@ void DXRender::Update(const FGameTimer& gt)
 	}
 }
 
-void DXRender::Draw(const FGameTimer& gt)
+void DXRender::Draw()
 {
 	// Reuse the memory associated with command recording.
 	// we can only  reset when the associated command lists have finished execution on the GPU.
@@ -150,106 +144,6 @@ void DXRender::Draw(const FGameTimer& gt)
 	FlushCommandQueue();
 }
 
-void DXRender::OnMouseDown(WPARAM btnState, int x, int y)
-{
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-
-	SetCapture(mhMainWnd);
-}
-void DXRender::OnMouseUp(WPARAM btnState, int x, int y)
-{
-	ReleaseCapture();
-}
-void DXRender::OnMouseMove(WPARAM btnState, int x, int y)
-{
-	float MouseSe = 0.03f;
-	if ((btnState & MK_LBUTTON) != 0)
-	{
-		// make each pixel correspond to a quarter of a degree
-		float dx = -MouseSe * static_cast<float>(x - mLastMousePos.x);
-		float dy = -MouseSe * static_cast<float>(y - mLastMousePos.y);
-		CameraTrans.row += (dx + dy);
-		FScene::GetInstance().GetCamera()->TransformCamera(CameraTrans);
-		CameraTrans = DefaultCameraTrans;
-	}
-	else if ((btnState & MK_RBUTTON) != 0)
-	{
-		
-		// Make each pixel correspond to 0.005 unit in the scene
-		float dx = MouseSe * static_cast<float>(x - mLastMousePos.x);
-		float dy = MouseSe * static_cast<float>(y - mLastMousePos.y);
-		CameraTrans.pitch += (dx + dy);
-		FScene::GetInstance().GetCamera()->TransformCamera(CameraTrans);
-		CameraTrans = DefaultCameraTrans;
-	}
-
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-}
-
-void DXRender::OnKeyBoardInput(const FGameTimer& gt)
-{
-	auto test = FWinInputSystem::GetInstance().GetEventKeys();
-	for (const auto& KeyIter : FWinInputSystem::GetInstance().GetEventKeys())
-	{
-		if (GetAsyncKeyState(KeyIter) & 0x8000)
-		{
-			FWinInputSystem::GetInstance().ExecuteKeyEvent(KeyIter, gt);
-		}
-	}
-
-	//float Se = 0.3f;
-
-	//if (GetAsyncKeyState('A') & 0x8000)
-	//{
-	//	CameraTrans.Translation.y -= Se;
-	//	MainCamera->TransformCamera(CameraTrans);
-	//	CameraTrans = DefaultCameraTrans;
-	//}
-	//if (GetAsyncKeyState('D') & 0x8000)
-	//{
-	//	CameraTrans.Translation.y += Se;
-	//	MainCamera->TransformCamera(CameraTrans);
-	//	CameraTrans = DefaultCameraTrans;
-	//}
-
-	//if (GetAsyncKeyState('W') & 0x8000)
-	//{
-	//	CameraTrans.Translation.x += Se;
-	//	MainCamera->TransformCamera(CameraTrans);
-	//	CameraTrans = DefaultCameraTrans;
-	//}
-
-	//if (GetAsyncKeyState('S') & 0x8000)
-	//{
-	//	CameraTrans.Translation.x -= Se;
-	//	MainCamera->TransformCamera(CameraTrans);
-	//	CameraTrans = DefaultCameraTrans;
-	//}
-
-	//if (GetAsyncKeyState('Q') & 0x8000)
-	//{
-	//	CameraTrans.Translation.z -= Se;
-	//	MainCamera->TransformCamera(CameraTrans);
-	//	CameraTrans = DefaultCameraTrans;
-	//}
-
-	//if (GetAsyncKeyState('E') & 0x8000)
-	//{
-	//	CameraTrans.Translation.z += Se;
-	//	MainCamera->TransformCamera(CameraTrans);
-	//	CameraTrans = DefaultCameraTrans;
-	//}
-
-	//if (GetAsyncKeyState('O') & 0x8000)
-	//{
-	//	glm::vec4 Location = glm::vec4(-5000.0f, 0.0f, 0.0f, 1.0f);
-	//	glm::vec4 Target = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	//	glm::vec4 Up = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-	//	MainCamera->BackCameraLocation(Location, Target, Up);
-	//}
-}
 
 void DXRender::BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap)
 {

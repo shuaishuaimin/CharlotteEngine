@@ -147,14 +147,8 @@
     <ClInclude Include="Engine\FWin32Window.h">
       <Filter>Header Files\Platform\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FPlatformAPI.h">
-      <Filter>Header Files\Platform\API</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\FDataProcessor.h">
       <Filter>Header Files\Public\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\FSceneAsset.h">
-      <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\BaseStructAllPlatform.h">
       <Filter>Header Files\Public\Data</Filter>
@@ -162,7 +156,7 @@
     <ClInclude Include="Engine\DXRender.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FWinGame.h">
+    <ClInclude Include="Engine\FGame.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Singleton.h">
@@ -179,6 +173,9 @@
     </ClInclude>
     <ClInclude Include="Engine\FInputSystem.h">
       <Filter>Header Files\Public\BaseClass</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FSceneAsset.h">
+      <Filter>Header Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -218,17 +215,14 @@
     <ClCompile Include="Engine\FWin32Window.cpp">
       <Filter>Source Files\Platform\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FPlatformAPI.cpp">
-      <Filter>Source Files\Platform</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\DXRender.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FWinGame.cpp">
+    <ClCompile Include="Engine\FGame.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FWinInputSystem.cpp">
-      <Filter>Source Files\Public</Filter>
+      <Filter>Source Files\Public\BaseClass</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

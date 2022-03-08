@@ -32,14 +32,8 @@ public:
 
 private:
 	virtual void OnResize()override;
-	virtual void Update(const FGameTimer& gt)override;
-	virtual void Draw(const FGameTimer& gt)override;
-
-	// transform
-	virtual void OnMouseDown(WPARAM btnState, int x, int y)override;
-	virtual void OnMouseUp(WPARAM btnState, int x, int y)override;
-	virtual void OnMouseMove(WPARAM btnState, int x, int y)override;
-	virtual void OnKeyBoardInput(const FGameTimer& gt)override;
+	virtual void Update()override;
+	virtual void Draw()override;
 
 	// render pipeline
 	void BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap);
@@ -68,11 +62,6 @@ private:
 	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
 
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> mPSO = nullptr;
-
-	// camera data
-	std::unique_ptr<FCamera> MainCamera;
-	Charalotte::CameraTransform CameraTrans;
-	Charalotte::CameraTransform DefaultCameraTrans;
 
 	POINT mLastMousePos;
 	Charalotte::FActorsInfoForPrint ActorInfos;
