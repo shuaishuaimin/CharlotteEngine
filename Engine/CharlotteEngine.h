@@ -1,6 +1,6 @@
 #pragma once
 #include "FWindow.h"
-#include "FApp.h"
+#include "FRender.h"
 #include "FAssetSystem.h"
 #if PLATFORM_WINDOWS
 #include "DXRender.h"
@@ -23,7 +23,7 @@ public:
 	void Destory();
 
 private:
-	std::unique_ptr<FApp> RenderIns;
+	std::unique_ptr<FRender> RenderIns;
 	std::shared_ptr<FWindow> WindowIns;
 };
 

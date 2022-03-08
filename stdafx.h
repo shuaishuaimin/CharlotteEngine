@@ -13,7 +13,7 @@
 #include <thread>
 #include <chrono>
 #include <mutex>
-#include "FApp.h"
+#include "FRender.h"
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
 #include "gtc/quaternion.hpp"
@@ -33,6 +33,6 @@
 #include "d3dx12.h"
 #include "DDSTextureLoader.h"
 #include "BaseStructAllPlatform.h"
-#include "FWinsApp.h"
+#include "FWinRender.h"
 #endif
 	

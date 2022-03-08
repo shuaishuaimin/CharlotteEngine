@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FWinsApp.h"
+#include "FWinRender.h"
 #include "FMathHelper.h"
 #include "FUploadBuffer.h"
 #include "BaseData.h"
@@ -19,7 +19,7 @@ struct FActorAsset
 	glm::mat4 MTrans = glm::mat4(1.0f);
 };
 
-class DXRender : public FWinsApp
+class DXRender : public FWinRender
 {
 public:
 	DXRender(HINSTANCE hInstance);

@@ -7,7 +7,7 @@
 #endif
 
 #include "FUtil.h"
-#include "FApp.h"
+#include "FRender.h"
 #include "FGameTimer.h"
 #include "FWin32Window.h"
 
@@ -16,17 +16,17 @@
 #pragma comment(lib, "D3D12.lib")
 #pragma comment(lib, "dxgi.lib")
 
-class FWinsApp : public FApp
+class FWinRender : public FRender
 {
 protected:
 	//ban  struct
-	FWinsApp(HINSTANCE hInstance);
-	FWinsApp(const FWinsApp& rhs) = delete;
-	FWinsApp& operator=(const FWinsApp& rhs) = delete;
-	virtual ~FWinsApp();
+	FWinRender(HINSTANCE hInstance);
+	FWinRender(const FWinRender& rhs) = delete;
+	FWinRender& operator=(const FWinRender& rhs) = delete;
+	virtual ~FWinRender();
 
 public:
-	static FWinsApp* GetApp();
+	static FWinRender* GetApp();
 
 	FWin32Window* GetWindow();
 
@@ -49,7 +49,7 @@ public:
 	virtual bool Initialize()override;
 
 	virtual std::shared_ptr<FWindow> CreateMainWindow()override;
-	virtual FApp* GetOwnApp()override;
+	virtual FRender* GetOwnApp()override;
 
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
@@ -77,7 +77,7 @@ protected:
 
 protected:
 
-	static FWinsApp* mApp;
+	static FWinRender* mApp;
 
 	std::shared_ptr<FWin32Window> mWindowIns;
 

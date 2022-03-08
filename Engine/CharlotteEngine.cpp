@@ -10,7 +10,7 @@ CharalotteEngine::CharalotteEngine(HINSTANCE hInstance) {
 #else
 CharalotteEngine::CharalotteEngine()
 {
-	RenderIns = std::make_unique<FApp>();
+	RenderIns = std::make_unique<FRender>();
 	WindowIns = RenderIns->CreateMainWindow();
 }
 #endif

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FWinsApp.h"
+#include "FWinRender.h"
 #include "FScene.h"
 #include <WindowsX.h>
 
@@ -7,25 +7,25 @@ using Microsoft::WRL::ComPtr;
 using namespace std;
 using namespace DirectX;
 
-FWinsApp* FWinsApp::mApp = nullptr;
-FWinsApp* FWinsApp::GetApp()
+FWinRender* FWinRender::mApp = nullptr;
+FWinRender* FWinRender::GetApp()
 {
 	return mApp;
 }
 
-FWin32Window* FWinsApp::GetWindow()
+FWin32Window* FWinRender::GetWindow()
 {
 	return mWindowIns.get();
 }
 
-FWinsApp::FWinsApp(HINSTANCE hInstance) : mhAppInst(hInstance)
+FWinRender::FWinRender(HINSTANCE hInstance) : mhAppInst(hInstance)
 {
 	// only one D3DApp can be construct
 	assert(mApp == nullptr);
 	mApp = this;
 }
 
-FWinsApp::~FWinsApp()
+FWinRender::~FWinRender()
 {
 	// if device is empty, flush the command list(queue)
 	if (md3dDevice != nullptr)
@@ -36,22 +36,22 @@ FWinsApp::~FWinsApp()
 	FScene::GetInstance().SetIsDeviceSucceed(false);
 }
 
-HINSTANCE FWinsApp::AppInst()const
+HINSTANCE FWinRender::AppInst()const
 {
 	return mhAppInst;
 }
 
-float FWinsApp::AspectRatio()const
+float FWinRender::AspectRatio()const
 {
 	return static_cast<float>(mClientWidth) / mClientHeight;
 }
 
-bool FWinsApp::Get4xMsaaState()const
+bool FWinRender::Get4xMsaaState()const
 {
 	return m4xMsaaState;
 }
 
-void FWinsApp::Set4xMsaaState(bool value)
+void FWinRender::Set4xMsaaState(bool value)
 {
 	if (m4xMsaaState != value)
 	{
@@ -64,7 +64,7 @@ void FWinsApp::Set4xMsaaState(bool value)
 }
 
 // main thread
-int FWinsApp::Run()
+int FWinRender::Run()
 {
 	MSG msg = { 0 };
 
@@ -110,7 +110,7 @@ int FWinsApp::Run()
 	return (int)msg.wParam;
 }
 
-bool FWinsApp::Initialize()
+bool FWinRender::Initialize()
 {
 	if (mWindowIns == nullptr)
 	{
@@ -133,7 +133,7 @@ bool FWinsApp::Initialize()
 // their type is D3D12_DESCRIPTOR_HEAP_DESC
 // we should create description and its own information, that is way to explain heap 
 //	data in heap can not be explained by computer without explain
-void FWinsApp::CreateRtvAndDsvDescriptorHeaps()
+void FWinRender::CreateRtvAndDsvDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
 	rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
@@ -157,7 +157,7 @@ void FWinsApp::CreateRtvAndDsvDescriptorHeaps()
 
 // resize
 // we must create device, swapchain and directcmdlist
-void FWinsApp::OnResize()
+void FWinRender::OnResize()
 {
 	assert(md3dDevice);
 	assert(mSwapChain);
@@ -261,7 +261,7 @@ void FWinsApp::OnResize()
 }
 
 
-bool FWinsApp::InitDirect3D()
+bool FWinRender::InitDirect3D()
 {
 #if defined(DEBUG) || defined(_DEBUG)
 	//enable the d3d12 debug layer
@@ -335,7 +335,7 @@ bool FWinsApp::InitDirect3D()
 	return true;
 }
 
-void FWinsApp::CreateCommandObjects()
+void FWinRender::CreateCommandObjects()
 {
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
@@ -359,7 +359,7 @@ void FWinsApp::CreateCommandObjects()
 
 }
 
-void FWinsApp::CreateSwapChain()
+void FWinRender::CreateSwapChain()
 {
 	// Release the previous swapchain we will be recreating
 	mSwapChain.Reset();
@@ -386,7 +386,7 @@ void FWinsApp::CreateSwapChain()
 		mCommandQueue.Get(), &sd, mSwapChain.GetAddressOf()));
 }
 
-void FWinsApp::FlushCommandQueue()
+void FWinRender::FlushCommandQueue()
 {
 	// advance the fence value to mark commands up to this fence point
 	mCurrentFence++;
@@ -410,24 +410,24 @@ void FWinsApp::FlushCommandQueue()
 	}
 
 }
-ID3D12Resource* FWinsApp::CurrentBackBuffer()const
+ID3D12Resource* FWinRender::CurrentBackBuffer()const
 {
 	return mSwapChainBuffer[mCurrBackBuffer].Get();
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE FWinsApp::CurrentBackBufferView()const
+D3D12_CPU_DESCRIPTOR_HANDLE FWinRender::CurrentBackBufferView()const
 {
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE(
 		mRtvHeap->GetCPUDescriptorHandleForHeapStart(),
 		mCurrBackBuffer, mRtvDescriptorSize);
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE FWinsApp::DepthStencilView()const
+D3D12_CPU_DESCRIPTOR_HANDLE FWinRender::DepthStencilView()const
 {
 	return mDsvHeap->GetCPUDescriptorHandleForHeapStart();
 }
 
-void FWinsApp::CalculateFrameStats()
+void FWinRender::CalculateFrameStats()
 {
 	static int frameCnt = 0;
 	static float timeElapsed = 0.0f;
@@ -456,7 +456,7 @@ void FWinsApp::CalculateFrameStats()
 
 }
 
-void FWinsApp::LogAdapters()
+void FWinRender::LogAdapters()
 {
 	UINT i = 0;
 	IDXGIAdapter* adapter = nullptr;
@@ -483,7 +483,7 @@ void FWinsApp::LogAdapters()
 		ReleaseCom(adapterList[i]);
 	}
 }
-void FWinsApp::LogAdapterOutputs(IDXGIAdapter* adapter)
+void FWinRender::LogAdapterOutputs(IDXGIAdapter* adapter)
 {
 	UINT i = 0;
 	IDXGIOutput* output = nullptr;
@@ -505,7 +505,7 @@ void FWinsApp::LogAdapterOutputs(IDXGIAdapter* adapter)
 	}
 }
 
-void FWinsApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
+void FWinRender::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 {
 	UINT count = 0;
 	UINT flags = 0;
@@ -530,12 +530,12 @@ void FWinsApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 	}
 }
 
-std::shared_ptr<FWindow> FWinsApp::CreateMainWindow()
+std::shared_ptr<FWindow> FWinRender::CreateMainWindow()
 {
 	mWindowIns = std::make_shared<FWin32Window>(mhAppInst);
 	return mWindowIns;
 }
-FApp* FWinsApp::GetOwnApp()
+FRender* FWinRender::GetOwnApp()
 {
 	return this;
 }

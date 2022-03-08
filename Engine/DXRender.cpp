@@ -11,7 +11,7 @@ using Microsoft::WRL::ComPtr;
 using namespace DirectX::PackedVector;
 using std::string;
 
-DXRender::DXRender(HINSTANCE hInstance) : FWinsApp(hInstance)
+DXRender::DXRender(HINSTANCE hInstance) : FWinRender(hInstance)
 {
 
 }
@@ -22,7 +22,7 @@ DXRender::~DXRender()
 
 bool DXRender::Initialize()
 {
-	if (!FWinsApp::Initialize())
+	if (!FWinRender::Initialize())
 		return false;
 
 	// reset
@@ -45,7 +45,7 @@ bool DXRender::Initialize()
 
 void DXRender::OnResize()
 {
-	FWinsApp::OnResize();
+	FWinRender::OnResize();
 }
 
 void DXRender::Update()

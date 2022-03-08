@@ -25,7 +25,7 @@
 #include "d3dx12.h"
 #include "DDSTextureLoader.h"
 #include "Math.h"
-#include "FWinsApp.h"
+#include "FWinRender.h"
 
 #endif
 	

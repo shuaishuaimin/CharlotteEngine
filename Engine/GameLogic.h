@@ -14,7 +14,7 @@ public:
 
 	void Init()
 	{
-		RegisterEvent();
+		FScene::GetInstance().GetAssetSystem()->LoadMap("ThirdPersonExampleMap.dat");
 	}
 
 	void Update(){}

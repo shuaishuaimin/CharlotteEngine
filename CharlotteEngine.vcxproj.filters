@@ -138,10 +138,10 @@
     <ClInclude Include="Engine\FCamera.h">
       <Filter>Header Files\Game\Actor\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FWinsApp.h">
+    <ClInclude Include="Engine\FWinRender.h">
       <Filter>Header Files\Platform\Windows\WindowsAPI\WinApp</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FApp.h">
+    <ClInclude Include="Engine\FRender.h">
       <Filter>Header Files\Platform\App</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FWindow.h">
@@ -224,7 +224,7 @@
     <ClCompile Include="WinMain.cpp">
       <Filter>Source Files\MainFunction</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FWinsApp.cpp">
+    <ClCompile Include="Engine\FWinRender.cpp">
       <Filter>Source Files\Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FWin32Window.cpp">
