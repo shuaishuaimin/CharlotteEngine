@@ -46,9 +46,6 @@
     <Filter Include="Source Files\Platform\Windows\WindowsAPI">
       <UniqueIdentifier>{ab83ffa0-4f5d-4115-b290-d355bdc67878}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Platform\Windows\WindowsAPI\WinApp">
-      <UniqueIdentifier>{bcefa897-75ff-4d6b-817b-fa766bed6c66}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Platform\API">
       <UniqueIdentifier>{b7b2e2b4-f415-466b-b795-e1a1304cdd00}</UniqueIdentifier>
     </Filter>
@@ -108,9 +105,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\d3dx12.h">
       <Filter>Header Files\Public\BaseCode</Filter>
     </ClInclude>
@@ -126,9 +120,6 @@
     <ClInclude Include="Engine\WinBaseData.h">
       <Filter>Header Files\Public\Data</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FGraphicsAPI.h">
-      <Filter>Header Files\Platform\Windows\WindowsAPI</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\FGameTimer.h">
       <Filter>Header Files\Public\BaseClass</Filter>
     </ClInclude>
@@ -137,9 +128,6 @@
     </ClInclude>
     <ClInclude Include="Engine\FCamera.h">
       <Filter>Header Files\Game\Actor\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\FWinRender.h">
-      <Filter>Header Files\Platform\Windows\WindowsAPI\WinApp</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FRender.h">
       <Filter>Header Files\Platform\App</Filter>
@@ -186,11 +174,11 @@
     <ClInclude Include="Engine\GameInstance.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
-    <ClInclude Include="AActor.h">
-      <Filter>Header Files\Game\Actor</Filter>
-    </ClInclude>
     <ClInclude Include="UStaticMesh.h">
       <Filter>Header Files\Game\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\stdafx.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -212,9 +200,6 @@
     <ClCompile Include="Engine\FGameTimer.cpp">
       <Filter>Source Files\Public\BaseClass</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FGraphicsAPI.cpp">
-      <Filter>Source Files\Platform\Windows\WindowsAPI</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files\MainFunction</Filter>
     </ClCompile>
@@ -223,9 +208,6 @@
     </ClCompile>
     <ClCompile Include="WinMain.cpp">
       <Filter>Source Files\MainFunction</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\FWinRender.cpp">
-      <Filter>Source Files\Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FWin32Window.cpp">
       <Filter>Source Files\Platform\Windows</Filter>

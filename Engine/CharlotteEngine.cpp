@@ -2,18 +2,11 @@
 #include "CharlotteEngine.h"
 #include "FScene.h"
 
-#if PLATFORM_WINDOWS
-CharalotteEngine::CharalotteEngine(HINSTANCE hInstance) {
-	RenderIns = std::make_unique<DXRender>(hInstance);
+
+CharalotteEngine::CharalotteEngine() {
+	RenderIns = std::make_unique<DXRender>();
 	WindowIns = RenderIns->CreateMainWindow();
 }
-#else
-CharalotteEngine::CharalotteEngine()
-{
-	RenderIns = std::make_unique<FRender>();
-	WindowIns = RenderIns->CreateMainWindow();
-}
-#endif
 
 bool CharalotteEngine::Init() {
 	if (!WindowIns->InitMainWindow())

@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "WinBaseData.h"
+#include "FMathHelper.h"
 
 extern const int gNumFrameResources;
 

@@ -5,6 +5,7 @@
 #include "FCamera.h"
 #include "WinBaseData.h"
 #include "FAssetSystem.h"
+#include "FGameTimer.h"
 
 class FScene : public Singleton<FScene>
 {

@@ -9,11 +9,8 @@
 class CharalotteEngine
 {
 public:
-#if PLATFORM_WINDOWS
-	CharalotteEngine(HINSTANCE hInstance);
-#else
 	CharalotteEngine();
-#endif
+
 	~CharalotteEngine(){}
 
 	bool Init();

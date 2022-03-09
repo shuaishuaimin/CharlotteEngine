@@ -1,5 +1,5 @@
 #pragma once
-
+#include "BaseStructAllPlatform.h"
 
 class UStaticMesh
 {
@@ -57,5 +57,5 @@ private:
 	DXGI_FORMAT IndexFormat = DXGI_FORMAT_R16_UINT;
 	UINT IndexBufferByteSize = 0;
 
-	std::unordered_map<std::string, Charalotte::SubmeshGeometry> DrawArgs;
+	//std::unordered_map<std::string, Charalotte::SubmeshGeometry> DrawArgs;
 };
