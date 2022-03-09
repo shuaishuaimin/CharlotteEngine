@@ -151,12 +151,12 @@
     <ClInclude Include="Engine\GameInstance.h" />
     <ClInclude Include="Engine\GameLogic.h" />
     <ClInclude Include="Engine\FInputSystem.h" />
-    <ClInclude Include="Engine\FWinInputSystem.h" />
+    <ClInclude Include="Engine\FWinEventRegisterSystem.h" />
     <ClInclude Include="Engine\FScene.h" />
-    <ClInclude Include="Engine\FSceneAsset.h" />
+    <ClInclude Include="Engine\FWinSceneAsset.h" />
     <ClInclude Include="Engine\FWindow.h" />
     <ClInclude Include="Engine\FWinRender.h" />
-    <ClInclude Include="Engine\BaseData.h" />
+    <ClInclude Include="Engine\WinBaseData.h" />
     <ClInclude Include="Engine\d3dx12.h" />
     <ClInclude Include="Engine\FCamera.h" />
     <ClInclude Include="Engine\FDataProcessor.h" />
@@ -179,7 +179,7 @@
     <ClCompile Include="Engine\FScene.cpp" />
     <ClCompile Include="Engine\GameInstance.cpp" />
     <ClCompile Include="Engine\GameLogic.cpp" />
-    <ClCompile Include="Engine\FWinInputSystem.cpp" />
+    <ClCompile Include="Engine\FWinEventRegisterSystem.cpp" />
     <ClCompile Include="Engine\FWin32Window.cpp" />
     <ClCompile Include="Engine\FWinRender.cpp" />
     <ClCompile Include="Engine\FCamera.cpp" />

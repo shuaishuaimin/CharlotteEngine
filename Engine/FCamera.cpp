@@ -3,7 +3,7 @@
 #include "FScene.h"
 
 #if PLATFORM_WINDOWS
-#include "FWinInputSystem.h"
+#include "FWinEventRegisterSystem.h"
 #endif
 
 FCamera::FCamera(const Charalotte::CameraData& Data) : MainCameraData(Data), Sensitivity(0.25)
@@ -91,68 +91,68 @@ void FCamera::BackCameraLocation(const glm::vec4& CameraLocation, const glm::vec
 
 void FCamera::RegisterCameraInput()
 {
-#if PLATFORM_WINDOWS
-	FWinInputSystem::GetInstance().RegisterKeyInput('A', []() {
+
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('A', []() {
 		float KeySe = 0.3f;
 		auto Trans = FScene::GetInstance().GetCameraTrans();
 		Trans.Translation.y -= KeySe;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
-	FWinInputSystem::GetInstance().RegisterKeyInput('D', []() {
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('D', []() {
 		float KeySe = 0.3f;
 		auto Trans = FScene::GetInstance().GetCameraTrans();
 		Trans.Translation.y += KeySe;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
-	FWinInputSystem::GetInstance().RegisterKeyInput('W', []() {
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('W', []() {
 		float KeySe = 0.3f;
 		auto Trans = FScene::GetInstance().GetCameraTrans();
 		Trans.Translation.x += KeySe;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
-	FWinInputSystem::GetInstance().RegisterKeyInput('S', []() {
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('S', []() {
 		float KeySe = 0.3f;
 		auto Trans = FScene::GetInstance().GetCameraTrans();
 		Trans.Translation.x -= KeySe;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
-	FWinInputSystem::GetInstance().RegisterKeyInput('Q', []() {
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('Q', []() {
 		float KeySe = 0.3f;
 		auto Trans = FScene::GetInstance().GetCameraTrans();
 		Trans.Translation.z -= KeySe;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
-	FWinInputSystem::GetInstance().RegisterKeyInput('E', []() {
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('E', []() {
 		float KeySe = 0.3f;
 		auto Trans = FScene::GetInstance().GetCameraTrans();
 		Trans.Translation.z += KeySe;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
-	FWinInputSystem::GetInstance().RegisterKeyInput('O', []() {
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('O', []() {
 		glm::vec4 Location = glm::vec4(-5000.0f, 0.0f, 0.0f, 1.0f);
 		glm::vec4 Target = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 		glm::vec4 Up = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 		FScene::GetInstance().GetCamera()->BackCameraLocation(Location, Target, Up);
 		});
 
-	FWinInputSystem::GetInstance().RegisterWindowsInput
+	FWinEventRegisterSystem::GetInstance().RegisterWindowsInput
 	(Charalotte::WindowsAction::MouseDown, [](const Charalotte::WindowsInputData& Mouse) {
 		FCamera::LastCameraMousePos.x = static_cast<float>(Mouse.x);
 		FCamera::LastCameraMousePos.y = static_cast<float>(Mouse.y);
 		});
 
-	FWinInputSystem::GetInstance().RegisterWindowsInput
+	FWinEventRegisterSystem::GetInstance().RegisterWindowsInput
 	(Charalotte::WindowsAction::MouseUp, [](const Charalotte::WindowsInputData& Mouse) {
 		ReleaseCapture();
 		});
-
-	FWinInputSystem::GetInstance().RegisterWindowsInput
+#if PLATFORM_WINDOWS
+	FWinEventRegisterSystem::GetInstance().RegisterWindowsInput
 	(Charalotte::WindowsAction::Move, [](const Charalotte::WindowsInputData& Mouse) {
 		float MouseSe = 0.03f;
 		if ((Mouse.btnState & MK_LBUTTON) != 0)

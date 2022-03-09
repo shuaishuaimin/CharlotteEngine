@@ -2,7 +2,7 @@
 #include <DirectXColors.h>
 #include "DXRender.h"
 #include "FDataProcessor.h"
-#include "FSceneAsset.h"
+#include "FWinSceneAsset.h"
 #include <cstdint>
 
 
@@ -13,7 +13,9 @@ using std::string;
 
 DXRender::DXRender(HINSTANCE hInstance) : FWinRender(hInstance)
 {
-
+	FWinEventRegisterSystem::GetInstance().RegisterMapLoadEventForDender(Charalotte::BaseMapLoad, [this](const std::string& MapName) {
+		this->LoadingMapDataFromAssetSystem(MapName);
+		});
 }
 DXRender::~DXRender()
 {
@@ -25,16 +27,10 @@ bool DXRender::Initialize()
 	if (!FWinRender::Initialize())
 		return false;
 
-	// reset
-
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
-
 	BuildRootSignature();
-	LoadMeshs("ThirdPersonExampleMap.dat");
-	LoadActors(ActorInfos);
 	BuildShadersAndInputLayOut();
 	BuildPSO();
-
 	ThrowIfFailed(mCommandList->Close());
 	ID3D12CommandList* cmdLists[] = { mCommandList.Get() };
 	mCommandQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
@@ -233,21 +229,9 @@ void DXRender::BuildShadersAndInputLayOut()
 
 void DXRender::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
 {
-	Charalotte::FMeshInfoForPrint MeshInfo;
-	std::shared_ptr<MeshGeometry> MeshGeo = std::make_shared<MeshGeometry>();
-	// save mesh data buffer
-	auto MeshInfoFind = MeshInfoDir.find(GeometryName);
-	if (MeshInfoFind != MeshInfoDir.end())
-	{
-		MeshInfo = MeshInfoFind->second;
-		return;
-	}
-	else
-	{
-		FDataProcessor::LoadMesh(GeometryName, MeshInfo);
-		MeshInfoDir.insert(std::make_pair(GeometryName, MeshInfo));
-	}
-	
+	Charalotte::FMeshInfoForPrint MeshInfo = FScene::GetInstance().GetAssetSystem()->GetMeshInfoByName(GeometryName);
+	std::shared_ptr<Charalotte::MeshGeometry> MeshGeo = std::make_shared<Charalotte::MeshGeometry>();
+
 	std::string Name = GeometryName;
 	if (MeshInfo.LodInfos.size() <= 0)
 	{
@@ -296,7 +280,7 @@ void DXRender::CalcVerticesAndIndices(const std::string& GeometryName, const Cha
 		MeshGeo->indices.push_back(static_cast<int16_t>(VertexIndex));
 	}
 
-	SubmeshGeometry submesh;
+	Charalotte::SubmeshGeometry submesh;
 	submesh.IndexCount = (UINT)(MeshInfo.LodInfos[0].Indices.size());
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
@@ -304,14 +288,14 @@ void DXRender::CalcVerticesAndIndices(const std::string& GeometryName, const Cha
 	MeshGeo->DrawArgs[GeometryName] = submesh;
 	MeshGeo->Name = GeometryName;
 
-	FSceneAsset::AddMeshData(GeometryName, MeshGeo);
+	FWinSceneAsset::AddMeshData(GeometryName, MeshGeo);
 
 	//MeshGeoArray.push_back(MeshGeo);
 }
 
 void DXRender::BuildMeshGeometrys()
 {
-	for (auto& MeshGeoIter : FSceneAsset::GetMeshAssets())
+	for (auto& MeshGeoIter : FWinSceneAsset::GetMeshAssets())
 	{
 		auto MeshGeo = MeshGeoIter.second;
 		const UINT vbByteSize = (UINT)MeshGeo->vertices.size() * sizeof(Charalotte::Vertex);
@@ -334,25 +318,7 @@ void DXRender::BuildMeshGeometrys()
 		MeshGeo->IndexBufferByteSize = ibByteSize;
 	}
 }
-void DXRender::BuildEnviroument(const std::string& GeometryName)
-{
-	Charalotte::FActorsInfoForPrint ActorInfos;
-	FDataProcessor::LoadActors(GeometryName, ActorInfos);
-	if (ActorInfos.ActorsInfo.size() <= 0) return;
-	for (const auto& EnviroumentActor : ActorInfos.ActorsInfo)
-	{
-		std::string assetName = EnviroumentActor.AssetName;
-		if (assetName.size() <= 0)
-		{
-			continue;
-		}
-		assetName.erase(assetName.size() - 1, 1);
-		assetName += ".dat";
-		//OutputDebugStringA(assetName.c_str());
-		CalcVerticesAndIndices(assetName, EnviroumentActor.Transform);
-	}
-	BuildMeshGeometrys();
-}
+
 
 void DXRender::BuildPSO()
 {
@@ -386,29 +352,34 @@ void DXRender::BuildPSO()
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
 }
 
-void DXRender::LoadMeshs(const std::string& GeometryName)
+void DXRender::BuilMeshAsset(const std::string& MapName)
 {
-	FDataProcessor::LoadActors(GeometryName, ActorInfos);
-	if (ActorInfos.ActorsInfo.size() <= 0) return;
-	for (const auto& EnviroumentActor : ActorInfos.ActorsInfo)
+	const auto& ActorInfors = FScene::GetInstance().GetAssetSystem()->GetActorInfos();
+	auto ActorInfosIter = ActorInfors.find(MapName);
+	if (ActorInfosIter != ActorInfors.end())
 	{
-		std::string assetName = EnviroumentActor.AssetName;
-		if (assetName.size() <= 0)
+		for (const auto& EnviroumentActor : ActorInfosIter->second.ActorsInfo )
 		{
-			continue;
+			std::string assetName = EnviroumentActor.AssetName;
+			if (assetName.size() <= 0)
+			{
+				continue;
+			}
+			assetName.erase(assetName.size() - 1, 1);
+			//OutputDebugStringA(assetName.c_str());
+			CalcVerticesAndIndices(assetName, EnviroumentActor.Transform);
 		}
-		assetName.erase(assetName.size() - 1, 1);
-		assetName += ".dat";
-		//OutputDebugStringA(assetName.c_str());
-		CalcVerticesAndIndices(assetName, EnviroumentActor.Transform);
 	}
+	
 	BuildMeshGeometrys();
 }
 
-void DXRender::LoadActors(const Charalotte::FActorsInfoForPrint& ActorInfoIn)
+void DXRender::BuildActors(const std::string& MapName)
 {
-	if (ActorInfoIn.ActorsInfo.size() <= 0) return;
-	for (const auto& EnviroumentActor : ActorInfoIn.ActorsInfo)
+	const auto& ActorInfors = FScene::GetInstance().GetAssetSystem()->GetActorInfos();
+	auto ActorInfosIter = ActorInfors.find(MapName);
+	if (ActorInfosIter->second.ActorsInfo.size() <= 0) return;
+	for (const auto& EnviroumentActor : ActorInfosIter->second.ActorsInfo)
 	{
 		std::string assetName = EnviroumentActor.AssetName;
 		if (assetName.size() <= 0)
@@ -416,9 +387,8 @@ void DXRender::LoadActors(const Charalotte::FActorsInfoForPrint& ActorInfoIn)
 			continue;
 		}
 		assetName.erase(assetName.size() - 1, 1);
-		assetName += ".dat";
 		std::shared_ptr<FActorAsset> ActorAsset = std::make_shared<FActorAsset>();
-		ActorAsset->MeshAsset = FSceneAsset::GetMeshAsset(assetName);
+		ActorAsset->MeshAsset = FWinSceneAsset::GetMeshAsset(assetName);
 		ActorAsset->Transform = EnviroumentActor.Transform;
 	
 		BuildDescriptorHeaps(ActorAsset->CbvHeap);
@@ -426,4 +396,17 @@ void DXRender::LoadActors(const Charalotte::FActorsInfoForPrint& ActorInfoIn)
 
 		ActorArray.push_back(ActorAsset);
 	}
+}
+
+void DXRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
+{
+	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
+
+	BuilMeshAsset(MapName);
+	BuildActors(MapName);
+	
+	ThrowIfFailed(mCommandList->Close());
+	ID3D12CommandList* cmdLists[] = { mCommandList.Get() };
+	mCommandQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
+	FlushCommandQueue();
 }

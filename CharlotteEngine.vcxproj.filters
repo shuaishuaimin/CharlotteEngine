@@ -123,7 +123,7 @@
     <ClInclude Include="Engine\FMathHelper.h">
       <Filter>Header Files\Public\BaseCode</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\BaseData.h">
+    <ClInclude Include="Engine\WinBaseData.h">
       <Filter>Header Files\Public\Data</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FGraphicsAPI.h">
@@ -165,7 +165,7 @@
     <ClInclude Include="Engine\Singleton.h">
       <Filter>Header Files\Public\BaseCode</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FWinInputSystem.h">
+    <ClInclude Include="Engine\FWinEventRegisterSystem.h">
       <Filter>Header Files\Public\BaseClass</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FScene.h">
@@ -177,7 +177,7 @@
     <ClInclude Include="Engine\FInputSystem.h">
       <Filter>Header Files\Public\BaseClass</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FSceneAsset.h">
+    <ClInclude Include="Engine\FWinSceneAsset.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FAssetSystem.h">
@@ -236,7 +236,7 @@
     <ClCompile Include="Engine\GameLogic.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FWinInputSystem.cpp">
+    <ClCompile Include="Engine\FWinEventRegisterSystem.cpp">
       <Filter>Source Files\Public\BaseClass</Filter>
     </ClCompile>
     <ClCompile Include="Engine\GameInstance.cpp">

@@ -3,14 +3,14 @@
 #include "FWinRender.h"
 #include "FMathHelper.h"
 #include "FUploadBuffer.h"
-#include "BaseData.h"
+#include "WinBaseData.h"
 #include "FCamera.h"
-#include "FWinInputSystem.h"
+#include "FWinEventRegisterSystem.h"
 #include "FScene.h"
 
 struct FActorAsset
 {
-	std::shared_ptr<MeshGeometry> MeshAsset = nullptr;
+	std::shared_ptr<Charalotte::MeshGeometry> MeshAsset = nullptr;
 	Charalotte::FTransform Transform;
 	std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>> ObjectCB = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CbvHeap = nullptr;
@@ -30,24 +30,26 @@ public:
 
 	virtual bool Initialize()override;
 
+	void LoadingMapDataFromAssetSystem(const std::string& MapName);
+
 	void Destory(){};
 
 private:
 	virtual void OnResize()override;
 	virtual void Update()override;
 	virtual void Draw()override;
-
+	
 	// render pipeline
 	void BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap);
 	void BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap,
 		std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>>& ObjectCb);
-	void LoadMeshs(const std::string& GeometryName);
-	void LoadActors(const Charalotte::FActorsInfoForPrint& Actor);
+	void BuilMeshAsset(const std::string& MapName);
+	void BuildActors(const std::string& MapName);
 	void BuildRootSignature();
 	void BuildShadersAndInputLayOut();
 	void CalcVerticesAndIndices(const std::string& GeometryName = "", const Charalotte::FTransform& Transform = Charalotte::FTransform());
 	void BuildMeshGeometrys();
-	void BuildEnviroument(const std::string& MapName = "");
+
 	void BuildPSO();
 
 private:
@@ -56,7 +58,7 @@ private:
 
 	std::vector<std::shared_ptr<FActorAsset>> ActorArray;
 
-	std::vector<std::shared_ptr<MeshGeometry>> MeshGeoArray;
+	std::vector<std::shared_ptr<Charalotte::MeshGeometry>> MeshGeoArray;
 
 	Microsoft::WRL::ComPtr<ID3DBlob> mvsByteCode = nullptr;
 	Microsoft::WRL::ComPtr<ID3DBlob> mpsByteCode = nullptr;
@@ -67,8 +69,5 @@ private:
 
 	POINT mLastMousePos;
 	Charalotte::FActorsInfoForPrint ActorInfos;
-
-	// store mesh data to prevent repeating read the same file
-	std::unordered_map<std::string, Charalotte::FMeshInfoForPrint> MeshInfoDir;
 
 };

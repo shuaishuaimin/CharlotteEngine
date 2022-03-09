@@ -4,11 +4,10 @@
 #include <unordered_map>
 #include <vector>
 #include <set>
-#include <windows.h>
 #include "FGameTimer.h"
 #include "Singleton.h"
 #include "FInputSystem.h"
-#include "BaseData.h"
+#include "WinBaseData.h"
 
 namespace Charalotte
 {
@@ -17,11 +16,11 @@ namespace Charalotte
 
 }
 
-class FWinInputSystem : public Singleton<FWinInputSystem>, public FInputSystem
+class FWinEventRegisterSystem : public Singleton<FWinEventRegisterSystem>, public FInputSystem
 {
 public:
-	FWinInputSystem();
-	~FWinInputSystem();
+	FWinEventRegisterSystem();
+	~FWinEventRegisterSystem();
 
 	void RegisterKeyInput(char Key, const std::function<void()>& Function);
 
@@ -37,13 +36,25 @@ public:
 
 	std::set<char> GetEventKeys();
 
+	// when new map loaded, execute load event
+	void RegisterMapLoadEventForDender(Charalotte::MapLoadType Type, std::function<void(const std::string& MapName)> Function);
+	
+	void ExecuteMapLoadEvent(const std::string& MapName);
+
+	void UnRegisterMapLoadEventForDender(Charalotte::MapLoadType Type);
 private:
+	// keyb event
 	std::unordered_map<char, Charalotte::KeyInputType> KeyBEvents;
 	bool IsExecuteKeyEvent;
 	std::set<char> EventKeys;
 
+	// mouse event
 	std::unordered_map<Charalotte::WindowsAction, Charalotte::WindowsInputType> MouseEvents;
 	bool IsExecuteMouseEvent;
 	std::set<Charalotte::WindowsAction> ActionMouses;
+
+	// load map event
+	std::unordered_map<Charalotte::MapLoadType, std::function<void(const std::string& MapName)>> LoadMapEvents;
+	Charalotte::MapLoadType NowLoadType;
 };
 

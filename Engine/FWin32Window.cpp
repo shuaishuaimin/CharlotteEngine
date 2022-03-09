@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FWin32Window.h"
 #include "FScene.h"
-#include "FWinInputSystem.h"
+#include "FWinEventRegisterSystem.h"
 #include <WindowsX.h>
 
 LRESULT CALLBACK
@@ -220,7 +220,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 void FWin32Window::OnMouseDown(WPARAM btnState, int x, int y)
 {
 	Charalotte::WindowsInputData MouseInput = { btnState , x, y, Charalotte::MouseDown };
-	FWinInputSystem::GetInstance().ExecuteWindowsEvent(MouseInput);
+	FWinEventRegisterSystem::GetInstance().ExecuteWindowsEvent(MouseInput);
 	SetCapture(mhMainWnd);
 }
 void FWin32Window::OnMouseUp(WPARAM btnState, int x, int y)
@@ -230,17 +230,17 @@ void FWin32Window::OnMouseUp(WPARAM btnState, int x, int y)
 void FWin32Window::OnMouseMove(WPARAM btnState, int x, int y)
 {
 	Charalotte::WindowsInputData MouseInput = { btnState , x, y, Charalotte::Move };
-	FWinInputSystem::GetInstance().ExecuteWindowsEvent(MouseInput);
+	FWinEventRegisterSystem::GetInstance().ExecuteWindowsEvent(MouseInput);
 }
 
 void FWin32Window::OnKeyBoardInput()
 {
-	auto test = FWinInputSystem::GetInstance().GetEventKeys();
-	for (const auto& KeyIter : FWinInputSystem::GetInstance().GetEventKeys())
+	auto test = FWinEventRegisterSystem::GetInstance().GetEventKeys();
+	for (const auto& KeyIter : FWinEventRegisterSystem::GetInstance().GetEventKeys())
 	{
 		if (GetAsyncKeyState(KeyIter) & 0x8000)
 		{
-			FWinInputSystem::GetInstance().ExecuteKeyEvent(KeyIter);
+			FWinEventRegisterSystem::GetInstance().ExecuteKeyEvent(KeyIter);
 		}
 	}
 }
