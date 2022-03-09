@@ -37,9 +37,9 @@ DXRender::~DXRender()
 	if (md3dDevice != nullptr)
 	{
 		FlushCommandQueue();
-		FScene::GetInstance().SetIsDeviceSucceed(false);
+		FSceneDataManager::GetInstance().SetIsDeviceSucceed(false);
 	}
-	FScene::GetInstance().SetIsDeviceSucceed(false);
+	FSceneDataManager::GetInstance().SetIsDeviceSucceed(false);
 }
 
 bool DXRender::Initialize()
@@ -164,18 +164,17 @@ void DXRender::OnResize()
 
 void DXRender::Update()
 {
-	if (FScene::GetInstance().GetIsCanResizing())
+	if (FSceneDataManager::GetInstance().GetIsCanResizing())
 	{
 		OnResize();
-		FScene::GetInstance().SetIsCanResizing(false);
+		FSceneDataManager::GetInstance().SetIsCanResizing(false);
 	}
-	GetWindow()->OnKeyBoardInput();
 	for (auto& ActorIns : ActorArray)
 	{
 		// update the constant buffer with the latest worldviewproj glm::mat4
 		Charalotte::ObjectConstants objConstants;
 		glm::mat4 NowVPTrans;
-		FScene::GetInstance().GetCamera()->GetVPTransform(NowVPTrans);
+		FSceneDataManager::GetInstance().GetCamera()->GetVPTransform(NowVPTrans);
 		glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorIns->Transform);
 		glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
 		objConstants.TransMatrix = glm::transpose(NowMVPTrans);
@@ -347,7 +346,7 @@ void DXRender::BuildShadersAndInputLayOut()
 
 void DXRender::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
 {
-	Charalotte::FMeshInfoForPrint MeshInfo = FScene::GetInstance().GetAssetSystem()->GetMeshInfoByName(GeometryName);
+	Charalotte::FMeshInfoForPrint MeshInfo = FSceneDataManager::GetInstance().GetMeshInfoByName(GeometryName);
 	std::shared_ptr<Charalotte::MeshGeometry> MeshGeo = std::make_shared<Charalotte::MeshGeometry>();
 
 	std::string Name = GeometryName;
@@ -472,7 +471,7 @@ void DXRender::BuildPSO()
 
 void DXRender::BuilMeshAsset(const std::string& MapName)
 {
-	const auto& ActorInfors = FScene::GetInstance().GetAssetSystem()->GetActorInfos();
+	const auto& ActorInfors = FSceneDataManager::GetInstance().GetActorInfos();
 	auto ActorInfosIter = ActorInfors.find(MapName);
 	if (ActorInfosIter != ActorInfors.end())
 	{
@@ -494,7 +493,7 @@ void DXRender::BuilMeshAsset(const std::string& MapName)
 
 void DXRender::BuildActors(const std::string& MapName)
 {
-	const auto& ActorInfors = FScene::GetInstance().GetAssetSystem()->GetActorInfos();
+	const auto& ActorInfors = FSceneDataManager::GetInstance().GetActorInfos();
 	auto ActorInfosIter = ActorInfors.find(MapName);
 	if (ActorInfosIter->second.ActorsInfo.size() <= 0) return;
 	for (const auto& EnviroumentActor : ActorInfosIter->second.ActorsInfo)
@@ -562,7 +561,7 @@ int DXRender::Run()
 {
 	MSG msg = { 0 };
 
-	FScene::GetInstance().GetTimer()->Reset();
+	FSceneDataManager::GetInstance().GetTimer()->Reset();
 
 	// if message is not wm_quit. Refresh the window
 	while (msg.message != WM_QUIT)
@@ -576,14 +575,16 @@ int DXRender::Run()
 		// otherwise, do animation/game stuff
 		else
 		{
-			FScene::GetInstance().GetTimer()->Tick();
+			FSceneDataManager::GetInstance().GetTimer()->Tick();
 
 			// if game pause sleep for wait
 			// else calculate frame states and update timer, draw timer to screen
-			if (!FScene::GetInstance().GetIsAppPaused())
+			if (!FSceneDataManager::GetInstance().GetIsAppPaused())
 			{
 				CalculateFrameStats();
 				Update();
+				// now we have not used thread
+				GetWindow()->Update();
 				Draw();
 			}
 			else
@@ -683,11 +684,11 @@ bool DXRender::InitDirect3D()
 		IID_PPV_ARGS(&mFence)));
 	if (md3dDevice)
 	{
-		FScene::GetInstance().SetIsDeviceSucceed(true);
+		FSceneDataManager::GetInstance().SetIsDeviceSucceed(true);
 	}
 	else
 	{
-		FScene::GetInstance().SetIsDeviceSucceed(false);
+		FSceneDataManager::GetInstance().SetIsDeviceSucceed(false);
 	}
 
 	mRtvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -823,7 +824,7 @@ void DXRender::CalculateFrameStats()
 	frameCnt++;
 
 	// Compute averages over one second period.
-	if ((FScene::GetInstance().GetTimer()->TotalTime() - timeElapsed) >= 1.0f)
+	if ((FSceneDataManager::GetInstance().GetTimer()->TotalTime() - timeElapsed) >= 1.0f)
 	{
 		float fps = (float)frameCnt; // fps = frameCnt / 1
 		float mspf = 1000.0f / fps;

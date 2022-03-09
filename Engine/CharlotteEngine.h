@@ -1,7 +1,6 @@
 #pragma once
 #include "FWindow.h"
 #include "FRender.h"
-#include "FAssetSystem.h"
 #if PLATFORM_WINDOWS
 #include "DXRender.h"
 #endif

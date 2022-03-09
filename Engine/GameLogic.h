@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "FWinEventRegisterSystem.h"
 #include "FGameTimer.h"
-#include "FScene.h"
+#include "FSceneDataManager.h"
 
 class GameLogic
 {
@@ -12,7 +12,7 @@ public:
 
 	void Init()
 	{
-		FScene::GetInstance().GetAssetSystem()->LoadMap("ThirdPersonExampleMap.dat");
+		FSceneDataManager::GetInstance().LoadMap("ThirdPersonExampleMap.dat");
 	}
 
 	void Update(){}

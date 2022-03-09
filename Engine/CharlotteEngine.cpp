@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "CharlotteEngine.h"
-#include "FScene.h"
+#include "FSceneDataManager.h"
 
 
 CharalotteEngine::CharalotteEngine() {

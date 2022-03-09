@@ -1,8 +1,4 @@
 #pragma once
-
-
-
-
 #include <string>
 #include <memory>
 #include <algorithm>
@@ -39,8 +35,7 @@
 #include "DDSTextureLoader.h"
 #include "WinBaseData.h"
 #include "FDataProcessor.h"
-#include "FAssetSystem.h"
 #include "FCamera.h"
-#include "FScene.h"
+#include "FSceneDataManager.h"
 #endif
 	

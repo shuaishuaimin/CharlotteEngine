@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "FWin32Window.h"
-#include "FScene.h"
+#include "FSceneDataManager.h"
 #include "FWinEventRegisterSystem.h"
+#include <thread>
 #include <WindowsX.h>
 
 LRESULT CALLBACK
@@ -22,7 +23,7 @@ FWin32Window* FWin32Window::MainWindow = nullptr;
 
 FWin32Window::~FWin32Window()
 {
-
+	IsRunning = false;
 }
 
 FWin32Window* FWin32Window::GetMainWindow()
@@ -30,6 +31,15 @@ FWin32Window* FWin32Window::GetMainWindow()
 	return MainWindow;
 }
 
+void FWin32Window::Update()
+{
+	/*while (IsRunning)
+	{
+		OnKeyBoardInput();
+		Sleep(100);
+	}*/
+	OnKeyBoardInput();
+}
 HWND FWin32Window::MainWnd()const
 {
 	return mhMainWnd;
@@ -91,13 +101,13 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_ACTIVATE:
 		if (LOWORD(wParam) == WA_INACTIVE)
 		{
-			FScene::GetInstance().SetIsAppPaused(true);
-			FScene::GetInstance().GetTimer()->Stop();
+			FSceneDataManager::GetInstance().SetIsAppPaused(true);
+			FSceneDataManager::GetInstance().GetTimer()->Stop();
 		}
 		else
 		{
-			FScene::GetInstance().SetIsAppPaused(false);
-			FScene::GetInstance().GetTimer()->Start();
+			FSceneDataManager::GetInstance().SetIsAppPaused(false);
+			FSceneDataManager::GetInstance().GetTimer()->Start();
 		}
 		return 0;
 
@@ -106,20 +116,20 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		// Save the new client area dimensions.
 		mClientWidth = LOWORD(lParam);
 		mClientHeight = HIWORD(lParam);
-		if (FScene::GetInstance().GetIsDeviceSucceed())
+		if (FSceneDataManager::GetInstance().GetIsDeviceSucceed())
 		{
 			if (wParam == SIZE_MINIMIZED)
 			{
-				FScene::GetInstance().SetIsAppPaused(true);
+				FSceneDataManager::GetInstance().SetIsAppPaused(true);
 				mMinimized = true;
 				mMaximized = false;
 			}
 			else if (wParam == SIZE_MAXIMIZED)
 			{
-				FScene::GetInstance().SetIsAppPaused(false);
+				FSceneDataManager::GetInstance().SetIsAppPaused(false);
 				mMinimized = false;
 				mMaximized = true;
-				FScene::GetInstance().SetIsCanResizing(true);
+				FSceneDataManager::GetInstance().SetIsCanResizing(true);
 			}
 			else if (wParam == SIZE_RESTORED)
 			{
@@ -127,17 +137,17 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				// Restoring from minimized state?
 				if (mMinimized)
 				{
-					FScene::GetInstance().SetIsAppPaused(false);
+					FSceneDataManager::GetInstance().SetIsAppPaused(false);
 					mMinimized = false;
-					FScene::GetInstance().SetIsCanResizing(true);
+					FSceneDataManager::GetInstance().SetIsCanResizing(true);
 				}
 
 				// Restoring from maximized state?
 				else if (mMaximized)
 				{
-					FScene::GetInstance().SetIsAppPaused(false);
+					FSceneDataManager::GetInstance().SetIsAppPaused(false);
 					mMaximized = false;
-					FScene::GetInstance().SetIsCanResizing(true);
+					FSceneDataManager::GetInstance().SetIsCanResizing(true);
 				}
 				else if (mResizing)
 				{
@@ -152,7 +162,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 				else // API call such as SetWindowPos or mSwapChain->SetFullscreenState.
 				{
-					FScene::GetInstance().SetIsCanResizing(true);
+					FSceneDataManager::GetInstance().SetIsCanResizing(true);
 				}
 			}
 		}
@@ -160,17 +170,17 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		// WM_EXITSIZEMOVE is sent when the user grabs the resize bars.
 	case WM_ENTERSIZEMOVE:
-		FScene::GetInstance().SetIsAppPaused(true);
+		FSceneDataManager::GetInstance().SetIsAppPaused(true);
 		mResizing = true;
-		FScene::GetInstance().GetTimer()->Stop();
+		FSceneDataManager::GetInstance().GetTimer()->Stop();
 		return 0;
 
 		// WM_EXITSIZEMOVE is sent when the user releases the resize bars.
 		// Here we reset everything based on the new window dimensions.
 	case WM_EXITSIZEMOVE:
-		FScene::GetInstance().SetIsAppPaused(false);
+		FSceneDataManager::GetInstance().SetIsAppPaused(false);
 		mResizing = false;
-		FScene::GetInstance().GetTimer()->Start();
+		FSceneDataManager::GetInstance().GetTimer()->Start();
 		return 0;
 
 		// WM_DESTROY is sent when the window is being destroyed.
@@ -203,6 +213,8 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEMOVE:
 		OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return 0;
+	case WM_KEYDOWN:
+		OnKeyBoardInput();
 	case WM_KEYUP:
 		if (wParam == VK_ESCAPE)
 		{
@@ -210,6 +222,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		else if ((int)wParam == VK_F2)
 		{}
+		
 
 		return 0;
 	}
@@ -235,7 +248,6 @@ void FWin32Window::OnMouseMove(WPARAM btnState, int x, int y)
 
 void FWin32Window::OnKeyBoardInput()
 {
-	auto test = FWinEventRegisterSystem::GetInstance().GetEventKeys();
 	for (const auto& KeyIter : FWinEventRegisterSystem::GetInstance().GetEventKeys())
 	{
 		if (GetAsyncKeyState(KeyIter) & 0x8000)

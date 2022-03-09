@@ -14,7 +14,7 @@
 #include "WinBaseData.h"
 #include "FCamera.h"
 #include "FWinEventRegisterSystem.h"
-#include "FScene.h"
+#include "FSceneDataManager.h"
 
 // link necessary lib
 #pragma comment(lib,"d3dcompiler.lib")

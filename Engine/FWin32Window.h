@@ -25,6 +25,7 @@ public:
 	void OnMouseMove(WPARAM btnState, int x, int y);
 	void OnKeyBoardInput();
 
+	void Update();
 protected:
 	static FWin32Window* MainWindow;
 
@@ -39,4 +40,6 @@ protected:
 	std::wstring mMainWndCaption = L"Charlotte Engine"; // name
 	int mClientWidth = 1980;
 	int mClientHeight = 1280;
+
+	bool IsRunning;
 };

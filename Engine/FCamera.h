@@ -6,6 +6,7 @@ class FCamera
 {
 public:
 	FCamera(const Charalotte::CameraData& Data);
+	FCamera();
 	~FCamera();
 
 	void GetVPTransform(glm::mat4& Matrix);
