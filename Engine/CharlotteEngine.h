@@ -16,6 +16,8 @@ public:
 
 	int Update();
 
+	std::shared_ptr<FWindow> CreateMainWindow();
+
 	void Destory();
 
 private:

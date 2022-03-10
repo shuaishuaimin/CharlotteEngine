@@ -28,7 +28,7 @@ DXRender::DXRender() : NowMapName("")
 	render = this;
 }
 
-DXRender* DXRender::GetApp()
+DXRender* DXRender::GetRender()
 {
 	return render;
 }
@@ -46,13 +46,6 @@ DXRender::~DXRender()
 
 bool DXRender::Initialize()
 {
-	if (mWindowIns == nullptr)
-	{
-		std::stringstream ss;
-		ss << "No Window";
-		OutputDebugStringA(ss.str().c_str());
-		return false;
-	}
 	// only mainwindow or directx3D is not inited, return initialize failed;
 
 	if (!InitDirect3D()) return false;
@@ -509,18 +502,7 @@ void DXRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 	FlushCommandQueue();
 }
 
-std::shared_ptr<FWindow> DXRender::CreateMainWindow()
-{
-	mWindowIns = std::make_shared<FWin32Window>(mhAppInst);
-	return mWindowIns;
-}
-
-FWin32Window* DXRender::GetWindow()
-{
-	return mWindowIns.get();
-}
-
-HINSTANCE DXRender::AppInst()const
+HINSTANCE DXRender::Inst()const
 {
 	return mhAppInst;
 }
@@ -609,7 +591,7 @@ void DXRender::CreateSwapChain()
 	sd.SampleDesc.Quality = m4xMsaaQuality ? (m4xMsaaQuality - 1) : 0;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.BufferCount = SwapChainBufferCount;
-	sd.OutputWindow = mWindowIns->MainWnd();
+	sd.OutputWindow = dynamic_cast<FWin32Window*>(FGlobalDataManager::GetInstance().GetWindowPtr())->MainWnd();
 	sd.Windowed = true;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -681,7 +663,7 @@ void DXRender::CalculateFrameStats()
 			L" FPS : " + fpsstr +
 			L" MSPF: " + mspfstr;
 
-		SetWindowText(mWindowIns->MainWnd(), windowText.c_str());
+		SetWindowText(dynamic_cast<FWin32Window*>(FGlobalDataManager::GetInstance().GetWindowPtr())->MainWnd(), windowText.c_str());
 
 		// reset
 		frameCnt = 0;

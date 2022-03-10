@@ -13,9 +13,15 @@ public:
 
 	void SetIsDeviceSucceed(bool IsSucceed);
 
+	void SaveWindowPtr(FWindow* WindowPtr); 
+
+	FWindow* GetWindowPtr();
+
 private:
 	std::unique_ptr<FGameTimer> GameTimer;
 
 	bool IsDeviceSucceed;
+
+	FWindow* NowWindow;
 };
 

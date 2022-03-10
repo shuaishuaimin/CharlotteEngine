@@ -6,8 +6,8 @@
 
 
 CharalotteEngine::CharalotteEngine() {
+	WindowIns = this->CreateMainWindow();
 	RenderIns = std::make_unique<DXRender>();
-	WindowIns = RenderIns->CreateMainWindow();
 }
 
 bool CharalotteEngine::Init() {
@@ -15,7 +15,7 @@ bool CharalotteEngine::Init() {
 	{
 		return false;
 	}
-
+	FGlobalDataManager::GetInstance().SaveWindowPtr(WindowIns.get());
 	if (!RenderIns->Initialize())
 	{
 		return false;
@@ -23,8 +23,18 @@ bool CharalotteEngine::Init() {
 	return true;
 }
 
+std::shared_ptr<FWindow> CharalotteEngine::CreateMainWindow()
+{
+#if	PLATFORM_WINDOWS
+	return std::make_shared<FWin32Window>(GetModuleHandle(0));
+#else
+	return nullptr;
+#endif
+}
+
 int CharalotteEngine::Update() {
 	//std::thread 
+#if PLATFORM_WINDOWS
 	MSG msg = { 0 };
 
 	FGlobalDataManager::GetInstance().GetTimer()->Reset();
@@ -58,6 +68,9 @@ int CharalotteEngine::Update() {
 		}
 	}
 	return (int)msg.wParam;
+#else
+	return 0;
+#endif
 }
 
 void CharalotteEngine::Destory()

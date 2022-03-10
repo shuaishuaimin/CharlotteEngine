@@ -36,11 +36,9 @@ public:
 
 	void Destory(){};
 
-	static DXRender* GetApp();
+	static DXRender* GetRender();
 
-	FWin32Window* GetWindow();
-
-	HINSTANCE AppInst()const;
+	HINSTANCE Inst()const;
 
 	//************************************
 	// Method:    Get4xMsaaState
@@ -53,8 +51,6 @@ public:
 	void Set4xMsaaState(bool value);
 
 	virtual void Update() override;
-
-	virtual std::shared_ptr<FWindow> CreateMainWindow()override;
 
 protected:
 	void OnResize();
@@ -94,10 +90,7 @@ private:
 
 	static DXRender* render;
 
-	std::shared_ptr<FWin32Window> mWindowIns;
-
 	HINSTANCE mhAppInst = nullptr; // application instance handle
-	HWND	  mhMainWnd = nullptr; // main window handle
 	bool	  mFullscreenState = false; // full screen enabled
 
 	// set true to use 4X MSAA ,the default is false

@@ -5,10 +5,12 @@ FGlobalDataManager::FGlobalDataManager()
 {
 	GameTimer = std::make_unique<FGameTimer>();
 	IsDeviceSucceed = false;
+	NowWindow = nullptr;
 }
 FGlobalDataManager::~FGlobalDataManager()
 {
 	GameTimer = nullptr;
+	NowWindow = nullptr;
 }
 
 FGameTimer* FGlobalDataManager::GetTimer()
@@ -24,4 +26,13 @@ bool FGlobalDataManager::GetIsDeviceSucceed()
 void FGlobalDataManager::SetIsDeviceSucceed(bool IsSucceed)
 {
 	IsDeviceSucceed = IsSucceed;
+}
+void FGlobalDataManager::SaveWindowPtr(FWindow* WindowPtr)
+{
+	NowWindow = WindowPtr;
+}
+
+FWindow* FGlobalDataManager::GetWindowPtr()
+{
+	return NowWindow;
 }
