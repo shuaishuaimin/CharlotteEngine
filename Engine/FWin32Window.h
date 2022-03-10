@@ -26,6 +26,7 @@ public:
 	void OnKeyBoardInput();
 
 	virtual void Update()override;
+	virtual bool GetIsPaused() override;
 protected:
 	static FWin32Window* MainWindow;
 
@@ -42,4 +43,6 @@ protected:
 	int mClientHeight = 1280;
 
 	bool IsRunning;
+
+	bool IsPaused;
 };

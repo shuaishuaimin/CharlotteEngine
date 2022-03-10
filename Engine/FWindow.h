@@ -11,6 +11,8 @@ public:
 
 	virtual void Update() = 0;
 
+	virtual bool GetIsPaused() = 0;
+
 private:
 	float Width;
 	float Height;

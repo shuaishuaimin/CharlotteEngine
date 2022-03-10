@@ -45,7 +45,7 @@ int CharalotteEngine::Update() {
 
 			// if game pause sleep for wait
 			// else calculate frame states and update timer, draw timer to screen
-			if (!FGlobalDataManager::GetInstance().GetIsDXPaused())
+			if (!WindowIns->GetIsPaused())
 			{
 				WindowIns->Update();
 				FScene::GetInstance().Update();

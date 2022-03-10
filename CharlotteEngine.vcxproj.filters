@@ -242,5 +242,8 @@
     <ClCompile Include="Engine\FMeshAsset.cpp">
       <Filter>Source Files\Engine\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\FWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

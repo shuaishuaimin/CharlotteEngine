@@ -14,8 +14,8 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return FWin32Window::GetMainWindow()->MsgProc(hwnd, msg, wParam, lParam);
 }
 
-FWin32Window::FWin32Window(HINSTANCE Instance) :
-				mhAppInst(Instance)
+FWin32Window::FWin32Window(HINSTANCE Instance) : 
+				mhAppInst(Instance), IsPaused(false)
 {
 	assert(MainWindow == nullptr);
 	MainWindow = this;
@@ -102,12 +102,12 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_ACTIVATE:
 		if (LOWORD(wParam) == WA_INACTIVE)
 		{
-			FGlobalDataManager::GetInstance().SetDXPaused(true);
+			IsPaused = true;
 			FGlobalDataManager::GetInstance().GetTimer()->Stop();
 		}
 		else
 		{
-			FGlobalDataManager::GetInstance().SetDXPaused(false);
+			IsPaused = false;
 			FGlobalDataManager::GetInstance().GetTimer()->Start();
 		}
 		return 0;
@@ -121,13 +121,13 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			if (wParam == SIZE_MINIMIZED)
 			{
-				FGlobalDataManager::GetInstance().SetDXPaused(true);
+				IsPaused = true;
 				mMinimized = true;
 				mMaximized = false;
 			}
 			else if (wParam == SIZE_MAXIMIZED)
 			{
-				FGlobalDataManager::GetInstance().SetDXPaused(false);
+				IsPaused = false;
 				mMinimized = false;
 				mMaximized = true;
 				FGlobalDataManager::GetInstance().SetIsCanResizing(true);
@@ -138,7 +138,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				// Restoring from minimized state?
 				if (mMinimized)
 				{
-					FGlobalDataManager::GetInstance().SetDXPaused(false);
+					IsPaused = false;
 					mMinimized = false;
 					FGlobalDataManager::GetInstance().SetIsCanResizing(true);
 				}
@@ -146,7 +146,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				// Restoring from maximized state?
 				else if (mMaximized)
 				{
-					FGlobalDataManager::GetInstance().SetDXPaused(false);
+					IsPaused = false;
 					mMaximized = false;
 					FGlobalDataManager::GetInstance().SetIsCanResizing(true);
 				}
@@ -171,7 +171,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		// WM_EXITSIZEMOVE is sent when the user grabs the resize bars.
 	case WM_ENTERSIZEMOVE:
-		FGlobalDataManager::GetInstance().SetDXPaused(true);
+		IsPaused = true;
 		mResizing = true;
 		FGlobalDataManager::GetInstance().GetTimer()->Stop();
 		return 0;
@@ -179,7 +179,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		// WM_EXITSIZEMOVE is sent when the user releases the resize bars.
 		// Here we reset everything based on the new window dimensions.
 	case WM_EXITSIZEMOVE:
-		FGlobalDataManager::GetInstance().SetDXPaused(false);
+		IsPaused = false;
 		mResizing = false;
 		FGlobalDataManager::GetInstance().GetTimer()->Start();
 		return 0;
@@ -256,4 +256,9 @@ void FWin32Window::OnKeyBoardInput()
 			FWinEventRegisterSystem::GetInstance().ExecuteKeyEvent(KeyIter);
 		}
 	}
+}
+
+bool FWin32Window::GetIsPaused()
+{
+	return IsPaused;
 }

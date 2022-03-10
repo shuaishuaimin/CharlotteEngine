@@ -9,10 +9,6 @@ public:
 
 	FGameTimer* GetTimer();
 
-	bool GetIsDXPaused();
-
-	void SetDXPaused(bool IsPaused);
-
 	bool GetIsDeviceSucceed();
 
 	void SetIsDeviceSucceed(bool IsSucceed);
@@ -23,8 +19,6 @@ public:
 
 private:
 	std::unique_ptr<FGameTimer> GameTimer;
-	// connect app and window
-	bool IsDXPaused;
 
 	bool IsDeviceSucceed;
 

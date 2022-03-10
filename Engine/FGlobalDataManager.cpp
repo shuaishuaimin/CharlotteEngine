@@ -19,16 +19,6 @@ FGameTimer* FGlobalDataManager::GetTimer()
 	return GameTimer.get();
 }
 
-bool FGlobalDataManager::GetIsDXPaused()
-{
-	return IsDXPaused;
-}
-
-void FGlobalDataManager::SetDXPaused(bool IsPaused)
-{
-	IsDXPaused = IsPaused;
-}
-
 bool FGlobalDataManager::GetIsDeviceSucceed()
 {
 	return IsDeviceSucceed;
