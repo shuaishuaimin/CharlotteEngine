@@ -58,7 +58,6 @@ public:
 
 protected:
 	void OnResize();
-	void Update1();
 	void Draw();
 	
 protected:

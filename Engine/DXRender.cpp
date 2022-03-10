@@ -190,26 +190,6 @@ void DXRender::OnResize()
 	mScissorRect = { 0, 0, mClientWidth, mClientHeight };
 }
 
-void DXRender::Update1()
-{
-	if (FSceneDataManager::GetInstance().GetIsCanResizing())
-	{
-		OnResize();
-		FSceneDataManager::GetInstance().SetIsCanResizing(false);
-	}
-	for (auto& ActorIns : FSceneDataManager::GetInstance().GetSceneActorByName(NowMapName))
-	{
-		// update the constant buffer with the latest worldviewproj glm::mat4
-		Charalotte::ObjectConstants objConstants;
-		glm::mat4 NowVPTrans;
-		FSceneDataManager::GetInstance().GetCamera()->GetVPTransform(NowVPTrans);
-		glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorIns->Transform);
-		glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
-		objConstants.TransMatrix = glm::transpose(NowMVPTrans);
-		ActorIns->ObjectCB->CopyData(0, objConstants);
-	}
-}
-
 void DXRender::Draw()
 {
 	// Reuse the memory associated with command recording.
