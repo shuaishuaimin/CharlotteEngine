@@ -145,13 +145,15 @@
   <ItemGroup>
     <ClInclude Include="Engine\BaseStructAllPlatform.h" />
     <ClInclude Include="Engine\CharlotteEngine.h" />
+    <ClInclude Include="Engine\FGlobalDataManager.h" />
+    <ClInclude Include="Engine\FMeshAsset.h" />
     <ClInclude Include="Engine\FRender.h" />
     <ClInclude Include="Engine\GameInstance.h" />
     <ClInclude Include="Engine\GameLogic.h" />
     <ClInclude Include="Engine\FInputSystem.h" />
     <ClInclude Include="Engine\FWinEventRegisterSystem.h" />
-    <ClInclude Include="Engine\FSceneDataManager.h" />
-    <ClInclude Include="Engine\FWinSceneAsset.h" />
+    <ClInclude Include="Engine\FScene.h" />
+    <ClInclude Include="Engine\FDXRenderMeshDataBuffer.h" />
     <ClInclude Include="Engine\FWindow.h" />
     <ClInclude Include="Engine\stdafx.h" />
     <ClInclude Include="Engine\WinBaseData.h" />
@@ -171,8 +173,10 @@
   <ItemGroup>
     <ClCompile Include="Engine\CharlotteEngine.cpp" />
     <ClCompile Include="Engine\DDSTextureLoader.cpp" />
-    <ClCompile Include="Engine\FSceneDataManager.cpp" />
-    <ClCompile Include="Engine\FWinSceneAsset.cpp" />
+    <ClCompile Include="Engine\FGlobalDataManager.cpp" />
+    <ClCompile Include="Engine\FMeshAsset.cpp" />
+    <ClCompile Include="Engine\FScene.cpp" />
+    <ClCompile Include="Engine\FDXRenderMeshDataBuffer.cpp" />
     <ClCompile Include="Engine\GameInstance.cpp" />
     <ClCompile Include="Engine\GameLogic.cpp" />
     <ClCompile Include="Engine\FWinEventRegisterSystem.cpp" />

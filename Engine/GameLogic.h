@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "FWinEventRegisterSystem.h"
 #include "FGameTimer.h"
-#include "FSceneDataManager.h"
+#include "FScene.h"
 
 class GameLogic
 {

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FCamera.h"
-#include "FSceneDataManager.h"
+#include "FScene.h"
 
 #if PLATFORM_WINDOWS
 #include "FWinEventRegisterSystem.h"
@@ -113,52 +113,52 @@ void FCamera::RegisterCameraInput()
 {
 	//float KeySe = 0.3f;
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('A', []() {
-		auto Trans = FSceneDataManager::GetInstance().GetCameraTrans();
+		auto Trans = FScene::GetInstance().GetCameraTrans();
 		float KeySe = 0.3f;
 		Trans.Translation.y -= KeySe;
-		FSceneDataManager::GetInstance().GetCamera()->TransformCamera(Trans);
-		FSceneDataManager::GetInstance().InitCameraTrans();
+		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
+		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('D', []() {
-		auto Trans = FSceneDataManager::GetInstance().GetCameraTrans();
+		auto Trans = FScene::GetInstance().GetCameraTrans();
 		float KeySe = 0.3f;
 		Trans.Translation.y += KeySe;
-		FSceneDataManager::GetInstance().GetCamera()->TransformCamera(Trans);
-		FSceneDataManager::GetInstance().InitCameraTrans();
+		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
+		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('W', []() {
-		auto Trans = FSceneDataManager::GetInstance().GetCameraTrans();
+		auto Trans = FScene::GetInstance().GetCameraTrans();
 		float KeySe = 0.3f;
 		Trans.Translation.x += KeySe;
-		FSceneDataManager::GetInstance().GetCamera()->TransformCamera(Trans);
-		FSceneDataManager::GetInstance().InitCameraTrans();
+		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
+		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('S', []() {
-		auto Trans = FSceneDataManager::GetInstance().GetCameraTrans();
+		auto Trans = FScene::GetInstance().GetCameraTrans();
 		float KeySe = 0.3f;
 		Trans.Translation.x -= KeySe;
-		FSceneDataManager::GetInstance().GetCamera()->TransformCamera(Trans);
-		FSceneDataManager::GetInstance().InitCameraTrans();
+		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
+		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('Q', []() {
-		auto Trans = FSceneDataManager::GetInstance().GetCameraTrans();
+		auto Trans = FScene::GetInstance().GetCameraTrans();
 		float KeySe = 0.3f;
 		Trans.Translation.z -= KeySe;
-		FSceneDataManager::GetInstance().GetCamera()->TransformCamera(Trans);
-		FSceneDataManager::GetInstance().InitCameraTrans();
+		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
+		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('E', []() {
-		auto Trans = FSceneDataManager::GetInstance().GetCameraTrans();
+		auto Trans = FScene::GetInstance().GetCameraTrans();
 		float KeySe = 0.3f;
 		Trans.Translation.z += KeySe;
-		FSceneDataManager::GetInstance().GetCamera()->TransformCamera(Trans);
-		FSceneDataManager::GetInstance().InitCameraTrans();
+		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
+		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('O', []() {
 		glm::vec4 Location = glm::vec4(-5000.0f, 0.0f, 0.0f, 1.0f);
 		glm::vec4 Target = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 		glm::vec4 Up = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-		FSceneDataManager::GetInstance().GetCamera()->BackCameraLocation(Location, Target, Up);
+		FScene::GetInstance().GetCamera()->BackCameraLocation(Location, Target, Up);
 		});
 
 	FWinEventRegisterSystem::GetInstance().RegisterWindowsInput
@@ -180,10 +180,10 @@ void FCamera::RegisterCameraInput()
 			// make each pixel correspond to a quarter of a degree
 			float dx = -MouseSe * static_cast<float>(Mouse.x - FCamera::LastCameraMousePos.x);
 			float dy = -MouseSe * static_cast<float>(Mouse.y - FCamera::LastCameraMousePos.y);
-			auto& CameraTrans = FSceneDataManager::GetInstance().GetCameraTrans();
+			auto& CameraTrans = FScene::GetInstance().GetCameraTrans();
 			CameraTrans.row += (dx + dy);
-			FSceneDataManager::GetInstance().GetCamera()->TransformCamera(CameraTrans);
-			FSceneDataManager::GetInstance().InitCameraTrans();
+			FScene::GetInstance().GetCamera()->TransformCamera(CameraTrans);
+			FScene::GetInstance().InitCameraTrans();
 		}
 		else if ((Mouse.btnState & MK_RBUTTON) != 0)
 		{
@@ -191,10 +191,10 @@ void FCamera::RegisterCameraInput()
 			// Make each pixel correspond to 0.005 unit in the scene
 			float dx = MouseSe * static_cast<float>(Mouse.x - FCamera::LastCameraMousePos.x);
 			float dy = MouseSe * static_cast<float>(Mouse.y - FCamera::LastCameraMousePos.y);
-			auto& CameraTrans = FSceneDataManager::GetInstance().GetCameraTrans();
+			auto& CameraTrans = FScene::GetInstance().GetCameraTrans();
 			CameraTrans.pitch += (dx + dy);
-			FSceneDataManager::GetInstance().GetCamera()->TransformCamera(CameraTrans);
-			FSceneDataManager::GetInstance().InitCameraTrans();
+			FScene::GetInstance().GetCamera()->TransformCamera(CameraTrans);
+			FScene::GetInstance().InitCameraTrans();
 		}
 
 		FCamera::LastCameraMousePos.x = static_cast<float>(Mouse.x);

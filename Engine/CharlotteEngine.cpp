@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "CharlotteEngine.h"
-#include "FSceneDataManager.h"
+#include "FScene.h"
 #include "thread"
 
 
@@ -26,7 +26,7 @@ int CharalotteEngine::Update() {
 	//std::thread 
 	MSG msg = { 0 };
 
-	FSceneDataManager::GetInstance().GetTimer()->Reset();
+	FScene::GetInstance().GetTimer()->Reset();
 
 	// if message is not wm_quit. Refresh the window
 	while (msg.message != WM_QUIT)
@@ -40,14 +40,14 @@ int CharalotteEngine::Update() {
 		// otherwise, do animation/game stuff
 		else
 		{
-			FSceneDataManager::GetInstance().GetTimer()->Tick();
+			FScene::GetInstance().GetTimer()->Tick();
 
 			// if game pause sleep for wait
 			// else calculate frame states and update timer, draw timer to screen
-			if (!FSceneDataManager::GetInstance().GetIsAppPaused())
+			if (!FScene::GetInstance().GetIsDXPaused())
 			{
 				WindowIns->Update();
-				FSceneDataManager::GetInstance().Update();
+				FScene::GetInstance().Update();
 				RenderIns->Update();
 			}
 			else

@@ -153,7 +153,7 @@
     <ClInclude Include="Engine\FWinEventRegisterSystem.h">
       <Filter>Header Files\Engine\Public\BaseClass</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FSceneDataManager.h">
+    <ClInclude Include="Engine\FScene.h">
       <Filter>Header Files\Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\CharlotteEngine.h">
@@ -162,7 +162,7 @@
     <ClInclude Include="Engine\FInputSystem.h">
       <Filter>Header Files\Engine\Public\BaseClass</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FWinSceneAsset.h">
+    <ClInclude Include="Engine\FDXRenderMeshDataBuffer.h">
       <Filter>Header Files\Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GameInstance.h">
@@ -173,6 +173,12 @@
     </ClInclude>
     <ClInclude Include="Engine\stdafx.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FMeshAsset.h">
+      <Filter>Header Files\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FGlobalDataManager.h">
+      <Filter>Header Files\Engine\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -215,13 +221,13 @@
     <ClCompile Include="Engine\GameInstance.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FSceneDataManager.cpp">
+    <ClCompile Include="Engine\FScene.cpp">
       <Filter>Source Files\Engine\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Engine\CharlotteEngine.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FWinSceneAsset.cpp">
+    <ClCompile Include="Engine\FDXRenderMeshDataBuffer.cpp">
       <Filter>Source Files\Engine\Scene</Filter>
     </ClCompile>
     <ClCompile Include="UStaticMesh.cpp">
@@ -229,6 +235,12 @@
     </ClCompile>
     <ClCompile Include="Engine\DXRender.cpp">
       <Filter>Source Files\Engine\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FGlobalDataManager.cpp">
+      <Filter>Source Files\Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FMeshAsset.cpp">
+      <Filter>Source Files\Engine\Scene</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -7,13 +7,13 @@
 #include "WinBaseData.h"
 #include "FGameTimer.h"
 #include "FWinEventRegisterSystem.h"
-#include "FWinSceneAsset.h"
+#include "FDXRenderMeshDataBuffer.h"
 
-class FSceneDataManager : public Singleton<FSceneDataManager>
+class FScene : public Singleton<FScene>
 {
 public:
-	FSceneDataManager();
-	~FSceneDataManager();
+	FScene();
+	~FScene();
 
 	FCamera* GetCamera();
 	
@@ -23,9 +23,9 @@ public:
 	
 	FGameTimer* GetTimer();
 
-	bool GetIsAppPaused();
+	bool GetIsDXPaused();
 
-	void SetIsAppPaused(bool IsPaused);
+	void SetDXPaused(bool IsPaused);
 
 	bool GetIsDeviceSucceed();
 
@@ -39,11 +39,9 @@ public:
 
 	std::unordered_map<std::string, Charalotte::FActorsInfoForPrint> GetActorInfos();
 
-	std::unordered_map<std::string, Charalotte::FMeshInfoForPrint> GetMeshInfors();
 
 	void LoadMap(const std::string& MapName);
 
-	Charalotte::FMeshInfoForPrint GetMeshInfoByName(const std::string& MeshName);
 
 	std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FActorAsset>>>& GetActorDictionary();
 
@@ -69,12 +67,10 @@ private:
 	std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FActorAsset>>> ActorDir;
 
 	std::vector<std::shared_ptr<Charalotte::FActorAsset>> EmptyActorVec;
-	// save the mesh information without render, the real data is in win scene asset
-	std::unordered_map<std::string, Charalotte::FMeshInfoForPrint> MeshsInfors;
 
 	std::unique_ptr<FGameTimer> GameTimer;
 	// connect app and window
-	bool IsAppPaused;
+	bool IsDXPaused;
 
 	bool IsDeviceSucceed;
 

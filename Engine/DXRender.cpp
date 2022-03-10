@@ -5,7 +5,7 @@
 #include <string>
 #include "DXRender.h"
 #include "FDataProcessor.h"
-#include "FWinSceneAsset.h"
+#include "FDXRenderMeshDataBuffer.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -38,9 +38,9 @@ DXRender::~DXRender()
 	if (md3dDevice != nullptr)
 	{
 		FlushCommandQueue();
-		FSceneDataManager::GetInstance().SetIsDeviceSucceed(false);
+		FScene::GetInstance().SetIsDeviceSucceed(false);
 	}
-	FSceneDataManager::GetInstance().SetIsDeviceSucceed(false);
+	FScene::GetInstance().SetIsDeviceSucceed(false);
 }
 
 bool DXRender::Initialize()
@@ -221,7 +221,7 @@ void DXRender::Draw()
 	// IA
 	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
-	for (auto& ActorIns : FSceneDataManager::GetInstance().GetSceneActorByName(NowMapName))
+	for (auto& ActorIns : FScene::GetInstance().GetSceneActorByName(NowMapName))
 	{
 		auto MeshGeo = ActorIns->MeshAsset;
 		if (MeshGeo == nullptr)
@@ -299,11 +299,11 @@ bool DXRender::InitDirect3D()
 		IID_PPV_ARGS(&mFence)));
 	if (md3dDevice)
 	{
-		FSceneDataManager::GetInstance().SetIsDeviceSucceed(true);
+		FScene::GetInstance().SetIsDeviceSucceed(true);
 	}
 	else
 	{
-		FSceneDataManager::GetInstance().SetIsDeviceSucceed(false);
+		FScene::GetInstance().SetIsDeviceSucceed(false);
 	}
 
 	mRtvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -428,7 +428,7 @@ void DXRender::BuildShadersAndInputLayOut()
 
 void DXRender::BuildMeshGeometrys()
 {
-	for (auto& MeshGeoIter : FWinSceneAsset::GetMeshAssets())
+	for (auto& MeshGeoIter : FDXRenderMeshDataBuffer::GetMeshAssets())
 	{
 		auto MeshGeo = MeshGeoIter.second;
 		const UINT vbByteSize = (UINT)MeshGeo->vertices.size() * sizeof(Charalotte::Vertex);
@@ -490,7 +490,7 @@ void DXRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
 	BuildMeshGeometrys();
-	auto& ActorDir = FSceneDataManager::GetInstance().GetActorDictionary();
+	auto& ActorDir = FScene::GetInstance().GetActorDictionary();
 	const auto& ActorIter = ActorDir.find(MapName);
 	if (ActorIter != ActorDir.end())
 	{
@@ -667,7 +667,7 @@ void DXRender::CalculateFrameStats()
 	frameCnt++;
 
 	// Compute averages over one second period.
-	if ((FSceneDataManager::GetInstance().GetTimer()->TotalTime() - timeElapsed) >= 1.0f)
+	if ((FScene::GetInstance().GetTimer()->TotalTime() - timeElapsed) >= 1.0f)
 	{
 		float fps = (float)frameCnt; // fps = frameCnt / 1
 		float mspf = 1000.0f / fps;

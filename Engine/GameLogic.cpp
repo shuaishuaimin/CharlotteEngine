@@ -3,5 +3,5 @@
 
 void GameLogic::Init()
 {
-	FSceneDataManager::GetInstance().LoadMap("ThirdPersonExampleMap.dat");
+	FScene::GetInstance().LoadMap("ThirdPersonExampleMap.dat");
 }

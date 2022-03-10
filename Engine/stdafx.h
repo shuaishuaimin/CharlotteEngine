@@ -36,6 +36,6 @@
 #include "WinBaseData.h"
 #include "FDataProcessor.h"
 #include "FCamera.h"
-#include "FSceneDataManager.h"
+#include "FScene.h"
 #endif
 	

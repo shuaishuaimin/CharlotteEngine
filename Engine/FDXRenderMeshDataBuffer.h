@@ -2,11 +2,11 @@
 #include <iostream>
 #include "WinBaseData.h"
 
-class FWinSceneAsset
+class FDXRenderMeshDataBuffer
 {
 public:
-	FWinSceneAsset();
-	~FWinSceneAsset();
+	FDXRenderMeshDataBuffer();
+	~FDXRenderMeshDataBuffer();
 	
 	static void AddMeshData(const std::string& AssetName, std::shared_ptr<Charalotte::MeshGeometry> MeshAsset);
 

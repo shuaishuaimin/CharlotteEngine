@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "GameInstance.h"
-#include "FSceneDataManager.h"
+#include "FScene.h"
 
 
 GameInstance::GameInstance()

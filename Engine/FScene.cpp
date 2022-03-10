@@ -1,7 +1,8 @@
 #include "stdafx.h"
-#include "FSceneDataManager.h"
+#include "FScene.h"
+#include "FMeshAsset.h"
 
-FSceneDataManager::FSceneDataManager() {
+FScene::FScene() {
 
 	MainCamera = std::make_shared<FCamera>();
 	Cameras.push_back(MainCamera);
@@ -12,11 +13,11 @@ FSceneDataManager::FSceneDataManager() {
 	ActorDir = {};
 	EmptyActorVec = {};
 	NowMapName = "";
-	IsAppPaused = false;
+	IsDXPaused = false;
 	IsDeviceSucceed = false;
 	IsCanResizing = false;
 }
-FSceneDataManager::~FSceneDataManager() {
+FScene::~FScene() {
 	GameTimer = nullptr;
 	MainCamera = nullptr;
 	for (auto& ActorVector : ActorDir)
@@ -29,65 +30,62 @@ FSceneDataManager::~FSceneDataManager() {
 	ActorDir.clear();
 }
 
-FCamera* FSceneDataManager::GetCamera()
+FCamera* FScene::GetCamera()
 {
 	return MainCamera.get();
 }
 
-Charalotte::CameraTransform& FSceneDataManager::GetCameraTrans()
+Charalotte::CameraTransform& FScene::GetCameraTrans()
 {
 	return CameraTrans;
 }
 
-void FSceneDataManager::InitCameraTrans()
+void FScene::InitCameraTrans()
 {
 	CameraTrans = DefaultCameraTrans;
 }
 
-FGameTimer* FSceneDataManager::GetTimer()
+FGameTimer* FScene::GetTimer()
 {
 	return GameTimer.get();
 }
 
-bool FSceneDataManager::GetIsAppPaused()
+bool FScene::GetIsDXPaused()
 {
-	return IsAppPaused;
+	return IsDXPaused;
 }
 
-void FSceneDataManager::SetIsAppPaused(bool IsPaused)
+void FScene::SetDXPaused(bool IsPaused)
 {
-	IsAppPaused = IsPaused;
+	IsDXPaused = IsPaused;
 }
 
-bool FSceneDataManager::GetIsDeviceSucceed()
+bool FScene::GetIsDeviceSucceed()
 {
 	return IsDeviceSucceed;
 }
 
-void FSceneDataManager::SetIsDeviceSucceed(bool IsSucceed)
+void FScene::SetIsDeviceSucceed(bool IsSucceed)
 {
 	IsDeviceSucceed = IsSucceed;
 }
 
-bool FSceneDataManager::GetIsCanResizing()
+bool FScene::GetIsCanResizing()
 {
 	return IsCanResizing;
 }
 
-void FSceneDataManager::SetIsCanResizing(bool IsCan)
+void FScene::SetIsCanResizing(bool IsCan)
 {
 	IsCanResizing = IsCan;
 }
 
-std::unordered_map<std::string, Charalotte::FActorsInfoForPrint> FSceneDataManager::GetActorInfos()
+std::unordered_map<std::string, Charalotte::FActorsInfoForPrint> FScene::GetActorInfos()
 {
 	return ActorInfors;
 }
-std::unordered_map<std::string, Charalotte::FMeshInfoForPrint> FSceneDataManager::GetMeshInfors()
-{
-	return MeshsInfors;
-}
-void FSceneDataManager::LoadMap(const std::string& MapName) {
+
+void FScene::LoadMap(const std::string& MapName) {
 	
 	Charalotte::FActorsInfoForPrint TempActorInfors;
 	FDataProcessor::LoadActors(MapName, TempActorInfors);
@@ -112,35 +110,25 @@ void FSceneDataManager::LoadMap(const std::string& MapName) {
 		if (NameWithout.size() > 4)
 		{
 			NameWithout.erase(NameWithout.size() - 4, 4);
-			MeshsInfors.insert({ NameWithout, MeshInfo });
+			FMeshAsset::GetInstance().AddMeshInfors(NameWithout, MeshInfo);
 		}
 	}
-	FSceneDataManager::GetInstance().BuilMeshAsset(MapName);
-	FSceneDataManager::GetInstance().BuildActors(MapName);
+	FScene::GetInstance().BuilMeshAsset(MapName);
+	FScene::GetInstance().BuildActors(MapName);
 
 	FWinEventRegisterSystem::GetInstance().ExecuteMapLoadEvent(MapName);
 
 	NowMapName = MapName;
 }
 
-Charalotte::FMeshInfoForPrint FSceneDataManager::GetMeshInfoByName(const std::string& MeshName)
-{
-	auto MeshInfoIter = MeshsInfors.find(MeshName);
-	if (MeshInfoIter != MeshsInfors.end())
-	{
-		return MeshInfoIter->second;
-	}
-	return Charalotte::FMeshInfoForPrint();
-}
-
-std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FActorAsset>>>& FSceneDataManager::GetActorDictionary()
+std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FActorAsset>>>& FScene::GetActorDictionary()
 {
 	return ActorDir;
 }
 
-void FSceneDataManager::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
+void FScene::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
 {
-	Charalotte::FMeshInfoForPrint MeshInfo = FSceneDataManager::GetInstance().GetMeshInfoByName(GeometryName);
+	Charalotte::FMeshInfoForPrint MeshInfo = FMeshAsset::GetInstance().GetMeshInfoByName(GeometryName);
 	std::shared_ptr<Charalotte::MeshGeometry> MeshGeo = std::make_shared<Charalotte::MeshGeometry>();
 
 	std::string Name = GeometryName;
@@ -199,12 +187,12 @@ void FSceneDataManager::CalcVerticesAndIndices(const std::string& GeometryName, 
 	MeshGeo->DrawArgs[GeometryName] = submesh;
 	MeshGeo->Name = GeometryName;
 
-	FWinSceneAsset::AddMeshData(GeometryName, MeshGeo);
+	FDXRenderMeshDataBuffer::AddMeshData(GeometryName, MeshGeo);
 }
 
-void FSceneDataManager::BuilMeshAsset(const std::string& MapName)
+void FScene::BuilMeshAsset(const std::string& MapName)
 {
-	const auto& ActorInfors = FSceneDataManager::GetInstance().GetActorInfos();
+	const auto& ActorInfors = FScene::GetInstance().GetActorInfos();
 	auto ActorInfosIter = ActorInfors.find(MapName);
 	if (ActorInfosIter != ActorInfors.end())
 	{
@@ -222,11 +210,11 @@ void FSceneDataManager::BuilMeshAsset(const std::string& MapName)
 	}
 }
 
-void FSceneDataManager::BuildActors(const std::string& MapName)
+void FScene::BuildActors(const std::string& MapName)
 {
 	ActorDir.insert({ MapName, {} });
 	auto Iter = ActorDir.find(MapName);
-	const auto& ActorInfors = FSceneDataManager::GetInstance().GetActorInfos();
+	const auto& ActorInfors = FScene::GetInstance().GetActorInfos();
 	auto ActorInfosIter = ActorInfors.find(MapName);
 	if (ActorInfosIter->second.ActorsInfo.size() <= 0) return;
 	for (const auto& EnviroumentActor : ActorInfosIter->second.ActorsInfo)
@@ -238,14 +226,14 @@ void FSceneDataManager::BuildActors(const std::string& MapName)
 		}
 		assetName.erase(assetName.size() - 1, 1);
 		std::shared_ptr<Charalotte::FActorAsset> ActorAsset = std::make_shared<Charalotte::FActorAsset>();
-		ActorAsset->MeshAsset = FWinSceneAsset::GetMeshAsset(assetName);
+		ActorAsset->MeshAsset = FDXRenderMeshDataBuffer::GetMeshAsset(assetName);
 		ActorAsset->Transform = EnviroumentActor.Transform;
 
 		Iter->second.push_back(ActorAsset);
 	}
 }
 
-std::vector<std::shared_ptr<Charalotte::FActorAsset>>& FSceneDataManager::GetSceneActorByName(const std::string& MapName)
+std::vector<std::shared_ptr<Charalotte::FActorAsset>>& FScene::GetSceneActorByName(const std::string& MapName)
 {
 	const auto& ActorVecIter = ActorDir.find(MapName);
 	if (ActorVecIter != ActorDir.end())
@@ -258,19 +246,19 @@ std::vector<std::shared_ptr<Charalotte::FActorAsset>>& FSceneDataManager::GetSce
 	}
 }
 
-void FSceneDataManager::Update()
+void FScene::Update()
 {
-	if (FSceneDataManager::GetInstance().GetIsCanResizing())
+	if (FScene::GetInstance().GetIsCanResizing())
 	{
 		FWinEventRegisterSystem::GetInstance().ExecuteOnResizeEvent(Charalotte::DXRenderResize);
-		FSceneDataManager::GetInstance().SetIsCanResizing(false);
+		FScene::GetInstance().SetIsCanResizing(false);
 	}
-	for (auto& ActorIns : FSceneDataManager::GetInstance().GetSceneActorByName(NowMapName))
+	for (auto& ActorIns : FScene::GetInstance().GetSceneActorByName(NowMapName))
 	{
 		// update the constant buffer with the latest worldviewproj glm::mat4
 		Charalotte::ObjectConstants objConstants;
 		glm::mat4 NowVPTrans;
-		FSceneDataManager::GetInstance().GetCamera()->GetVPTransform(NowVPTrans);
+		FScene::GetInstance().GetCamera()->GetVPTransform(NowVPTrans);
 		glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorIns->Transform);
 		glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
 		objConstants.TransMatrix = glm::transpose(NowMVPTrans);
