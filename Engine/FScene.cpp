@@ -4,13 +4,11 @@
 #include "FGlobalDataManager.h"
 
 FScene::FScene() {
-
 	MainCamera = std::make_shared<FCamera>();
 	Cameras.push_back(MainCamera);
 	CameraTrans = Charalotte::CameraTransform();
 	DefaultCameraTrans = Charalotte::CameraTransform();
 
-	
 	ActorDir = {};
 	EmptyActorVec = {};
 	NowMapName = "";
@@ -210,11 +208,8 @@ std::vector<std::shared_ptr<Charalotte::FActorAsset>>& FScene::GetSceneActorByNa
 
 void FScene::Update()
 {
-	if (FGlobalDataManager::GetInstance().GetIsCanResizing())
-	{
-		FWinEventRegisterSystem::GetInstance().ExecuteOnResizeEvent(Charalotte::DXRenderResize);
-		FGlobalDataManager::GetInstance().SetIsCanResizing(false);
-	}
+	FWinEventRegisterSystem::GetInstance().ExecuteOnResizeEvent(Charalotte::DXRenderResize);
+
 	for (auto& ActorIns : FScene::GetInstance().GetSceneActorByName(NowMapName))
 	{
 		// update the constant buffer with the latest worldviewproj glm::mat4
