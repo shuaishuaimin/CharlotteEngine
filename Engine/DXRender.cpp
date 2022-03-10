@@ -7,7 +7,6 @@
 #include "FDataProcessor.h"
 #include "FWinSceneAsset.h"
 
-
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 using namespace DirectX::PackedVector;
@@ -29,7 +28,6 @@ DXRender* DXRender::GetApp()
 {
 	return render;
 }
-
 
 DXRender::~DXRender()
 {
@@ -68,6 +66,55 @@ bool DXRender::Initialize()
 
 	FlushCommandQueue();
 	return true;
+}
+
+// main thread
+int DXRender::Run()
+{
+	MSG msg = { 0 };
+
+	FSceneDataManager::GetInstance().GetTimer()->Reset();
+
+	// if message is not wm_quit. Refresh the window
+	while (msg.message != WM_QUIT)
+	{
+		// if there are Window messages then process them
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		// otherwise, do animation/game stuff
+		else
+		{
+			FSceneDataManager::GetInstance().GetTimer()->Tick();
+
+			// if game pause sleep for wait
+			// else calculate frame states and update timer, draw timer to screen
+			if (!FSceneDataManager::GetInstance().GetIsAppPaused())
+			{
+				CalculateFrameStats();
+				Update();
+				// now we have not used thread
+				GetWindow()->Update();
+				Draw();
+			}
+			else
+			{
+				Sleep(100);
+			}
+		}
+	}
+	//#if defined(DEBUG) || defined(_DEBUG)
+	//{
+	//	ID3D12DebugDevice* pDebugDevice = nullptr;
+	//	md3dDevice->QueryInterface(&pDebugDevice);
+	//	pDebugDevice->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
+	//	pDebugDevice->Release();
+	//}
+	//#endif
+
+	return (int)msg.wParam;
 }
 
 void DXRender::OnResize()
@@ -268,6 +315,80 @@ void DXRender::Draw()
 	FlushCommandQueue();
 }
 
+bool DXRender::InitDirect3D()
+{
+#if defined(DEBUG) || defined(_DEBUG)
+	//enable the d3d12 debug layer
+	{
+		ComPtr<ID3D12Debug> debugController;
+		ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
+		debugController->EnableDebugLayer();
+	}
+#endif
+
+	ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&mdxgiFactory)));
+
+	// Try to create hard ware device !!important
+	HRESULT hardwareResult = D3D12CreateDevice(
+		nullptr, D3D_FEATURE_LEVEL_11_0,
+		IID_PPV_ARGS(&md3dDevice));
+
+	// Fallback to WARP device.
+	if (FAILED(hardwareResult))
+	{
+		ComPtr<IDXGIAdapter> pWarpAdapter;
+		ThrowIfFailed(mdxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&pWarpAdapter)));
+
+		ThrowIfFailed(D3D12CreateDevice(
+			pWarpAdapter.Get(),
+			D3D_FEATURE_LEVEL_11_0,
+			IID_PPV_ARGS(&md3dDevice)));
+	}
+
+	ThrowIfFailed(md3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE,
+		IID_PPV_ARGS(&mFence)));
+	if (md3dDevice)
+	{
+		FSceneDataManager::GetInstance().SetIsDeviceSucceed(true);
+	}
+	else
+	{
+		FSceneDataManager::GetInstance().SetIsDeviceSucceed(false);
+	}
+
+	mRtvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	mDsvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	mCbvSrvUavDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	// Check 4x MSAA quality support for our back buffer format
+	// All Direct3D 11 capable devices support 4X MSAA for all render
+	// target formats, so we only need to check quality support
+
+	D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS msQualityLevels;
+	msQualityLevels.Format = mBackBufferFormat;
+	msQualityLevels.SampleCount = 4;
+	msQualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
+	msQualityLevels.NumQualityLevels = 0;
+	ThrowIfFailed(md3dDevice->CheckFeatureSupport(
+		D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS,
+		&msQualityLevels, sizeof(msQualityLevels)));
+
+	m4xMsaaQuality = msQualityLevels.NumQualityLevels;
+	assert(m4xMsaaQuality > 0 && "Unexpected MSAA quality level.");
+
+
+#ifdef _DEBUG
+	LogAdapters();
+#endif
+
+	// create others
+	CreateCommandObjects();
+	CreateSwapChain();
+	CreateRtvAndDsvDescriptorHeaps();
+
+	return true;
+}
+
 void DXRender::BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap)
 {
 	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
@@ -278,6 +399,7 @@ void DXRender::BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>
 	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&cbvHeapDesc,
 		IID_PPV_ARGS(&CbvHeap)));
 }
+
 void DXRender::BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap,
 	std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>>& ObjectCb)
 {
@@ -338,6 +460,7 @@ void DXRender::BuildRootSignature()
 		serializeRootSig->GetBufferSize(),
 		IID_PPV_ARGS(&mRootSignature)));
 }
+
 void DXRender::BuildShadersAndInputLayOut()
 {
 	HRESULT hr = S_OK;
@@ -467,55 +590,6 @@ void DXRender::Set4xMsaaState(bool value)
 	}
 }
 
-// main thread
-int DXRender::Run()
-{
-	MSG msg = { 0 };
-
-	FSceneDataManager::GetInstance().GetTimer()->Reset();
-
-	// if message is not wm_quit. Refresh the window
-	while (msg.message != WM_QUIT)
-	{
-		// if there are Window messages then process them
-		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-		// otherwise, do animation/game stuff
-		else
-		{
-			FSceneDataManager::GetInstance().GetTimer()->Tick();
-
-			// if game pause sleep for wait
-			// else calculate frame states and update timer, draw timer to screen
-			if (!FSceneDataManager::GetInstance().GetIsAppPaused())
-			{
-				CalculateFrameStats();
-				Update();
-				// now we have not used thread
-				GetWindow()->Update();
-				Draw();
-			}
-			else
-			{
-				Sleep(100);
-			}
-		}
-	}
-	//#if defined(DEBUG) || defined(_DEBUG)
-	//{
-	//	ID3D12DebugDevice* pDebugDevice = nullptr;
-	//	md3dDevice->QueryInterface(&pDebugDevice);
-	//	pDebugDevice->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
-	//	pDebugDevice->Release();
-	//}
-	//#endif
-
-	return (int)msg.wParam;
-}
-
 // when input heap, we should two heap, that is rtvHeap and dsvHeap
 // their type is D3D12_DESCRIPTOR_HEAP_DESC
 // we should create description and its own information, that is way to explain heap 
@@ -540,80 +614,6 @@ void DXRender::CreateRtvAndDsvDescriptorHeaps()
 	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(
 		&dsvHeapDesc, IID_PPV_ARGS(mDsvHeap.GetAddressOf())));
-}
-
-bool DXRender::InitDirect3D()
-{
-#if defined(DEBUG) || defined(_DEBUG)
-	//enable the d3d12 debug layer
-	{
-		ComPtr<ID3D12Debug> debugController;
-		ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
-		debugController->EnableDebugLayer();
-	}
-#endif
-
-	ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&mdxgiFactory)));
-
-	// Try to create hard ware device !!important
-	HRESULT hardwareResult = D3D12CreateDevice(
-		nullptr, D3D_FEATURE_LEVEL_11_0,
-		IID_PPV_ARGS(&md3dDevice));
-
-	// Fallback to WARP device.
-	if (FAILED(hardwareResult))
-	{
-		ComPtr<IDXGIAdapter> pWarpAdapter;
-		ThrowIfFailed(mdxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&pWarpAdapter)));
-
-		ThrowIfFailed(D3D12CreateDevice(
-			pWarpAdapter.Get(),
-			D3D_FEATURE_LEVEL_11_0,
-			IID_PPV_ARGS(&md3dDevice)));
-	}
-
-	ThrowIfFailed(md3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE,
-		IID_PPV_ARGS(&mFence)));
-	if (md3dDevice)
-	{
-		FSceneDataManager::GetInstance().SetIsDeviceSucceed(true);
-	}
-	else
-	{
-		FSceneDataManager::GetInstance().SetIsDeviceSucceed(false);
-	}
-
-	mRtvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	mDsvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	mCbvSrvUavDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-	// Check 4x MSAA quality support for our back buffer format
-	// All Direct3D 11 capable devices support 4X MSAA for all render
-	// target formats, so we only need to check quality support
-
-	D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS msQualityLevels;
-	msQualityLevels.Format = mBackBufferFormat;
-	msQualityLevels.SampleCount = 4;
-	msQualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
-	msQualityLevels.NumQualityLevels = 0;
-	ThrowIfFailed(md3dDevice->CheckFeatureSupport(
-		D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS,
-		&msQualityLevels, sizeof(msQualityLevels)));
-
-	m4xMsaaQuality = msQualityLevels.NumQualityLevels;
-	assert(m4xMsaaQuality > 0 && "Unexpected MSAA quality level.");
-
-
-#ifdef _DEBUG
-	LogAdapters();
-#endif
-
-	// create others
-	CreateCommandObjects();
-	CreateSwapChain();
-	CreateRtvAndDsvDescriptorHeaps();
-
-	return true;
 }
 
 void DXRender::CreateCommandObjects()
@@ -691,6 +691,7 @@ void DXRender::FlushCommandQueue()
 	}
 
 }
+
 ID3D12Resource* DXRender::CurrentBackBuffer()const
 {
 	return mSwapChainBuffer[mCurrBackBuffer].Get();
@@ -764,6 +765,7 @@ void DXRender::LogAdapters()
 		ReleaseCom(adapterList[i]);
 	}
 }
+
 void DXRender::LogAdapterOutputs(IDXGIAdapter* adapter)
 {
 	UINT i = 0;

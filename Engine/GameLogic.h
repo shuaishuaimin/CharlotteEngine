@@ -10,11 +10,8 @@ public:
 	GameLogic(){};
 	~GameLogic(){};
 
-	void Init()
-	{
-		FSceneDataManager::GetInstance().LoadMap("ThirdPersonExampleMap.dat");
-	}
-
+	void Init();
+	
 	void Update(){}
 
 	void Destory(){}

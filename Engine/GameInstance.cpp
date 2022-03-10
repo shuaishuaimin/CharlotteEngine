@@ -11,7 +11,7 @@ GameInstance::GameInstance()
 
 GameInstance::~GameInstance()
 {
-
+	
 }
 
 bool GameInstance::Init()
