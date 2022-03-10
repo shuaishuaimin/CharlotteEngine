@@ -11,6 +11,7 @@ FSceneDataManager::FSceneDataManager() {
 	GameTimer = std::make_unique<FGameTimer>();
 	ActorDir = {};
 	EmptyActorVec = {};
+	NowMapName = "";
 	IsAppPaused = false;
 	IsDeviceSucceed = false;
 	IsCanResizing = false;
@@ -87,6 +88,7 @@ std::unordered_map<std::string, Charalotte::FMeshInfoForPrint> FSceneDataManager
 	return MeshsInfors;
 }
 void FSceneDataManager::LoadMap(const std::string& MapName) {
+	
 	Charalotte::FActorsInfoForPrint TempActorInfors;
 	FDataProcessor::LoadActors(MapName, TempActorInfors);
 	ActorInfors.insert({ MapName, TempActorInfors });
@@ -117,6 +119,8 @@ void FSceneDataManager::LoadMap(const std::string& MapName) {
 	FSceneDataManager::GetInstance().BuildActors(MapName);
 
 	FWinEventRegisterSystem::GetInstance().ExecuteMapLoadEvent(MapName);
+
+	NowMapName = MapName;
 }
 
 Charalotte::FMeshInfoForPrint FSceneDataManager::GetMeshInfoByName(const std::string& MeshName)
@@ -251,5 +255,25 @@ std::vector<std::shared_ptr<Charalotte::FActorAsset>>& FSceneDataManager::GetSce
 	else
 	{
 		return EmptyActorVec;
+	}
+}
+
+void FSceneDataManager::Update()
+{
+	if (FSceneDataManager::GetInstance().GetIsCanResizing())
+	{
+		FWinEventRegisterSystem::GetInstance().ExecuteOnResizeEvent(Charalotte::DXRenderResize);
+		FSceneDataManager::GetInstance().SetIsCanResizing(false);
+	}
+	for (auto& ActorIns : FSceneDataManager::GetInstance().GetSceneActorByName(NowMapName))
+	{
+		// update the constant buffer with the latest worldviewproj glm::mat4
+		Charalotte::ObjectConstants objConstants;
+		glm::mat4 NowVPTrans;
+		FSceneDataManager::GetInstance().GetCamera()->GetVPTransform(NowVPTrans);
+		glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorIns->Transform);
+		glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
+		objConstants.TransMatrix = glm::transpose(NowMVPTrans);
+		ActorIns->ObjectCB->CopyData(0, objConstants);
 	}
 }

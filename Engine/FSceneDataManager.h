@@ -35,6 +35,8 @@ public:
 
 	void SetIsCanResizing(bool IsCan);
 
+	void Update();
+
 	std::unordered_map<std::string, Charalotte::FActorsInfoForPrint> GetActorInfos();
 
 	std::unordered_map<std::string, Charalotte::FMeshInfoForPrint> GetMeshInfors();
@@ -77,4 +79,6 @@ private:
 	bool IsDeviceSucceed;
 
 	bool IsCanResizing;
+
+	std::string NowMapName;
 };

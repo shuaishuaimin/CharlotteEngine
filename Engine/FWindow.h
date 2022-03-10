@@ -9,6 +9,8 @@ public:
 
 	virtual bool InitMainWindow() = 0;
 
+	virtual void Update() = 0;
+
 private:
 	float Width;
 	float Height;

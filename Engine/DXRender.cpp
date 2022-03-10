@@ -19,6 +19,9 @@ DXRender::DXRender() : NowMapName("")
 	FWinEventRegisterSystem::GetInstance().RegisterMapLoadEventForDender(Charalotte::BaseMapLoad, [this](const std::string& MapName) {
 		this->LoadingMapDataFromAssetSystem(MapName);
 		});
+	FWinEventRegisterSystem::GetInstance().RegisterOnResize(Charalotte::DXRenderResize, [this](){
+		this->OnResize();
+	});
 	mhAppInst = GetModuleHandle(0);
 	assert(render == nullptr);
 	render = this;
@@ -69,42 +72,10 @@ bool DXRender::Initialize()
 }
 
 // main thread
-int DXRender::Run()
+void DXRender::Update()
 {
-	MSG msg = { 0 };
-
-	FSceneDataManager::GetInstance().GetTimer()->Reset();
-
-	// if message is not wm_quit. Refresh the window
-	while (msg.message != WM_QUIT)
-	{
-		// if there are Window messages then process them
-		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-		// otherwise, do animation/game stuff
-		else
-		{
-			FSceneDataManager::GetInstance().GetTimer()->Tick();
-
-			// if game pause sleep for wait
-			// else calculate frame states and update timer, draw timer to screen
-			if (!FSceneDataManager::GetInstance().GetIsAppPaused())
-			{
-				CalculateFrameStats();
-				Update();
-				// now we have not used thread
-				GetWindow()->Update();
-				Draw();
-			}
-			else
-			{
-				Sleep(100);
-			}
-		}
-	}
+	CalculateFrameStats();
+	Draw();
 	//#if defined(DEBUG) || defined(_DEBUG)
 	//{
 	//	ID3D12DebugDevice* pDebugDevice = nullptr;
@@ -114,7 +85,6 @@ int DXRender::Run()
 	//}
 	//#endif
 
-	return (int)msg.wParam;
 }
 
 void DXRender::OnResize()
@@ -220,7 +190,7 @@ void DXRender::OnResize()
 	mScissorRect = { 0, 0, mClientWidth, mClientHeight };
 }
 
-void DXRender::Update()
+void DXRender::Update1()
 {
 	if (FSceneDataManager::GetInstance().GetIsCanResizing())
 	{

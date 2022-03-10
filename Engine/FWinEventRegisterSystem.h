@@ -42,6 +42,12 @@ public:
 	void ExecuteMapLoadEvent(const std::string& MapName);
 
 	void UnRegisterMapLoadEventForDender(Charalotte::MapLoadType Type);
+
+	void RegisterOnResize(Charalotte::ResizeType Type, const std::function<void()>& OnResize);
+
+	void ExecuteOnResizeEvent(Charalotte::ResizeType ResizeType);
+
+	void UnRegisterOnResizeEvent(Charalotte::ResizeType ResizeType);
 private:
 	// keyb event
 	std::unordered_map<char, Charalotte::KeyInputType> KeyBEvents;
@@ -56,5 +62,8 @@ private:
 	// load map event
 	std::unordered_map<Charalotte::MapLoadType, std::function<void(const std::string& MapName)>> LoadMapEvents;
 	Charalotte::MapLoadType NowLoadType;
+
+	// OnResize
+	std::unordered_map<Charalotte::ResizeType, std::function<void()>> OnResizeEvents;
 };
 

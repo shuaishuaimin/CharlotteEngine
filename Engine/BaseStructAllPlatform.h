@@ -131,4 +131,9 @@ namespace Charalotte
 	{
 		BaseMapLoad
 	};
+
+	enum ResizeType
+	{
+		DXRenderResize
+	};
 }

@@ -8,6 +8,7 @@ FWinEventRegisterSystem::FWinEventRegisterSystem()
 	IsExecuteKeyEvent = false;
 	EventKeys = {};
 	ActionMouses = {};
+	OnResizeEvents = {};
 	IsExecuteMouseEvent = false;
 }
 FWinEventRegisterSystem::~FWinEventRegisterSystem()
@@ -93,3 +94,21 @@ void FWinEventRegisterSystem::UnRegisterMapLoadEventForDender(Charalotte::MapLoa
 	LoadMapEvents.erase(Type);
 }
 
+void FWinEventRegisterSystem::RegisterOnResize(Charalotte::ResizeType Type, const std::function<void()>& OnResize)
+{
+	OnResizeEvents.insert({Type, OnResize});
+}
+
+void FWinEventRegisterSystem::ExecuteOnResizeEvent(Charalotte::ResizeType ResizeType)
+{
+	const auto& EventIter = OnResizeEvents.find(ResizeType);
+	if (EventIter != OnResizeEvents.end())
+	{
+		EventIter->second();
+	}
+}
+
+void FWinEventRegisterSystem::UnRegisterOnResizeEvent(Charalotte::ResizeType ResizeType)
+{
+	OnResizeEvents.erase(ResizeType);
+}

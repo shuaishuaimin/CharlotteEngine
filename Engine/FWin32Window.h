@@ -25,7 +25,7 @@ public:
 	void OnMouseMove(WPARAM btnState, int x, int y);
 	void OnKeyBoardInput();
 
-	void Update();
+	virtual void Update()override;
 protected:
 	static FWin32Window* MainWindow;
 

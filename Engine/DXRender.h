@@ -52,15 +52,13 @@ public:
 	bool Get4xMsaaState()const;
 	void Set4xMsaaState(bool value);
 
-	virtual int Run() override;
+	virtual void Update() override;
 
 	virtual std::shared_ptr<FWindow> CreateMainWindow()override;
 
-	void Coll()
-	{}
 protected:
 	void OnResize();
-	void Update();
+	void Update1();
 	void Draw();
 	
 protected:
