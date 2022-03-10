@@ -172,6 +172,7 @@ void FScene::BuilMeshAsset(const std::string& MapName)
 
 void FScene::BuildActors(const std::string& MapName)
 {
+	ActorDir.clear();
 	ActorDir.insert({ MapName, {} });
 	auto Iter = ActorDir.find(MapName);
 	const auto& ActorInfors = FScene::GetInstance().GetActorInfos();

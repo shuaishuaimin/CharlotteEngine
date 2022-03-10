@@ -114,42 +114,42 @@ void FCamera::RegisterCameraInput()
 	//float KeySe = 0.3f;
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('A', []() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
-		float KeySe = 0.3f;
+		float KeySe = 0.7f;
 		Trans.Translation.y -= KeySe;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('D', []() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
-		float KeySe = 0.3f;
+		float KeySe = 0.7f;
 		Trans.Translation.y += KeySe;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('W', []() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
-		float KeySe = 0.3f;
+		float KeySe = 0.7f;
 		Trans.Translation.x += KeySe;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('S', []() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
-		float KeySe = 0.3f;
+		float KeySe = 0.7f;
 		Trans.Translation.x -= KeySe;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('Q', []() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
-		float KeySe = 0.3f;
+		float KeySe = 0.7f;
 		Trans.Translation.z -= KeySe;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('E', []() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
-		float KeySe = 0.3f;
+		float KeySe = 0.7f;
 		Trans.Translation.z += KeySe;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
