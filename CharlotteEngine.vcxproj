@@ -172,6 +172,7 @@
     <ClCompile Include="Engine\CharlotteEngine.cpp" />
     <ClCompile Include="Engine\DDSTextureLoader.cpp" />
     <ClCompile Include="Engine\FSceneDataManager.cpp" />
+    <ClCompile Include="Engine\FWinSceneAsset.cpp" />
     <ClCompile Include="Engine\GameInstance.cpp" />
     <ClCompile Include="Engine\GameLogic.cpp" />
     <ClCompile Include="Engine\FWinEventRegisterSystem.cpp" />

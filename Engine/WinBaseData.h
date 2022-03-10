@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "BaseStructAllPlatform.h"
+#include "FUploadBuffer.h"
 
 namespace Charalotte
 {
@@ -89,6 +90,17 @@ namespace Charalotte
 			VertexBufferUploader = nullptr;
 			IndexBufferUploader = nullptr;
 		}
+	};
+
+	struct FActorAsset
+	{
+		std::shared_ptr<Charalotte::MeshGeometry> MeshAsset = nullptr;
+		Charalotte::FTransform Transform;
+		std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>> ObjectCB = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CbvHeap = nullptr;
+
+		glm::mat4 VPTrans = glm::mat4(1.0f);
+		glm::mat4 MTrans = glm::mat4(1.0f);
 	};
 }
 

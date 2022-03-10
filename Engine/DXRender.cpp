@@ -15,7 +15,7 @@ using std::string;
 
 DXRender* DXRender::render = nullptr;
 
-DXRender::DXRender()
+DXRender::DXRender() : NowMapName("")
 {
 	FWinEventRegisterSystem::GetInstance().RegisterMapLoadEventForDender(Charalotte::BaseMapLoad, [this](const std::string& MapName) {
 		this->LoadingMapDataFromAssetSystem(MapName);
@@ -44,8 +44,19 @@ DXRender::~DXRender()
 
 bool DXRender::Initialize()
 {
-	if (!InitStart())
+	if (mWindowIns == nullptr)
+	{
+		std::stringstream ss;
+		ss << "No Window";
+		OutputDebugStringA(ss.str().c_str());
 		return false;
+	}
+	// only mainwindow or directx3D is not inited, return initialize failed;
+
+	if (!InitDirect3D()) return false;
+
+	// init resize code
+	OnResize();
 
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 	BuildRootSignature();
@@ -169,7 +180,7 @@ void DXRender::Update()
 		OnResize();
 		FSceneDataManager::GetInstance().SetIsCanResizing(false);
 	}
-	for (auto& ActorIns : ActorArray)
+	for (auto& ActorIns : FSceneDataManager::GetInstance().GetSceneActorByName(NowMapName))
 	{
 		// update the constant buffer with the latest worldviewproj glm::mat4
 		Charalotte::ObjectConstants objConstants;
@@ -213,7 +224,7 @@ void DXRender::Draw()
 	// IA
 	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
-	for (auto& ActorIns : ActorArray)
+	for (auto& ActorIns : FSceneDataManager::GetInstance().GetSceneActorByName(NowMapName))
 	{
 		auto MeshGeo = ActorIns->MeshAsset;
 		if (MeshGeo == nullptr)
@@ -256,7 +267,6 @@ void DXRender::Draw()
 	// Later we will show how to organize our rendering code so we do not have to wait per frame
 	FlushCommandQueue();
 }
-
 
 void DXRender::BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap)
 {
@@ -343,73 +353,6 @@ void DXRender::BuildShadersAndInputLayOut()
 	};
 }
 
-
-void DXRender::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
-{
-	Charalotte::FMeshInfoForPrint MeshInfo = FSceneDataManager::GetInstance().GetMeshInfoByName(GeometryName);
-	std::shared_ptr<Charalotte::MeshGeometry> MeshGeo = std::make_shared<Charalotte::MeshGeometry>();
-
-	std::string Name = GeometryName;
-	if (MeshInfo.LodInfos.size() <= 0)
-	{
-		std::stringstream ss;
-		ss << GeometryName << "No result";
-		OutputDebugStringA(ss.str().c_str());
-		return;
-	}
-
-	int VertexIndex = 0;
-	// use normal to vertex color
-	bool IsUseNormalToColor = false;
-	if (MeshInfo.LodInfos[0].VerticesLocation.size() == MeshInfo.LodInfos[0].VerticesNormal.size())
-	{
-		IsUseNormalToColor = true;
-	}
-
-	for (const auto& VertexLocation : MeshInfo.LodInfos[0].VerticesLocation)
-	{
-		glm::vec4 VertexColor = glm::vec4(1.0f);
-
-		Charalotte::Vertex vertex;
-		glm::vec3 Float3 = glm::vec3(1.0f);
-		// execute scale transport
-		Float3.x = VertexLocation.x;
-		Float3.y = VertexLocation.y;
-		Float3.z = VertexLocation.z;
-
-		vertex.Pos = Float3;
-		if (IsUseNormalToColor)
-		{
-			VertexColor.x = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].x * 0.5f + 0.5f;
-			VertexColor.y = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].y * 0.5f + 0.5f;
-			VertexColor.z = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].z * 0.5f + 0.5f;
-			VertexColor.w = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].w * 0.5f + 0.5f;
-		}
-		vertex.Color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) ;
-		vertex.Normal = VertexColor;
-		MeshGeo->vertices.push_back(vertex);
-		VertexIndex ++;
-	}
-
-	for (const auto& index : MeshInfo.LodInfos[0].Indices)
-	{
-		int32_t VertexIndex = index;
-		MeshGeo->indices.push_back(static_cast<int16_t>(VertexIndex));
-	}
-
-	Charalotte::SubmeshGeometry submesh;
-	submesh.IndexCount = (UINT)(MeshInfo.LodInfos[0].Indices.size());
-	submesh.StartIndexLocation = 0;
-	submesh.BaseVertexLocation = 0;
-
-	MeshGeo->DrawArgs[GeometryName] = submesh;
-	MeshGeo->Name = GeometryName;
-
-	FWinSceneAsset::AddMeshData(GeometryName, MeshGeo);
-
-	//MeshGeoArray.push_back(MeshGeo);
-}
-
 void DXRender::BuildMeshGeometrys()
 {
 	for (auto& MeshGeoIter : FWinSceneAsset::GetMeshAssets())
@@ -435,7 +378,6 @@ void DXRender::BuildMeshGeometrys()
 		MeshGeo->IndexBufferByteSize = ibByteSize;
 	}
 }
-
 
 void DXRender::BuildPSO()
 {
@@ -469,58 +411,22 @@ void DXRender::BuildPSO()
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
 }
 
-void DXRender::BuilMeshAsset(const std::string& MapName)
-{
-	const auto& ActorInfors = FSceneDataManager::GetInstance().GetActorInfos();
-	auto ActorInfosIter = ActorInfors.find(MapName);
-	if (ActorInfosIter != ActorInfors.end())
-	{
-		for (const auto& EnviroumentActor : ActorInfosIter->second.ActorsInfo )
-		{
-			std::string assetName = EnviroumentActor.AssetName;
-			if (assetName.size() <= 0)
-			{
-				continue;
-			}
-			assetName.erase(assetName.size() - 1, 1);
-			//OutputDebugStringA(assetName.c_str());
-			CalcVerticesAndIndices(assetName, EnviroumentActor.Transform);
-		}
-	}
-	
-	BuildMeshGeometrys();
-}
-
-void DXRender::BuildActors(const std::string& MapName)
-{
-	const auto& ActorInfors = FSceneDataManager::GetInstance().GetActorInfos();
-	auto ActorInfosIter = ActorInfors.find(MapName);
-	if (ActorInfosIter->second.ActorsInfo.size() <= 0) return;
-	for (const auto& EnviroumentActor : ActorInfosIter->second.ActorsInfo)
-	{
-		std::string assetName = EnviroumentActor.AssetName;
-		if (assetName.size() <= 0)
-		{
-			continue;
-		}
-		assetName.erase(assetName.size() - 1, 1);
-		std::shared_ptr<FActorAsset> ActorAsset = std::make_shared<FActorAsset>();
-		ActorAsset->MeshAsset = FWinSceneAsset::GetMeshAsset(assetName);
-		ActorAsset->Transform = EnviroumentActor.Transform;
-	
-		BuildDescriptorHeaps(ActorAsset->CbvHeap);
-		BulidConstantBuffers(ActorAsset->CbvHeap, ActorAsset->ObjectCB);
-
-		ActorArray.push_back(ActorAsset);
-	}
-}
-
 void DXRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 {
+	NowMapName = MapName;
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
-	BuilMeshAsset(MapName);
-	BuildActors(MapName);
+	BuildMeshGeometrys();
+	auto& ActorDir = FSceneDataManager::GetInstance().GetActorDictionary();
+	const auto& ActorIter = ActorDir.find(MapName);
+	if (ActorIter != ActorDir.end())
+	{
+		for (auto& Actors : ActorIter->second)
+		{
+			BuildDescriptorHeaps(Actors->CbvHeap);
+			BulidConstantBuffers(Actors->CbvHeap, Actors->ObjectCB);
+		}
+	}
 	
 	ThrowIfFailed(mCommandList->Close());
 	ID3D12CommandList* cmdLists[] = { mCommandList.Get() };
@@ -528,6 +434,11 @@ void DXRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 	FlushCommandQueue();
 }
 
+std::shared_ptr<FWindow> DXRender::CreateMainWindow()
+{
+	mWindowIns = std::make_shared<FWin32Window>(mhAppInst);
+	return mWindowIns;
+}
 
 FWin32Window* DXRender::GetWindow()
 {
@@ -603,25 +514,6 @@ int DXRender::Run()
 	//#endif
 
 	return (int)msg.wParam;
-}
-
-bool DXRender::InitStart()
-{
-	if (mWindowIns == nullptr)
-	{
-		std::stringstream ss;
-		ss << "No Window";
-		OutputDebugStringA(ss.str().c_str());
-		return false;
-	}
-	// only mainwindow or directx3D is not inited, return initialize failed;
-
-	if (!InitDirect3D()) return false;
-
-	// init resize code
-	OnResize();
-
-	return true;
 }
 
 // when input heap, we should two heap, that is rtvHeap and dsvHeap
@@ -919,8 +811,4 @@ void DXRender::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 	}
 }
 
-std::shared_ptr<FWindow> DXRender::CreateMainWindow()
-{
-	mWindowIns = std::make_shared<FWin32Window>(mhAppInst);
-	return mWindowIns;
-}
+

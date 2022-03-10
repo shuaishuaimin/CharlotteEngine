@@ -7,125 +7,52 @@
 #include "WinBaseData.h"
 #include "FGameTimer.h"
 #include "FWinEventRegisterSystem.h"
+#include "FWinSceneAsset.h"
 
 class FSceneDataManager : public Singleton<FSceneDataManager>
 {
 public:
-	FSceneDataManager(){
-		
-		MainCamera = std::make_shared<FCamera>();
-		Cameras.push_back(MainCamera);
-		CameraTrans = Charalotte::CameraTransform();
-		DefaultCameraTrans = Charalotte::CameraTransform();
+	FSceneDataManager();
+	~FSceneDataManager();
 
-		GameTimer = std::make_unique<FGameTimer>();
-		IsAppPaused = false;
-		IsDeviceSucceed = false;
-		IsCanResizing = false;
-	}
-	~FSceneDataManager(){
-		GameTimer = nullptr;
-		MainCamera = nullptr;
-	}
+	FCamera* GetCamera();
+	
+	Charalotte::CameraTransform& GetCameraTrans();
+	
+	void InitCameraTrans();
+	
+	FGameTimer* GetTimer();
 
-	FCamera* GetCamera()
-	{
-		return MainCamera.get();
-	}
+	bool GetIsAppPaused();
 
-	Charalotte::CameraTransform& GetCameraTrans()
-	{
-		return CameraTrans;
-	}
+	void SetIsAppPaused(bool IsPaused);
 
-	void InitCameraTrans()
-	{
-		CameraTrans = DefaultCameraTrans;
-	}
+	bool GetIsDeviceSucceed();
 
-	FGameTimer* GetTimer()
-	{
-		return GameTimer.get();
-	}
+	void SetIsDeviceSucceed(bool IsSucceed);
 
-	bool GetIsAppPaused()
-	{
-		return IsAppPaused;
-	}
+	bool GetIsCanResizing();
 
-	void SetIsAppPaused(bool IsPaused)
-	{
-		IsAppPaused = IsPaused;
-	}
+	void SetIsCanResizing(bool IsCan);
 
-	bool GetIsDeviceSucceed()
-	{
-		return IsDeviceSucceed;
-	}
+	std::unordered_map<std::string, Charalotte::FActorsInfoForPrint> GetActorInfos();
 
-	void SetIsDeviceSucceed(bool IsSucceed)
-	{
-		IsDeviceSucceed = IsSucceed;
-	}
+	std::unordered_map<std::string, Charalotte::FMeshInfoForPrint> GetMeshInfors();
 
-	bool GetIsCanResizing()
-	{
-		return IsCanResizing;
-	}
+	void LoadMap(const std::string& MapName);
 
-	void SetIsCanResizing(bool IsCan)
-	{
-		IsCanResizing = IsCan;
-	}
+	Charalotte::FMeshInfoForPrint GetMeshInfoByName(const std::string& MeshName);
 
-	std::unordered_map<std::string, Charalotte::FActorsInfoForPrint> GetActorInfos()
-	{
-		return ActorInfors;
-	}
-	std::unordered_map<std::string, Charalotte::FMeshInfoForPrint> GetMeshInfors()
-	{
-		return MeshsInfors;
-	}
-	void LoadMap(const std::string& MapName) {
-		Charalotte::FActorsInfoForPrint TempActorInfors;
-		FDataProcessor::LoadActors(MapName, TempActorInfors);
-		ActorInfors.insert({ MapName, TempActorInfors });
-		std::set<std::string> AssetNames;
-		for (const auto& ActorInfor : TempActorInfors.ActorsInfo)
-		{
-			std::string AssetName = ActorInfor.AssetName;
-			if (AssetName.size() > 0)
-			{
-				AssetName.erase(AssetName.size() - 1, 1);
-			}
-			AssetName += ".dat";
-			AssetNames.insert(AssetName);
-		}
-		for (const auto& AssetName : AssetNames)
-		{
-			Charalotte::FMeshInfoForPrint MeshInfo;
-			FDataProcessor::LoadMesh(AssetName, MeshInfo);
-			std::string NameWithout = AssetName;
+	std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FActorAsset>>>& GetActorDictionary();
 
-			if (NameWithout.size() > 4)
-			{
-				NameWithout.erase(NameWithout.size() - 4, 4);
-				MeshsInfors.insert({ NameWithout, MeshInfo });
-			}
-		}
-		FWinEventRegisterSystem::GetInstance().ExecuteMapLoadEvent(MapName);
-	}
+	std::vector<std::shared_ptr<Charalotte::FActorAsset>>& GetSceneActorByName(const std::string& MapName);
+protected:
 
-	Charalotte::FMeshInfoForPrint GetMeshInfoByName(const std::string& MeshName)
-	{
-		auto MeshInfoIter = MeshsInfors.find(MeshName);
-		if (MeshInfoIter != MeshsInfors.end())
-		{
-			return MeshInfoIter->second;
-		}
-		return Charalotte::FMeshInfoForPrint();
-	}
+	void CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform);
 
+	void BuilMeshAsset(const std::string& MapName);
+
+	void BuildActors(const std::string& MapName);
 
 private:
 	std::vector<std::shared_ptr<FCamera>> Cameras;
@@ -133,7 +60,14 @@ private:
 	Charalotte::CameraTransform CameraTrans;
 	Charalotte::CameraTransform DefaultCameraTrans;
 
+	// save the actor information without render
 	std::unordered_map<std::string, Charalotte::FActorsInfoForPrint> ActorInfors;
+
+	// save the actor information have been rendered;
+	std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FActorAsset>>> ActorDir;
+
+	std::vector<std::shared_ptr<Charalotte::FActorAsset>> EmptyActorVec;
+	// save the mesh information without render, the real data is in win scene asset
 	std::unordered_map<std::string, Charalotte::FMeshInfoForPrint> MeshsInfors;
 
 	std::unique_ptr<FGameTimer> GameTimer;
