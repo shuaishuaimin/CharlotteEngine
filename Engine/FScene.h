@@ -20,20 +20,6 @@ public:
 	Charalotte::CameraTransform& GetCameraTrans();
 	
 	void InitCameraTrans();
-	
-	FGameTimer* GetTimer();
-
-	bool GetIsDXPaused();
-
-	void SetDXPaused(bool IsPaused);
-
-	bool GetIsDeviceSucceed();
-
-	void SetIsDeviceSucceed(bool IsSucceed);
-
-	bool GetIsCanResizing();
-
-	void SetIsCanResizing(bool IsCan);
 
 	void Update();
 
@@ -67,14 +53,6 @@ private:
 	std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FActorAsset>>> ActorDir;
 
 	std::vector<std::shared_ptr<Charalotte::FActorAsset>> EmptyActorVec;
-
-	std::unique_ptr<FGameTimer> GameTimer;
-	// connect app and window
-	bool IsDXPaused;
-
-	bool IsDeviceSucceed;
-
-	bool IsCanResizing;
 
 	std::string NowMapName;
 };

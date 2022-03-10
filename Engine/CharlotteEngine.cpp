@@ -2,6 +2,7 @@
 #include "CharlotteEngine.h"
 #include "FScene.h"
 #include "thread"
+#include "FGlobalDataManager.h"
 
 
 CharalotteEngine::CharalotteEngine() {
@@ -26,7 +27,7 @@ int CharalotteEngine::Update() {
 	//std::thread 
 	MSG msg = { 0 };
 
-	FScene::GetInstance().GetTimer()->Reset();
+	FGlobalDataManager::GetInstance().GetTimer()->Reset();
 
 	// if message is not wm_quit. Refresh the window
 	while (msg.message != WM_QUIT)
@@ -40,11 +41,11 @@ int CharalotteEngine::Update() {
 		// otherwise, do animation/game stuff
 		else
 		{
-			FScene::GetInstance().GetTimer()->Tick();
+			FGlobalDataManager::GetInstance().GetTimer()->Tick();
 
 			// if game pause sleep for wait
 			// else calculate frame states and update timer, draw timer to screen
-			if (!FScene::GetInstance().GetIsDXPaused())
+			if (!FGlobalDataManager::GetInstance().GetIsDXPaused())
 			{
 				WindowIns->Update();
 				FScene::GetInstance().Update();

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FScene.h"
 #include "FMeshAsset.h"
+#include "FGlobalDataManager.h"
 
 FScene::FScene() {
 
@@ -9,16 +10,12 @@ FScene::FScene() {
 	CameraTrans = Charalotte::CameraTransform();
 	DefaultCameraTrans = Charalotte::CameraTransform();
 
-	GameTimer = std::make_unique<FGameTimer>();
+	
 	ActorDir = {};
 	EmptyActorVec = {};
 	NowMapName = "";
-	IsDXPaused = false;
-	IsDeviceSucceed = false;
-	IsCanResizing = false;
 }
 FScene::~FScene() {
-	GameTimer = nullptr;
 	MainCamera = nullptr;
 	for (auto& ActorVector : ActorDir)
 	{
@@ -43,41 +40,6 @@ Charalotte::CameraTransform& FScene::GetCameraTrans()
 void FScene::InitCameraTrans()
 {
 	CameraTrans = DefaultCameraTrans;
-}
-
-FGameTimer* FScene::GetTimer()
-{
-	return GameTimer.get();
-}
-
-bool FScene::GetIsDXPaused()
-{
-	return IsDXPaused;
-}
-
-void FScene::SetDXPaused(bool IsPaused)
-{
-	IsDXPaused = IsPaused;
-}
-
-bool FScene::GetIsDeviceSucceed()
-{
-	return IsDeviceSucceed;
-}
-
-void FScene::SetIsDeviceSucceed(bool IsSucceed)
-{
-	IsDeviceSucceed = IsSucceed;
-}
-
-bool FScene::GetIsCanResizing()
-{
-	return IsCanResizing;
-}
-
-void FScene::SetIsCanResizing(bool IsCan)
-{
-	IsCanResizing = IsCan;
 }
 
 std::unordered_map<std::string, Charalotte::FActorsInfoForPrint> FScene::GetActorInfos()
@@ -248,10 +210,10 @@ std::vector<std::shared_ptr<Charalotte::FActorAsset>>& FScene::GetSceneActorByNa
 
 void FScene::Update()
 {
-	if (FScene::GetInstance().GetIsCanResizing())
+	if (FGlobalDataManager::GetInstance().GetIsCanResizing())
 	{
 		FWinEventRegisterSystem::GetInstance().ExecuteOnResizeEvent(Charalotte::DXRenderResize);
-		FScene::GetInstance().SetIsCanResizing(false);
+		FGlobalDataManager::GetInstance().SetIsCanResizing(false);
 	}
 	for (auto& ActorIns : FScene::GetInstance().GetSceneActorByName(NowMapName))
 	{

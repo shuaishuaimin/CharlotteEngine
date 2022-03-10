@@ -6,6 +6,7 @@
 #include "DXRender.h"
 #include "FDataProcessor.h"
 #include "FDXRenderMeshDataBuffer.h"
+#include "FGlobalDataManager.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -38,9 +39,9 @@ DXRender::~DXRender()
 	if (md3dDevice != nullptr)
 	{
 		FlushCommandQueue();
-		FScene::GetInstance().SetIsDeviceSucceed(false);
+		FGlobalDataManager::GetInstance().SetIsDeviceSucceed(false);
 	}
-	FScene::GetInstance().SetIsDeviceSucceed(false);
+	FGlobalDataManager::GetInstance().SetIsDeviceSucceed(false);
 }
 
 bool DXRender::Initialize()
@@ -299,11 +300,11 @@ bool DXRender::InitDirect3D()
 		IID_PPV_ARGS(&mFence)));
 	if (md3dDevice)
 	{
-		FScene::GetInstance().SetIsDeviceSucceed(true);
+		FGlobalDataManager::GetInstance().SetIsDeviceSucceed(true);
 	}
 	else
 	{
-		FScene::GetInstance().SetIsDeviceSucceed(false);
+		FGlobalDataManager::GetInstance().SetIsDeviceSucceed(false);
 	}
 
 	mRtvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -667,7 +668,7 @@ void DXRender::CalculateFrameStats()
 	frameCnt++;
 
 	// Compute averages over one second period.
-	if ((FScene::GetInstance().GetTimer()->TotalTime() - timeElapsed) >= 1.0f)
+	if ((FGlobalDataManager::GetInstance().GetTimer()->TotalTime() - timeElapsed) >= 1.0f)
 	{
 		float fps = (float)frameCnt; // fps = frameCnt / 1
 		float mspf = 1000.0f / fps;
