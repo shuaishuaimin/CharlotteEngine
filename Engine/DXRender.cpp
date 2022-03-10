@@ -57,7 +57,6 @@ bool DXRender::Initialize()
 
 	if (!InitDirect3D()) return false;
 
-	// init resize code
 	OnResize();
 
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
@@ -69,6 +68,8 @@ bool DXRender::Initialize()
 	mCommandQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
 
 	FlushCommandQueue();
+	// init resize code
+	OnResize();
 	return true;
 }
 

@@ -13,15 +13,9 @@ public:
 
 	void SetIsDeviceSucceed(bool IsSucceed);
 
-	bool GetIsCanResizing();
-
-	void SetIsCanResizing(bool IsCan);
-
 private:
 	std::unique_ptr<FGameTimer> GameTimer;
 
 	bool IsDeviceSucceed;
-
-	bool IsCanResizing;
 };
 

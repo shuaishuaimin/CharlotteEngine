@@ -4,15 +4,12 @@
 FGlobalDataManager::FGlobalDataManager()
 {
 	GameTimer = std::make_unique<FGameTimer>();
-	IsDXPaused = false;
 	IsDeviceSucceed = false;
-	IsCanResizing = false;
 }
 FGlobalDataManager::~FGlobalDataManager()
 {
 	GameTimer = nullptr;
 }
-
 
 FGameTimer* FGlobalDataManager::GetTimer()
 {
@@ -28,14 +25,3 @@ void FGlobalDataManager::SetIsDeviceSucceed(bool IsSucceed)
 {
 	IsDeviceSucceed = IsSucceed;
 }
-
-bool FGlobalDataManager::GetIsCanResizing()
-{
-	return IsCanResizing;
-}
-
-void FGlobalDataManager::SetIsCanResizing(bool IsCan)
-{
-	IsCanResizing = IsCan;
-}
-

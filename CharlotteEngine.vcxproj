@@ -177,7 +177,6 @@
     <ClCompile Include="Engine\FMeshAsset.cpp" />
     <ClCompile Include="Engine\FScene.cpp" />
     <ClCompile Include="Engine\FDXRenderMeshDataBuffer.cpp" />
-    <ClCompile Include="Engine\FWindow.cpp" />
     <ClCompile Include="Engine\GameInstance.cpp" />
     <ClCompile Include="Engine\GameLogic.cpp" />
     <ClCompile Include="Engine\FWinEventRegisterSystem.cpp" />

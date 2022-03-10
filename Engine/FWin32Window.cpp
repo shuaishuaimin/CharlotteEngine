@@ -130,7 +130,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				IsPaused = false;
 				mMinimized = false;
 				mMaximized = true;
-				FGlobalDataManager::GetInstance().SetIsCanResizing(true);
+				FWinEventRegisterSystem::GetInstance().ExecuteOnResizeEvent(Charalotte::DXRenderResize);
 			}
 			else if (wParam == SIZE_RESTORED)
 			{
@@ -140,7 +140,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				{
 					IsPaused = false;
 					mMinimized = false;
-					FGlobalDataManager::GetInstance().SetIsCanResizing(true);
+					FWinEventRegisterSystem::GetInstance().ExecuteOnResizeEvent(Charalotte::DXRenderResize);
 				}
 
 				// Restoring from maximized state?
@@ -148,7 +148,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				{
 					IsPaused = false;
 					mMaximized = false;
-					FGlobalDataManager::GetInstance().SetIsCanResizing(true);
+					FWinEventRegisterSystem::GetInstance().ExecuteOnResizeEvent(Charalotte::DXRenderResize);
 				}
 				else if (mResizing)
 				{
@@ -163,7 +163,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 				else // API call such as SetWindowPos or mSwapChain->SetFullscreenState.
 				{
-					FGlobalDataManager::GetInstance().SetIsCanResizing(true);
+					FWinEventRegisterSystem::GetInstance().ExecuteOnResizeEvent(Charalotte::DXRenderResize);
 				}
 			}
 		}
@@ -182,6 +182,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		IsPaused = false;
 		mResizing = false;
 		FGlobalDataManager::GetInstance().GetTimer()->Start();
+		FWinEventRegisterSystem::GetInstance().ExecuteOnResizeEvent(Charalotte::DXRenderResize);
 		return 0;
 
 		// WM_DESTROY is sent when the window is being destroyed.
