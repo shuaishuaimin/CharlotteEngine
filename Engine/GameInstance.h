@@ -16,7 +16,6 @@ public:
 	void Destory();
 
 protected:
-	std::unique_ptr<CharalotteEngine> Engine;
 	std::unique_ptr<GameLogic> Game;
 };
 

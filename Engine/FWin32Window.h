@@ -6,7 +6,7 @@ class FWin32Window : public FWindow
 {
 public: 
 
-	FWin32Window(HINSTANCE Instance);
+	FWin32Window();
 	FWin32Window(const FWin32Window& rhs) = delete;
 	FWin32Window& operator=(const FWin32Window& rhs) = delete;
 	virtual ~FWin32Window();
@@ -27,6 +27,10 @@ public:
 
 	virtual void Update()override;
 	virtual bool GetIsPaused() override;
+
+	MSG GetMsg();
+
+	virtual bool GetIsExit() override;
 protected:
 	static FWin32Window* MainWindow;
 
@@ -45,4 +49,8 @@ protected:
 	bool IsRunning;
 
 	bool IsPaused;
+
+	MSG msg;
+
+	bool IsExit;
 };

@@ -13,6 +13,8 @@ public:
 
 	virtual bool GetIsPaused() = 0;
 
+	virtual bool GetIsExit() = 0;
+
 private:
 	float Width;
 	float Height;

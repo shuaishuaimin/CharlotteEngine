@@ -19,6 +19,8 @@ public:
 
 	std::shared_ptr<FWindow> CreateMainWindow();
 
+	void tick();
+
 	void Destory();
 
 private:

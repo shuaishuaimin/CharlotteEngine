@@ -26,7 +26,7 @@ bool CharalotteEngine::Init() {
 std::shared_ptr<FWindow> CharalotteEngine::CreateMainWindow()
 {
 #if	PLATFORM_WINDOWS
-	return std::make_shared<FWin32Window>(GetModuleHandle(0));
+	return std::make_shared<FWin32Window>();
 #else
 	return nullptr;
 #endif
@@ -40,31 +40,9 @@ int CharalotteEngine::Update() {
 	FGlobalDataManager::GetInstance().GetTimer()->Reset();
 
 	// if message is not wm_quit. Refresh the window
-	while (msg.message != WM_QUIT)
+	while (!WindowIns->GetIsExit())
 	{
-		// if there are Window messages then process them
-		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-		// otherwise, do animation/game stuff
-		else
-		{
-			FGlobalDataManager::GetInstance().GetTimer()->Tick();
-
-			// if game pause sleep for wait
-			// else calculate frame states and update timer, draw timer to screen
-			if (!WindowIns->GetIsPaused())
-			{
-				WindowIns->Update();
-				
-			}
-			else
-			{
-				Sleep(100);
-			}
-		}
+		WindowIns->Update();
 		if (!WindowIns->GetIsPaused())
 		{
 			FScene::GetInstance().Update();
@@ -72,7 +50,7 @@ int CharalotteEngine::Update() {
 		}
 		
 	}
-	return (int)msg.wParam;
+	return (int)0;
 #else
 	return 0;
 #endif
@@ -84,4 +62,13 @@ void CharalotteEngine::Destory()
 	WindowIns = nullptr;
 
 	RenderIns = nullptr;
+}
+
+void CharalotteEngine::tick()
+{
+	if (!WindowIns->GetIsPaused())
+	{
+		FScene::GetInstance().Update();
+		RenderIns->Update();
+	}
 }

@@ -14,11 +14,12 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return FWin32Window::GetMainWindow()->MsgProc(hwnd, msg, wParam, lParam);
 }
 
-FWin32Window::FWin32Window(HINSTANCE Instance) : 
-				mhAppInst(Instance), IsPaused(false)
+FWin32Window::FWin32Window() : 
+				mhAppInst(GetModuleHandle(0)), IsPaused(false), IsExit(false)
 {
 	assert(MainWindow == nullptr);
 	MainWindow = this;
+	msg = {0};
 }
 FWin32Window* FWin32Window::MainWindow = nullptr;
 
@@ -34,12 +35,37 @@ FWin32Window* FWin32Window::GetMainWindow()
 
 void FWin32Window::Update()
 {
-	/*while (IsRunning)
+	if (msg.message != WM_QUIT)
 	{
-		OnKeyBoardInput();
-		Sleep(100);
-	}*/
-	OnKeyBoardInput();
+		// if there are Window messages then process them
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		// otherwise, do animation/game stuff
+		else
+		{
+			FGlobalDataManager::GetInstance().GetTimer()->Tick();
+
+			// if game pause sleep for wait
+			// else calculate frame states and update timer, draw timer to screen
+			if (!IsPaused)
+			{
+				OnKeyBoardInput();
+
+			}
+			else
+			{
+				Sleep(100);
+			}
+		}
+	}
+	else
+	{
+		IsExit = true;
+	}
+	
 }
 HWND FWin32Window::MainWnd()const
 {
@@ -48,6 +74,16 @@ HWND FWin32Window::MainWnd()const
 float FWin32Window::AspectRatio()const
 {
 	return static_cast<float>(mClientWidth) / mClientHeight;
+}
+
+MSG FWin32Window::GetMsg()
+{
+	return msg;
+}
+
+bool FWin32Window::GetIsExit()
+{
+	return IsExit;
 }
 
 bool FWin32Window::InitMainWindow()
