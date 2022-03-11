@@ -52,6 +52,8 @@ public:
 
 	virtual void Update() override;
 
+	virtual bool GetIsDevicedSucceed()override;
+
 protected:
 	void OnResize();
 	void Draw();
@@ -147,4 +149,6 @@ private:
 	POINT mLastMousePos;
 
 	std::string NowMapName;
+
+	bool IsDeviceSucceed;
 };

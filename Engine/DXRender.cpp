@@ -7,6 +7,7 @@
 #include "FDataProcessor.h"
 #include "FDXRenderMeshDataBuffer.h"
 #include "FGlobalDataManager.h"
+#include "CharlotteEngine.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -15,7 +16,7 @@ using std::string;
 
 DXRender* DXRender::render = nullptr;
 
-DXRender::DXRender() : NowMapName("")
+DXRender::DXRender() : NowMapName(""), IsDeviceSucceed(false)
 {
 	FWinEventRegisterSystem::GetInstance().RegisterMapLoadEventForDender(Charalotte::BaseMapLoad, [this](const std::string& MapName) {
 		this->LoadingMapDataFromAssetSystem(MapName);
@@ -39,9 +40,9 @@ DXRender::~DXRender()
 	if (md3dDevice != nullptr)
 	{
 		FlushCommandQueue();
-		FGlobalDataManager::GetInstance().SetIsDeviceSucceed(false);
+		IsDeviceSucceed = false;
 	}
-	FGlobalDataManager::GetInstance().SetIsDeviceSucceed(false);
+	IsDeviceSucceed = false;
 }
 
 bool DXRender::Initialize()
@@ -79,8 +80,13 @@ void DXRender::Update()
 	//	pDebugDevice->Release();
 	//}
 	//#endif
-
 }
+
+bool DXRender::GetIsDevicedSucceed()
+{
+	return IsDeviceSucceed;
+}
+
 
 void DXRender::OnResize()
 {
@@ -294,11 +300,11 @@ bool DXRender::InitDirect3D()
 		IID_PPV_ARGS(&mFence)));
 	if (md3dDevice)
 	{
-		FGlobalDataManager::GetInstance().SetIsDeviceSucceed(true);
+		IsDeviceSucceed = true;
 	}
 	else
 	{
-		FGlobalDataManager::GetInstance().SetIsDeviceSucceed(false);
+		IsDeviceSucceed = false;
 	}
 
 	mRtvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -591,7 +597,7 @@ void DXRender::CreateSwapChain()
 	sd.SampleDesc.Quality = m4xMsaaQuality ? (m4xMsaaQuality - 1) : 0;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.BufferCount = SwapChainBufferCount;
-	sd.OutputWindow = dynamic_cast<FWin32Window*>(FGlobalDataManager::GetInstance().GetWindowPtr())->MainWnd();
+	sd.OutputWindow = dynamic_cast<FWin32Window*>(CharalotteEngine::GetInstance().GetWindowPtr())->MainWnd();
 	sd.Windowed = true;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -651,7 +657,7 @@ void DXRender::CalculateFrameStats()
 	frameCnt++;
 
 	// Compute averages over one second period.
-	if ((FGlobalDataManager::GetInstance().GetTimer()->TotalTime() - timeElapsed) >= 1.0f)
+	if ((CharalotteEngine::GetInstance().GetTimer()->TotalTime() - timeElapsed) >= 1.0f)
 	{
 		float fps = (float)frameCnt; // fps = frameCnt / 1
 		float mspf = 1000.0f / fps;
@@ -663,7 +669,7 @@ void DXRender::CalculateFrameStats()
 			L" FPS : " + fpsstr +
 			L" MSPF: " + mspfstr;
 
-		SetWindowText(dynamic_cast<FWin32Window*>(FGlobalDataManager::GetInstance().GetWindowPtr())->MainWnd(), windowText.c_str());
+		SetWindowText(dynamic_cast<FWin32Window*>(CharalotteEngine::GetInstance().GetWindowPtr())->MainWnd(), windowText.c_str());
 
 		// reset
 		frameCnt = 0;

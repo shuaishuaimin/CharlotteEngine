@@ -8,6 +8,7 @@
 CharalotteEngine::CharalotteEngine() {
 	WindowIns = this->CreateMainWindow();
 	RenderIns = std::make_unique<DXRender>();
+	Timer = std::make_unique<FGameTimer>();
 }
 
 bool CharalotteEngine::Init() {
@@ -15,7 +16,6 @@ bool CharalotteEngine::Init() {
 	{
 		return false;
 	}
-	FGlobalDataManager::GetInstance().SaveWindowPtr(WindowIns.get());
 	if (!RenderIns->Initialize())
 	{
 		return false;
@@ -37,7 +37,7 @@ int CharalotteEngine::Update() {
 #if PLATFORM_WINDOWS
 	MSG msg = { 0 };
 
-	FGlobalDataManager::GetInstance().GetTimer()->Reset();
+	Timer->Reset();
 
 	// if message is not wm_quit. Refresh the window
 	while (!WindowIns->GetIsExit())
@@ -71,4 +71,19 @@ void CharalotteEngine::tick()
 		FScene::GetInstance().Update();
 		RenderIns->Update();
 	}
+}
+
+FGameTimer* CharalotteEngine::GetTimer()
+{
+	return Timer.get();
+}
+
+FWindow* CharalotteEngine::GetWindowPtr()
+{
+	return WindowIns.get();
+}
+
+FRender* CharalotteEngine::GetRenderPtr()
+{
+	return RenderIns.get();
 }

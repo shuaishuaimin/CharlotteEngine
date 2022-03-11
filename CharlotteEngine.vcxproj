@@ -145,7 +145,6 @@
   <ItemGroup>
     <ClInclude Include="Engine\BaseStructAllPlatform.h" />
     <ClInclude Include="Engine\CharlotteEngine.h" />
-    <ClInclude Include="Engine\FGlobalDataManager.h" />
     <ClInclude Include="Engine\FMeshAsset.h" />
     <ClInclude Include="Engine\FRender.h" />
     <ClInclude Include="Engine\GameInstance.h" />
@@ -173,7 +172,6 @@
   <ItemGroup>
     <ClCompile Include="Engine\CharlotteEngine.cpp" />
     <ClCompile Include="Engine\DDSTextureLoader.cpp" />
-    <ClCompile Include="Engine\FGlobalDataManager.cpp" />
     <ClCompile Include="Engine\FMeshAsset.cpp" />
     <ClCompile Include="Engine\FScene.cpp" />
     <ClCompile Include="Engine\FDXRenderMeshDataBuffer.cpp" />

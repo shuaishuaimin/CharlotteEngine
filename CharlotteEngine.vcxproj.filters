@@ -177,9 +177,6 @@
     <ClInclude Include="Engine\FMeshAsset.h">
       <Filter>Header Files\Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FGlobalDataManager.h">
-      <Filter>Header Files\Engine\Scene</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\DDSTextureLoader.cpp">
@@ -235,9 +232,6 @@
     </ClCompile>
     <ClCompile Include="Engine\DXRender.cpp">
       <Filter>Source Files\Engine\Platform</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\FGlobalDataManager.cpp">
-      <Filter>Source Files\Engine\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FMeshAsset.cpp">
       <Filter>Source Files\Engine\Scene</Filter>

@@ -23,8 +23,16 @@ public:
 
 	void Destory();
 
+	FGameTimer* GetTimer();
+
+	FWindow* GetWindowPtr();
+
+	FRender* GetRenderPtr();
+
 private:
 	std::unique_ptr<FRender> RenderIns;
 	std::shared_ptr<FWindow> WindowIns;
+	std::unique_ptr<FGameTimer> Timer;
+
 };
 

@@ -3,6 +3,7 @@
 #include "FScene.h"
 #include "FWinEventRegisterSystem.h"
 #include "FGlobalDataManager.h"
+#include "CharlotteEngine.h"
 #include <thread>
 #include <WindowsX.h>
 
@@ -46,7 +47,7 @@ void FWin32Window::Update()
 		// otherwise, do animation/game stuff
 		else
 		{
-			FGlobalDataManager::GetInstance().GetTimer()->Tick();
+			CharalotteEngine::GetInstance().GetTimer()->Tick();
 
 			// if game pause sleep for wait
 			// else calculate frame states and update timer, draw timer to screen
@@ -139,12 +140,12 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (LOWORD(wParam) == WA_INACTIVE)
 		{
 			IsPaused = true;
-			FGlobalDataManager::GetInstance().GetTimer()->Stop();
+			CharalotteEngine::GetInstance().GetTimer()->Stop();
 		}
 		else
 		{
 			IsPaused = false;
-			FGlobalDataManager::GetInstance().GetTimer()->Start();
+			CharalotteEngine::GetInstance().GetTimer()->Start();
 		}
 		return 0;
 
@@ -153,7 +154,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		// Save the new client area dimensions.
 		mClientWidth = LOWORD(lParam);
 		mClientHeight = HIWORD(lParam);
-		if (FGlobalDataManager::GetInstance().GetIsDeviceSucceed())
+		if (CharalotteEngine::GetInstance().GetRenderPtr()->GetIsDevicedSucceed())
 		{
 			if (wParam == SIZE_MINIMIZED)
 			{
@@ -209,7 +210,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_ENTERSIZEMOVE:
 		IsPaused = true;
 		mResizing = true;
-		FGlobalDataManager::GetInstance().GetTimer()->Stop();
+		CharalotteEngine::GetInstance().GetTimer()->Stop();
 		return 0;
 
 		// WM_EXITSIZEMOVE is sent when the user releases the resize bars.
@@ -217,7 +218,7 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_EXITSIZEMOVE:
 		IsPaused = false;
 		mResizing = false;
-		FGlobalDataManager::GetInstance().GetTimer()->Start();
+		CharalotteEngine::GetInstance().GetTimer()->Start();
 		FWinEventRegisterSystem::GetInstance().ExecuteOnResizeEvent(Charalotte::DXRenderResize);
 		return 0;
 
