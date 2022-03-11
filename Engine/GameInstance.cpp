@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GameInstance.h"
 #include "FScene.h"
-
+#include <thread>
 
 GameInstance::GameInstance()
 {
@@ -26,6 +26,10 @@ bool GameInstance::Init()
 
 int GameInstance::Update()
 {
+	/*std::thread t1(&CharalotteEngine::Update, Engine.get());
+	std::thread t2(&GameLogic::Update, Game.get());
+	t1.join();
+	t1.join();*/
 	int Result = Engine->Update();
 	Game->Update();
 	return Result;

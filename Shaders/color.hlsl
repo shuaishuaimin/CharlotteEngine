@@ -38,7 +38,7 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
-    return pin.Color;
+    return pow((pin.Color + 1) * 0.5, 1/2.2f);
 }
 
 
