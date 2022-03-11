@@ -95,3 +95,9 @@ glm::vec4 FMathHelper::Vec4MultipyMat(const glm::vec4& vector, const glm::mat4& 
 
 	return ResultVector;
 }
+
+glm::mat4 FMathHelper::GetRotateMatrix(const glm::vec4& Qua)
+{
+	glm::qua<float> Quater = glm::qua<float>(Qua.w, Qua.x, Qua.y, Qua.z);
+	return glm::mat4_cast(Quater);
+}

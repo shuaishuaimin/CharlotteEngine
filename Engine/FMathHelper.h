@@ -71,6 +71,8 @@ public:
 	static glm::mat4 GetRotateMatrix(float Pitch, 
 					float Yaw, float Roll, const glm::vec4& Target, const glm::vec4& Up, const glm::vec4& Location);
 
+	static glm::mat4 GetRotateMatrix(const glm::vec4& Qua);
+
 	static const float Infinity;
 	static const float Pi;
 

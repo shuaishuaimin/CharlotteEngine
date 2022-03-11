@@ -58,6 +58,7 @@ namespace Charalotte
 	struct ObjectConstants
 	{
 		glm::mat4 TransMatrix = glm::mat4(1.0f);
+		glm::mat4 Rotate = glm::mat4(1.0f);
 	};
 
 	struct FLODInfo

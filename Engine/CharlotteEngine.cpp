@@ -58,14 +58,19 @@ int CharalotteEngine::Update() {
 			if (!WindowIns->GetIsPaused())
 			{
 				WindowIns->Update();
-				FScene::GetInstance().Update();
-				RenderIns->Update();
+				
 			}
 			else
 			{
 				Sleep(100);
 			}
 		}
+		if (!WindowIns->GetIsPaused())
+		{
+			FScene::GetInstance().Update();
+			RenderIns->Update();
+		}
+		
 	}
 	return (int)msg.wParam;
 #else

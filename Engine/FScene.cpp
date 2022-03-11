@@ -187,10 +187,14 @@ void FScene::BuildActors(const std::string& MapName)
 		}
 		assetName.erase(assetName.size() - 1, 1);
 		std::shared_ptr<Charalotte::FActorAsset> ActorAsset = std::make_shared<Charalotte::FActorAsset>();
-		ActorAsset->MeshAsset = FDXRenderMeshDataBuffer::GetMeshAsset(assetName);
-		ActorAsset->Transform = EnviroumentActor.Transform;
 
-		Iter->second.push_back(ActorAsset);
+		ActorAsset->MeshAsset = FDXRenderMeshDataBuffer::GetMeshAsset(assetName);
+		if (ActorAsset->MeshAsset != nullptr)
+		{
+			ActorAsset->Transform = EnviroumentActor.Transform;
+
+			Iter->second.push_back(ActorAsset);
+		}
 	}
 }
 
@@ -218,8 +222,12 @@ void FScene::Update()
 		glm::mat4 NowVPTrans;
 		FScene::GetInstance().GetCamera()->GetVPTransform(NowVPTrans);
 		glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorIns->Transform);
+		auto& RotateStruct = ActorIns->Transform.Rotation;
+		glm::vec4 Rotate(RotateStruct.X, RotateStruct.Y, RotateStruct.Z, RotateStruct.W);
+		glm::mat4 NowRotate = FMathHelper::GetRotateMatrix(Rotate);
 		glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
 		objConstants.TransMatrix = glm::transpose(NowMVPTrans);
+		objConstants.Rotate = (NowRotate);
 		ActorIns->ObjectCB->CopyData(0, objConstants);
 	}
 }
