@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include "WinBaseData.h"
+#include "WinFrameResource.h"
 
 class FDXRenderMeshDataBuffer
 {

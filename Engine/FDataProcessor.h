@@ -1,5 +1,5 @@
 #pragma once
-#include "WinBaseData.h"
+#include "WinFrameResource.h"
 
 class FDataProcessor
 {

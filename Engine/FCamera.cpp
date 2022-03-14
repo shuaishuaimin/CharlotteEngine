@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FCamera.h"
 #include "FScene.h"
+#include "CharlotteEngine.h"
 
 #if PLATFORM_WINDOWS
 #include "FWinEventRegisterSystem.h"
@@ -12,9 +13,9 @@ FCamera::FCamera(const Charalotte::CameraData& Data) : MainCameraData(Data), Sen
 	VPTransform.ProjectionTransform = glm::mat4(1.0f);;
 	CalcVPMatrix();
 	RegisterCameraInput();
-
+	
 }
-FCamera::FCamera() : Sensitivity(0.25)
+FCamera::FCamera() : Sensitivity(1.5)
 {
 	Charalotte::CameraData DefaultCameraData;
 	DefaultCameraData.Near = 1.0f;
@@ -31,6 +32,7 @@ FCamera::FCamera() : Sensitivity(0.25)
 	VPTransform.ProjectionTransform = glm::mat4(1.0f);;
 	CalcVPMatrix();
 	RegisterCameraInput();
+	CharalotteEngine::GetInstance().GetWindowPtr()->SetCameraSen(this->Sensitivity);
 }
 
 
@@ -112,45 +114,45 @@ void FCamera::BackCameraLocation(const glm::vec4& CameraLocation, const glm::vec
 void FCamera::RegisterCameraInput()
 {
 	//float KeySe = 0.3f;
-	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('A', []() {
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('A', [this]() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
-		float KeySe = 0.7f;
+		float KeySe = this->Sensitivity;
 		Trans.Translation.y -= KeySe;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
-	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('D', []() {
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('D', [this]() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
-		float KeySe = 0.7f;
-		Trans.Translation.y += KeySe;
+		float KeySe = 1.5f;
+		Trans.Translation.y += this->Sensitivity;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
-	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('W', []() {
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('W', [this]() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
-		float KeySe = 0.7f;
-		Trans.Translation.x += KeySe;
+		float KeySe = 1.5f;
+		Trans.Translation.x += this->Sensitivity;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
-	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('S', []() {
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('S', [this]() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
-		float KeySe = 0.7f;
-		Trans.Translation.x -= KeySe;
+		float KeySe = 1.5f;
+		Trans.Translation.x -= this->Sensitivity;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
-	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('Q', []() {
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('Q', [this]() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
-		float KeySe = 0.7f;
-		Trans.Translation.z -= KeySe;
+		float KeySe = 1.5f;
+		Trans.Translation.z -= this->Sensitivity;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
-	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('E', []() {
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('E', [this]() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
-		float KeySe = 0.7f;
-		Trans.Translation.z += KeySe;
+		float KeySe = 1.5f;
+		Trans.Translation.z += this->Sensitivity;
 		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
@@ -159,6 +161,21 @@ void FCamera::RegisterCameraInput()
 		glm::vec4 Target = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 		glm::vec4 Up = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 		FScene::GetInstance().GetCamera()->BackCameraLocation(Location, Target, Up);
+		});
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('R', [this]() {
+		this->Sensitivity += 0.1f;
+		CharalotteEngine::GetInstance().GetWindowPtr()->SetCameraSen(this->Sensitivity);
+		});
+	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('T', [this]() {
+		if (this->Sensitivity > 0.0f)
+		{
+			this->Sensitivity -= 0.1f;
+		}
+		else
+		{
+			this->Sensitivity = 0.0f;
+		}
+		CharalotteEngine::GetInstance().GetWindowPtr()->SetCameraSen(this->Sensitivity);
 		});
 
 	FWinEventRegisterSystem::GetInstance().RegisterWindowsInput

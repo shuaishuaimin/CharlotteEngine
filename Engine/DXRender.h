@@ -11,7 +11,7 @@
 #include "FWin32Window.h"
 #include "FMathHelper.h"
 #include "FUploadBuffer.h"
-#include "WinBaseData.h"
+#include "WinFrameResource.h"
 #include "FCamera.h"
 #include "FWinEventRegisterSystem.h"
 #include "FScene.h"
@@ -70,7 +70,6 @@ protected:
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView()const;
 
 	// calculate the frame state
-	void CalculateFrameStats();
 
 	void LogAdapters();
 	void LogAdapterOutputs(IDXGIAdapter* adapter);

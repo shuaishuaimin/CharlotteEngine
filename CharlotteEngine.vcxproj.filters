@@ -100,6 +100,9 @@
     <Filter Include="Header Files\Engine\Platform\Render">
       <UniqueIdentifier>{fdb246d8-673c-4106-bb8e-9aaebb5c4461}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Engine\Public\Material">
+      <UniqueIdentifier>{b09146ce-ba1b-48e3-842a-aad28acc8d2a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\d3dx12.h">
@@ -114,7 +117,7 @@
     <ClInclude Include="Engine\FMathHelper.h">
       <Filter>Header Files\Engine\Public\BaseCode</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\WinBaseData.h">
+    <ClInclude Include="Engine\WinFrameResource.h">
       <Filter>Header Files\Engine\Public\Data</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FGameTimer.h">
@@ -176,6 +179,12 @@
     </ClInclude>
     <ClInclude Include="Engine\FMeshAsset.h">
       <Filter>Header Files\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\WinMaterialData.h">
+      <Filter>Header Files\Engine\Public\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\MaterialSystem.h">
+      <Filter>Header Files\Engine\Public\Material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

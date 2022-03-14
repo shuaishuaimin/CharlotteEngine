@@ -155,7 +155,8 @@
     <ClInclude Include="Engine\FDXRenderMeshDataBuffer.h" />
     <ClInclude Include="Engine\FWindow.h" />
     <ClInclude Include="Engine\stdafx.h" />
-    <ClInclude Include="Engine\WinBaseData.h" />
+    <ClInclude Include="Engine\MaterialSystem.h" />
+    <ClInclude Include="Engine\WinFrameResource.h" />
     <ClInclude Include="Engine\d3dx12.h" />
     <ClInclude Include="Engine\FCamera.h" />
     <ClInclude Include="Engine\FDataProcessor.h" />
@@ -167,6 +168,7 @@
     <ClInclude Include="Engine\FUtil.h" />
     <ClInclude Include="Engine\FWin32Window.h" />
     <ClInclude Include="Engine\Singleton.h" />
+    <ClInclude Include="Engine\WinMaterialData.h" />
     <ClInclude Include="UStaticMesh.h" />
   </ItemGroup>
   <ItemGroup>

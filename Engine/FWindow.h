@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 class FWindow
 {
@@ -15,6 +16,7 @@ public:
 
 	virtual bool GetIsExit() = 0;
 
+	virtual void SetCameraSen(float SenNum) = 0;
 private:
 	float Width;
 	float Height;

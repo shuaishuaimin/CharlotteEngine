@@ -3,6 +3,10 @@
 #include "BaseStructAllPlatform.h"
 #include "FUploadBuffer.h"
 
+class WinFrameResource
+{
+
+};
 namespace Charalotte
 {
 

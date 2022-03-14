@@ -27,10 +27,12 @@ public:
 
 	virtual void Update()override;
 	virtual bool GetIsPaused() override;
-
+	virtual void SetCameraSen(float SenNum) override;
 	MSG GetMsg();
 
 	virtual bool GetIsExit() override;
+
+	void CalculateFrameStats();
 protected:
 	static FWin32Window* MainWindow;
 
@@ -43,6 +45,7 @@ protected:
 	bool	  mFullscreenState = false; // full screen enabled
 
 	std::wstring mMainWndCaption = L"Charlotte Engine"; // name
+	std::wstring WinText;
 	int mClientWidth = 1980;
 	int mClientHeight = 1280;
 
@@ -53,4 +56,6 @@ protected:
 	MSG msg;
 
 	bool IsExit;
+
+	float CameraSen;
 };

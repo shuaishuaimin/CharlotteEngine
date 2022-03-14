@@ -6,7 +6,6 @@
 #include "DXRender.h"
 #include "FDataProcessor.h"
 #include "FDXRenderMeshDataBuffer.h"
-#include "FGlobalDataManager.h"
 #include "CharlotteEngine.h"
 
 using namespace DirectX;
@@ -70,7 +69,6 @@ bool DXRender::Initialize()
 // main thread
 void DXRender::Update()
 {
-	CalculateFrameStats();
 	Draw();
 	//#if defined(DEBUG) || defined(_DEBUG)
 	//{
@@ -649,34 +647,6 @@ D3D12_CPU_DESCRIPTOR_HANDLE DXRender::DepthStencilView()const
 	return mDsvHeap->GetCPUDescriptorHandleForHeapStart();
 }
 
-void DXRender::CalculateFrameStats()
-{
-	static int frameCnt = 0;
-	static float timeElapsed = 0.0f;
-
-	frameCnt++;
-
-	// Compute averages over one second period.
-	if ((CharalotteEngine::GetInstance().GetTimer()->TotalTime() - timeElapsed) >= 1.0f)
-	{
-		float fps = (float)frameCnt; // fps = frameCnt / 1
-		float mspf = 1000.0f / fps;
-
-		std::wstring fpsstr = std::to_wstring(fps);
-		std::wstring mspfstr = std::to_wstring(mspf);
-
-		std::wstring windowText = mMainWndCaption +
-			L" FPS : " + fpsstr +
-			L" MSPF: " + mspfstr;
-
-		SetWindowText(dynamic_cast<FWin32Window*>(CharalotteEngine::GetInstance().GetWindowPtr())->MainWnd(), windowText.c_str());
-
-		// reset
-		frameCnt = 0;
-		timeElapsed += 1.0f;
-	}
-
-}
 
 void DXRender::LogAdapters()
 {

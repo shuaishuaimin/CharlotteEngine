@@ -2,7 +2,6 @@
 #include "CharlotteEngine.h"
 #include "FScene.h"
 #include "thread"
-#include "FGlobalDataManager.h"
 
 
 CharalotteEngine::CharalotteEngine() {

@@ -4,7 +4,7 @@
 #include <set>
 #include "Singleton.h"
 #include "FCamera.h"
-#include "WinBaseData.h"
+#include "WinFrameResource.h"
 #include "FGameTimer.h"
 #include "FWinEventRegisterSystem.h"
 #include "FDXRenderMeshDataBuffer.h"

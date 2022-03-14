@@ -1,11 +1,13 @@
 #include "stdafx.h"
+#include <thread>
+#include <WindowsX.h>
+#include <locale>
+#include <codecvt>
 #include "FWin32Window.h"
 #include "FScene.h"
 #include "FWinEventRegisterSystem.h"
-#include "FGlobalDataManager.h"
 #include "CharlotteEngine.h"
-#include <thread>
-#include <WindowsX.h>
+
 
 LRESULT CALLBACK
 MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -21,6 +23,7 @@ FWin32Window::FWin32Window() :
 	assert(MainWindow == nullptr);
 	MainWindow = this;
 	msg = {0};
+	WinText = mMainWndCaption;
 }
 FWin32Window* FWin32Window::MainWindow = nullptr;
 
@@ -53,8 +56,8 @@ void FWin32Window::Update()
 			// else calculate frame states and update timer, draw timer to screen
 			if (!IsPaused)
 			{
+				CalculateFrameStats();
 				OnKeyBoardInput();
-
 			}
 			else
 			{
@@ -85,6 +88,11 @@ MSG FWin32Window::GetMsg()
 bool FWin32Window::GetIsExit()
 {
 	return IsExit;
+}
+
+void FWin32Window::SetCameraSen(float SenNum)
+{
+	CameraSen = SenNum;
 }
 
 bool FWin32Window::InitMainWindow()
@@ -267,6 +275,37 @@ LRESULT FWin32Window::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+void FWin32Window::CalculateFrameStats()
+{
+	static int frameCnt = 0;
+	static float timeElapsed = 0.0f;
+
+	frameCnt++;
+
+	// Compute averages over one second period.
+	if ((CharalotteEngine::GetInstance().GetTimer()->TotalTime() - timeElapsed) >= 1.0f)
+	{
+		float fps = (float)frameCnt; // fps = frameCnt / 1
+		float mspf = 1000.0f / fps;
+
+		std::wstring fpsstr = std::to_wstring(fps);
+		std::wstring mspfstr = std::to_wstring(mspf);
+		std::wstring senstr = std::to_wstring(CameraSen);
+
+		std::wstring windowText = mMainWndCaption +
+			L" FPS : " + fpsstr +
+			L" MSPF: " + mspfstr +
+			L" Camera sensitivity: " + senstr;
+		WinText = windowText;
+
+		SetWindowText(MainWnd(), windowText.c_str());
+
+		// reset
+		frameCnt = 0;
+		timeElapsed += 1.0f;
+	}
 }
 
 void FWin32Window::OnMouseDown(WPARAM btnState, int x, int y)

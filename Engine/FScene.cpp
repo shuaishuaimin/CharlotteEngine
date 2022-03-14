@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FScene.h"
 #include "FMeshAsset.h"
-#include "FGlobalDataManager.h"
 
 FScene::FScene() {
 	MainCamera = std::make_shared<FCamera>();
