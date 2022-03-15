@@ -101,8 +101,9 @@ namespace Charalotte
 		std::shared_ptr<Charalotte::MeshGeometry> MeshAsset = nullptr;
 		Charalotte::FTransform Transform;
 		std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>> ObjectCB = nullptr;
+	//	std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>> ObjectCB2 = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CbvHeap = nullptr;
-
+	//	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> TextureHeap = nullptr;
 		glm::mat4 VPTrans = glm::mat4(1.0f);
 		glm::mat4 MTrans = glm::mat4(1.0f);
 	};

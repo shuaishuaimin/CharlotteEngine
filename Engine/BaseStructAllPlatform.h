@@ -35,6 +35,11 @@ namespace Charalotte
 		float W = 1.0f;
 	};
 
+	struct FVector2D
+	{
+		float X = 0.0f;
+		float Y = 0.0f;
+	};
 	struct FTransform
 	{
 		Charalotte::FQuaternion Rotation;
@@ -75,6 +80,8 @@ namespace Charalotte
 		std::vector<int> Indices;
 
 		std::vector<Charalotte::FVector4> VerticesNormal;
+
+		std::vector<Charalotte::FVector2D> UVs;
 	};
 
 	struct FMeshInfoForPrint

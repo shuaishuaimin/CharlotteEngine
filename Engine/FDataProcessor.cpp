@@ -83,6 +83,16 @@ void FDataProcessor::LoadMesh(const std::string& FileName, Charalotte::FMeshInfo
 			file.read((char*)&(NormalVector.w), sizeof(float));
 			lodinfo.VerticesNormal.push_back(NormalVector);
 		}
+		int UVNums = 0;
+		file.read((char*)&UVNums, sizeof(int));
+		for (int Index = 0; Index < UVNums; Index++)
+		{
+			Charalotte::FVector2D TempUV;
+			file.read((char*)&(TempUV.X), sizeof(float));
+			file.read((char*)&(TempUV.Y), sizeof(float));
+			lodinfo.UVs.push_back(TempUV);
+		}
+
 		TempMeshInfo.LodInfos.push_back(lodinfo);
 		//	TempMeshInfo.LodInfos 
 	}

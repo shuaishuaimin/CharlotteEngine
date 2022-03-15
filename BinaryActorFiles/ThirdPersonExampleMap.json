@@ -31,20 +31,70 @@
 				"rotation":
 				{
 					"x": 0,
-					"y": -0,
+					"y": 0,
 					"z": 0,
 					"w": 1
 				},
 				"translation":
 				{
-					"x": -399.75146484375,
-					"y": 0,
-					"z": 130.27708435058594
+					"x": -1610,
+					"y": 1070,
+					"z": 730
 				},
 				"scale3D":
 				{
-					"x": 0.75,
-					"y": 0.75,
+					"x": 3,
+					"y": 2.5,
+					"z": 4.5
+				}
+			},
+			"assetName": "SM_Lamp_Wall"
+		},
+		{
+			"transform":
+			{
+				"rotation":
+				{
+					"x": 0,
+					"y": 0,
+					"z": 0,
+					"w": 1
+				},
+				"translation":
+				{
+					"x": -1800,
+					"y": 520,
+					"z": 660
+				},
+				"scale3D":
+				{
+					"x": 1,
+					"y": 1,
+					"z": 1
+				}
+			},
+			"assetName": "SM_MatPreviewMesh_02"
+		},
+		{
+			"transform":
+			{
+				"rotation":
+				{
+					"x": 0,
+					"y": 0,
+					"z": 0,
+					"w": 1
+				},
+				"translation":
+				{
+					"x": -450,
+					"y": -20,
+					"z": 650
+				},
+				"scale3D":
+				{
+					"x": 1,
+					"y": 1,
 					"z": 1
 				}
 			},
@@ -62,9 +112,9 @@
 				},
 				"translation":
 				{
-					"x": -390,
-					"y": 280,
-					"z": 125
+					"x": -1350,
+					"y": -1130,
+					"z": 650
 				},
 				"scale3D":
 				{
@@ -73,307 +123,7 @@
 					"z": 1
 				}
 			},
-			"assetName": "Linear_Stair_StaticMesh"
-		},
-		{
-			"transform":
-			{
-				"rotation":
-				{
-					"x": 0,
-					"y": 0,
-					"z": 0,
-					"w": 1
-				},
-				"translation":
-				{
-					"x": 169,
-					"y": -40,
-					"z": 94
-				},
-				"scale3D":
-				{
-					"x": 1,
-					"y": 1,
-					"z": 1
-				}
-			},
-			"assetName": "Bump_StaticMesh"
-		},
-		{
-			"transform":
-			{
-				"rotation":
-				{
-					"x": 0,
-					"y": 0,
-					"z": 0,
-					"w": 1
-				},
-				"translation":
-				{
-					"x": -90,
-					"y": -40,
-					"z": 105
-				},
-				"scale3D":
-				{
-					"x": 1,
-					"y": 1,
-					"z": 1
-				}
-			},
-			"assetName": "LeftArm_StaticMesh"
-		},
-		{
-			"transform":
-			{
-				"rotation":
-				{
-					"x": 0,
-					"y": 0,
-					"z": 0,
-					"w": 1
-				},
-				"translation":
-				{
-					"x": -90,
-					"y": 210,
-					"z": 105
-				},
-				"scale3D":
-				{
-					"x": 1,
-					"y": 1,
-					"z": 1
-				}
-			},
-			"assetName": "RightArm_StaticMesh"
-		},
-		{
-			"transform":
-			{
-				"rotation":
-				{
-					"x": 0,
-					"y": 0,
-					"z": 0,
-					"w": 1
-				},
-				"translation":
-				{
-					"x": -90,
-					"y": -310,
-					"z": 105
-				},
-				"scale3D":
-				{
-					"x": 1,
-					"y": 1,
-					"z": 1
-				}
-			},
-			"assetName": "Ramp_StaticMesh"
-		},
-		{
-			"transform":
-			{
-				"rotation":
-				{
-					"x": 0,
-					"y": 0,
-					"z": 0,
-					"w": 1
-				},
-				"translation":
-				{
-					"x": -290,
-					"y": -470,
-					"z": 194.6453857421875
-				},
-				"scale3D":
-				{
-					"x": 2,
-					"y": 2,
-					"z": 1.5
-				}
-			},
-			"assetName": "1M_Cube_Chamfer"
-		},
-		{
-			"transform":
-			{
-				"rotation":
-				{
-					"x": -0.38268342614173889,
-					"y": -0,
-					"z": 0,
-					"w": 0.92387950420379639
-				},
-				"translation":
-				{
-					"x": -980,
-					"y": -850,
-					"z": 850
-				},
-				"scale3D":
-				{
-					"x": 0.25,
-					"y": 0.25,
-					"z": 12
-				}
-			},
-			"assetName": "1M_Cube"
-		},
-		{
-			"transform":
-			{
-				"rotation":
-				{
-					"x": 0,
-					"y": -0.38268342614173889,
-					"z": 0,
-					"w": 0.92387950420379639
-				},
-				"translation":
-				{
-					"x": -980,
-					"y": -80,
-					"z": 850
-				},
-				"scale3D":
-				{
-					"x": 0.25,
-					"y": 0.25,
-					"z": 12
-				}
-			},
-			"assetName": "1M_Cube"
-		},
-		{
-			"transform":
-			{
-				"rotation":
-				{
-					"x": 0,
-					"y": -0,
-					"z": 0.38268342614173889,
-					"w": 0.92387950420379639
-				},
-				"translation":
-				{
-					"x": -980,
-					"y": 770,
-					"z": 850
-				},
-				"scale3D":
-				{
-					"x": 8,
-					"y": 0.25,
-					"z": 2
-				}
-			},
-			"assetName": "1M_Cube"
-		},
-		{
-			"transform":
-			{
-				"rotation":
-				{
-					"x": 0,
-					"y": 0,
-					"z": 0,
-					"w": 1
-				},
-				"translation":
-				{
-					"x": -410,
-					"y": -1550,
-					"z": 290
-				},
-				"scale3D":
-				{
-					"x": 31.25,
-					"y": 1,
-					"z": 7.5
-				}
-			},
-			"assetName": "1M_Cube"
-		},
-		{
-			"transform":
-			{
-				"rotation":
-				{
-					"x": 0,
-					"y": 0,
-					"z": 0,
-					"w": 1
-				},
-				"translation":
-				{
-					"x": -410,
-					"y": 1550,
-					"z": 290
-				},
-				"scale3D":
-				{
-					"x": 31.25,
-					"y": 1,
-					"z": 7.5
-				}
-			},
-			"assetName": "1M_Cube"
-		},
-		{
-			"transform":
-			{
-				"rotation":
-				{
-					"x": -0,
-					"y": 0,
-					"z": -0.70710790157318115,
-					"w": 0.70710563659667969
-				},
-				"translation":
-				{
-					"x": 1260,
-					"y": -10,
-					"z": 290
-				},
-				"scale3D":
-				{
-					"x": 31.25,
-					"y": 1,
-					"z": 7.5
-				}
-			},
-			"assetName": "1M_Cube"
-		},
-		{
-			"transform":
-			{
-				"rotation":
-				{
-					"x": 0,
-					"y": 0,
-					"z": 0,
-					"w": 1
-				},
-				"translation":
-				{
-					"x": -1210.0025634765625,
-					"y": 300,
-					"z": 226.00160217285156
-				},
-				"scale3D":
-				{
-					"x": 1,
-					"y": 1,
-					"z": 1
-				}
-			},
-			"assetName": "MatineeCam_SM"
+			"assetName": "Shape_Cylinder"
 		}
 	]
 }
