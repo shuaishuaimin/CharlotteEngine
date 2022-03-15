@@ -238,20 +238,6 @@ void DXRender::Draw()
 		mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		mCommandList->SetName(L"COOL");
 
-		Charalotte::ObjectConstants objConstants;
-		glm::mat4 NowVPTrans;
-		FScene::GetInstance().GetCamera()->GetVPTransform(NowVPTrans);
-		glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorIns->Transform);
-		auto& RotateStruct = ActorIns->Transform.Rotation;
-		glm::vec4 Rotate(RotateStruct.X, RotateStruct.Y, RotateStruct.Z, RotateStruct.W);
-		glm::mat4 NowRotate = FMathHelper::GetRotateMatrix(Rotate);
-		glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
-		objConstants.TransMatrix = glm::transpose(NowMVPTrans);
-		objConstants.Rotate = (NowRotate);
-		ActorIns->ObjectCB->CopyData(0, objConstants);
-
-
-
 		auto count = MeshGeo->DrawArgs[MeshGeo->Name].IndexCount;
 		// use resource
 
@@ -378,7 +364,7 @@ void DXRender::LoadTexture()
 void DXRender::BuildDescriptorHeapsAndTables(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap)
 {
 	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
-	cbvHeapDesc.NumDescriptors = 1;
+	cbvHeapDesc.NumDescriptors = 10;
 	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	cbvHeapDesc.NodeMask = 0;
@@ -531,7 +517,7 @@ void DXRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 	{
 		for (auto& Actors : ActorIter->second)
 		{
-			//BuildDescriptorHeapsAndTables(Actors->CbvHeap);
+			BuildDescriptorHeapsAndTables(Actors->CbvHeap);
 			BuildDescriptorHeapsAndTables(Actors->SrvHeap);
 			BulidSRV(Actors->SrvHeap);
 			BulidConstantBuffers(Actors->CbvHeap, Actors->ObjectCB);

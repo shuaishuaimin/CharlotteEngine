@@ -11,13 +11,13 @@ FDXRenderMeshDataBuffer::~FDXRenderMeshDataBuffer() {
 	MeshAssets.clear();
 }
 
-void FDXRenderMeshDataBuffer::AddMeshData(const std::string& AssetName, std::shared_ptr<Charalotte::MeshGeometry> MeshAsset)
+void FDXRenderMeshDataBuffer::AddMeshData(const std::string& AssetName, std::shared_ptr<Charalotte::MeshGeometry>& MeshAsset)
 {
 	if (MeshAssets.find(AssetName) != MeshAssets.end())
 	{
 		return;
 	}
-	MeshAssets.insert(std::make_pair(AssetName, MeshAsset));
+	MeshAssets.insert(std::make_pair(AssetName, std::move(MeshAsset)));
 }
 
 std::shared_ptr<Charalotte::MeshGeometry> FDXRenderMeshDataBuffer::GetMeshAsset(const std::string& Assetname)
@@ -33,7 +33,7 @@ std::shared_ptr<Charalotte::MeshGeometry> FDXRenderMeshDataBuffer::GetMeshAsset(
 	}
 }
 
-std::unordered_map<std::string, std::shared_ptr<Charalotte::MeshGeometry>> FDXRenderMeshDataBuffer::GetMeshAssets()
+std::unordered_map<std::string, std::shared_ptr<Charalotte::MeshGeometry>>& FDXRenderMeshDataBuffer::GetMeshAssets()
 {
 	return MeshAssets;
 }
