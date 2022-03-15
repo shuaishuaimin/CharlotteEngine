@@ -118,16 +118,19 @@ void FScene::CalcVerticesAndIndices(const std::string& GeometryName, const Chara
 		Float3.y = VertexLocation.y;
 		Float3.z = VertexLocation.z;
 
+		const auto& MeshLod = MeshInfo.LodInfos[0];
 		vertex.Pos = Float3;
 		if (IsUseNormalToColor)
 		{
-			VertexColor.x = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].x * 0.5f + 0.5f;
-			VertexColor.y = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].y * 0.5f + 0.5f;
-			VertexColor.z = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].z * 0.5f + 0.5f;
-			VertexColor.w = MeshInfo.LodInfos[0].VerticesNormal[VertexIndex].w * 0.5f + 0.5f;
+			VertexColor.x = MeshLod.VerticesNormal[VertexIndex].x * 0.5f + 0.5f;
+			VertexColor.y = MeshLod.VerticesNormal[VertexIndex].y * 0.5f + 0.5f;
+			VertexColor.z = MeshLod.VerticesNormal[VertexIndex].z * 0.5f + 0.5f;
+			VertexColor.w = MeshLod.VerticesNormal[VertexIndex].w * 0.5f + 0.5f;
 		}
 		vertex.Color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
 		vertex.Normal = VertexColor;
+		vertex.UV.x = MeshLod.UVs[VertexIndex].X;
+		vertex.UV.y = MeshLod.UVs[VertexIndex].Y;
 		MeshGeo->vertices.push_back(vertex);
 		VertexIndex++;
 	}
