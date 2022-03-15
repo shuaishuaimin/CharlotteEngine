@@ -3,16 +3,20 @@
 //
 // Transforms and colors geometry.
 //***************************************************************************************
+#include "Engine/ShaderH.hlsli"
 
-//Texture2D gDiffuseMap : register(t0);
-//
-//SamplerState gsamLinerWrap : register(s0);
+SamplerState gsamLiner : register(s0);
 
-cbuffer cbPerObject : register(b0)
+float4 CameraLoc : register(b0);
+
+cbuffer cbPerObject : register(b1)
 {
 	float4x4 gWorldViewProj; 
 	float4x4 gRotate;
 };
+
+Texture2D gDiffuseMap : register(t0);
+Texture2D gNormalMap : register(t1);
 
 struct VertexIn
 {
@@ -30,6 +34,7 @@ struct VertexOut
 	//float4 Normal : NORMAL;
 };
 
+[RootSignature(TreeStump_RootSig)]
 VertexOut VS(VertexIn vin)
 {
 	VertexOut vout;
@@ -44,13 +49,15 @@ VertexOut VS(VertexIn vin)
 	// Just pass vertex color into the pixel shader.
     vout.Color = ResultNormal;
 
+	vout.TexC = vin.TexC;
     return vout;
 }
 
 float4 PS(VertexOut pin) : SV_Target
 {
-	//float4 diffuseAlbedo = gDiffuseMap.Sample;
-    return pow((pin.Color + 1) * 0.5, 1/2.2f);
+	float4 diffuseAlbedo = gDiffuseMap.Sample(gsamLiner, pin.TexC);
+	
+    return diffuseAlbedo;
 }
 
 

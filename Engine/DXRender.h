@@ -15,7 +15,7 @@
 #include "FCamera.h"
 #include "FWinEventRegisterSystem.h"
 #include "FScene.h"
-
+#include "WinMaterialData.h"
 // link necessary lib
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
@@ -75,11 +75,15 @@ protected:
 	void LogAdapterOutputs(IDXGIAdapter* adapter);
 	void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
 protected:
-
+	void LoadTexture();
 	// render pipeline
-	void BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap);
+	void BuildDescriptorHeapsAndTables(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap);
 	void BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap,
 		std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>>& ObjectCb);
+
+	void BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap);
+
+	//void BuildDescriptorTable();
 
 	void BuildRootSignature();
 	void BuildShadersAndInputLayOut();
@@ -137,6 +141,7 @@ private:
 	int mClientHeight = 1280;
 
 	std::vector<std::shared_ptr<Charalotte::FActorAsset>> ActorArray;
+	std::unordered_map<std::string, std::unique_ptr<Charalotte::Texture>> mTextures;
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
 	Microsoft::WRL::ComPtr<ID3DBlob> mvsByteCode = nullptr;

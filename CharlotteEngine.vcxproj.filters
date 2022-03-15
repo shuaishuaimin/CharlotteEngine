@@ -246,4 +246,9 @@
       <Filter>Source Files\Engine\Scene</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Engine\ShaderH.hlsli">
+      <Filter>Header Files\Engine</Filter>
+    </None>
+  </ItemGroup>
 </Project>

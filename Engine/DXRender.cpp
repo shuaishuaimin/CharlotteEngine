@@ -53,8 +53,9 @@ bool DXRender::Initialize()
 	OnResize();
 
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
-	BuildRootSignature();
+	LoadTexture();
 	BuildShadersAndInputLayOut();
+	BuildRootSignature();
 	BuildPSO();
 	ThrowIfFailed(mCommandList->Close());
 	ID3D12CommandList* cmdLists[] = { mCommandList.Get() };
@@ -227,7 +228,7 @@ void DXRender::Draw()
 		{
 			continue;
 		}
-		ID3D12DescriptorHeap* descriptorHeaps[] = { ActorIns->CbvHeap.Get() };
+		ID3D12DescriptorHeap* descriptorHeaps[] = { ActorIns->SrvHeap.Get() };
 		mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 		auto VertexBufferView = MeshGeo->VertexBufferView();
@@ -236,8 +237,32 @@ void DXRender::Draw()
 		mCommandList->IASetIndexBuffer(&IndexBufferView);
 		mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		mCommandList->SetName(L"COOL");
-		mCommandList->SetGraphicsRootDescriptorTable(0, ActorIns->CbvHeap->GetGPUDescriptorHandleForHeapStart());
+
+		Charalotte::ObjectConstants objConstants;
+		glm::mat4 NowVPTrans;
+		FScene::GetInstance().GetCamera()->GetVPTransform(NowVPTrans);
+		glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorIns->Transform);
+		auto& RotateStruct = ActorIns->Transform.Rotation;
+		glm::vec4 Rotate(RotateStruct.X, RotateStruct.Y, RotateStruct.Z, RotateStruct.W);
+		glm::mat4 NowRotate = FMathHelper::GetRotateMatrix(Rotate);
+		glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
+		objConstants.TransMatrix = glm::transpose(NowMVPTrans);
+		objConstants.Rotate = (NowRotate);
+		ActorIns->ObjectCB->CopyData(0, objConstants);
+
+
+
 		auto count = MeshGeo->DrawArgs[MeshGeo->Name].IndexCount;
+		// use resource
+
+		Charalotte::CameraData NowCameraData;
+		FScene::GetInstance().GetCamera()->GetCameraData(NowCameraData);
+		mCommandList->SetGraphicsRoot32BitConstants(0, 4, &(NowCameraData.Location), 0);
+
+		mCommandList->SetGraphicsRootConstantBufferView(1, ActorIns->ObjectCB->Resource()->GetGPUVirtualAddress());
+
+		mCommandList->SetGraphicsRootDescriptorTable(2, ActorIns->SrvHeap->GetGPUDescriptorHandleForHeapStart());
+
 		mCommandList->DrawIndexedInstanced(
 			MeshGeo->DrawArgs[MeshGeo->Name].IndexCount,
 			1, 0, 0, 0);
@@ -338,7 +363,19 @@ bool DXRender::InitDirect3D()
 	return true;
 }
 
-void DXRender::BuildDescriptorHeaps(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap)
+void DXRender::LoadTexture()
+{
+	auto Texture = std::make_unique<Charalotte::Texture>();
+	Texture->Name = "Texture";
+	Texture->Filename = L"Content/Textures/bricks.dds";
+	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
+		mCommandList.Get(), Texture->Filename.c_str(),
+		Texture->Resource, Texture->UploadHeap));
+
+	mTextures.insert({Texture->Name, std::move(Texture)});
+}
+
+void DXRender::BuildDescriptorHeapsAndTables(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap)
 {
 	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
 	cbvHeapDesc.NumDescriptors = 1;
@@ -373,40 +410,38 @@ void DXRender::BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>
 		CbvHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
+void DXRender::BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap)
+{
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+	auto Resources = mTextures.find("Texture");
+	srvDesc.Format = Resources->second->Resource->GetDesc().Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = Resources->second->Resource->GetDesc().MipLevels;
+	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE CPUHandle = SrvHeap->GetCPUDescriptorHandleForHeapStart();
+	
+	md3dDevice->CreateShaderResourceView(
+		Resources->second->Resource.Get(),
+		&srvDesc,
+		CPUHandle);
+	CPUHandle.ptr += mCbvSrvUavDescriptorSize;
+	md3dDevice->CreateShaderResourceView(
+		Resources->second->Resource.Get(),
+		&srvDesc,
+		CPUHandle);
+}
+
 void DXRender::BuildRootSignature()
 {
-	// Shader programs typically require resources as input (constant buffers,
-	// textures, samplers).  The root signature defines the resources the shader
-	// programs expect.  If we think of the shader programs as a function, and
-	// the input resources as function parameters, then the root signature can be
-	// thought of as defining the function signature. 
-
-	// Root parameter can be a table, root descriptor or root constants.
-	CD3DX12_ROOT_PARAMETER slotRootParamter[1];
-
-	// Create a single descriptor table of CBVS. ??
-	CD3DX12_DESCRIPTOR_RANGE cbvTable;
-	cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-	slotRootParamter[0].InitAsDescriptorTable(1, &cbvTable);
-
-	// A root signature is an array of root parameters.!!!
-	CD3DX12_ROOT_SIGNATURE_DESC rootSignatures(1, slotRootParamter,
-		0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-
-	// create a root signature with a single lot which points to a descriptor range consisting of a single constant buffer
-	ComPtr<ID3DBlob> serializeRootSig = nullptr;
-	ComPtr<ID3DBlob> errorBlob = nullptr;
-	HRESULT hr = D3D12SerializeRootSignature(&rootSignatures, D3D_ROOT_SIGNATURE_VERSION_1,
-		serializeRootSig.GetAddressOf(), errorBlob.GetAddressOf());
-
-	if (errorBlob != nullptr)
-	{
-		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-	}
-	ThrowIfFailed(hr);
 	ThrowIfFailed(md3dDevice->CreateRootSignature(
-		0, serializeRootSig->GetBufferPointer(),
-		serializeRootSig->GetBufferSize(),
+		0, 
+		mvsByteCode->GetBufferPointer(),
+		mvsByteCode->GetBufferSize(),
 		IID_PPV_ARGS(&mRootSignature)));
 }
 
@@ -496,7 +531,9 @@ void DXRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 	{
 		for (auto& Actors : ActorIter->second)
 		{
-			BuildDescriptorHeaps(Actors->CbvHeap);
+			//BuildDescriptorHeapsAndTables(Actors->CbvHeap);
+			BuildDescriptorHeapsAndTables(Actors->SrvHeap);
+			BulidSRV(Actors->SrvHeap);
 			BulidConstantBuffers(Actors->CbvHeap, Actors->ObjectCB);
 		}
 	}
