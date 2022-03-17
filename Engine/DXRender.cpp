@@ -5,7 +5,7 @@
 #include <string>
 #include "DXRender.h"
 #include "FDataProcessor.h"
-#include "FDXRenderMeshDataBuffer.h"
+#include "FDXResources.h"
 #include "CharlotteEngine.h"
 
 using namespace DirectX;
@@ -53,7 +53,7 @@ bool DXRender::Initialize()
 	OnResize();
 
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
-	LoadTexture();
+	
 	BuildShadersAndInputLayOut();
 	BuildRootSignature();
 	BuildPSO();
@@ -351,7 +351,7 @@ bool DXRender::InitDirect3D()
 
 void DXRender::LoadTexture()
 {
-	auto Texture = std::make_unique<Charalotte::Texture>();
+	auto Texture = std::make_unique<Charalotte::DXTextureResource>();
 	Texture->Name = "Texture";
 	Texture->Filename = L"Content/Textures/bricks.dds";
 	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
@@ -403,6 +403,7 @@ void DXRender::BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap)
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
 	auto Resources = mTextures.find("Texture");
+
 	srvDesc.Format = Resources->second->Resource->GetDesc().Format;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
@@ -449,9 +450,13 @@ void DXRender::BuildShadersAndInputLayOut()
 
 void DXRender::BuildMeshGeometrys()
 {
-	for (auto& MeshGeoIter : FDXRenderMeshDataBuffer::GetMeshAssets())
+	for (auto& MeshGeoIter : FDXResources::GetInstance().GetMeshAssets())
 	{
-		auto MeshGeo = MeshGeoIter.second;
+		Charalotte::MeshGeometry* MeshGeo = MeshGeoIter.second.get();
+		if (MeshGeo == nullptr)
+		{
+			continue;
+		}
 		const UINT vbByteSize = (UINT)MeshGeo->vertices.size() * sizeof(Charalotte::Vertex);
 		const UINT ibByteSize = (UINT)MeshGeo->indices.size() * sizeof(int);
 		ThrowIfFailed(D3DCreateBlob(vbByteSize, &MeshGeo->VertexBufferCPU));
@@ -509,7 +514,7 @@ void DXRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 {
 	NowMapName = MapName;
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
-
+	LoadTexture();
 	BuildMeshGeometrys();
 	auto& ActorDir = FScene::GetInstance().GetActorDictionary();
 	const auto& ActorIter = ActorDir.find(MapName);

@@ -61,7 +61,7 @@ namespace Charalotte
 		glm::mat4 MatTransform = FMathHelper::Identity4x4();
 	};
 
-	struct Texture
+	struct DXTextureResource
 	{
 		// Unique material name for lookup.
 		std::string Name;

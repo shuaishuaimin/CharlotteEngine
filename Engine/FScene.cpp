@@ -149,7 +149,7 @@ void FScene::CalcVerticesAndIndices(const std::string& GeometryName, const Chara
 	MeshGeo->DrawArgs[GeometryName] = submesh;
 	MeshGeo->Name = GeometryName;
 
-	FDXRenderMeshDataBuffer::AddMeshData(GeometryName, MeshGeo);
+	FDXResources::GetInstance().AddMeshData(GeometryName, MeshGeo);
 }
 
 void FScene::BuilMeshAsset(const std::string& MapName)
@@ -190,12 +190,12 @@ void FScene::BuildActors(const std::string& MapName)
 		assetName.erase(assetName.size() - 1, 1);
 		std::shared_ptr<Charalotte::FActorAsset> ActorAsset = std::make_shared<Charalotte::FActorAsset>();
 
-		ActorAsset->MeshAsset = FDXRenderMeshDataBuffer::GetMeshAsset(assetName);
+		ActorAsset->MeshAsset = FDXResources::GetInstance().GetMeshAsset(assetName);
 		if (ActorAsset->MeshAsset != nullptr)
 		{
 			ActorAsset->Transform = EnviroumentActor.Transform;
 
-			Iter->second.push_back(ActorAsset);
+			Iter->second.push_back(std::move(ActorAsset));
 		}
 	}
 }

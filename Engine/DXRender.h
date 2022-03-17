@@ -83,8 +83,6 @@ protected:
 
 	void BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap);
 
-	//void BuildDescriptorTable();
-
 	void BuildRootSignature();
 	void BuildShadersAndInputLayOut();
 	void BuildMeshGeometrys();
@@ -141,7 +139,7 @@ private:
 	int mClientHeight = 1280;
 
 	std::vector<std::shared_ptr<Charalotte::FActorAsset>> ActorArray;
-	std::unordered_map<std::string, std::unique_ptr<Charalotte::Texture>> mTextures;
+	std::unordered_map<std::string, std::unique_ptr<Charalotte::DXTextureResource>> mTextures;
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
 	Microsoft::WRL::ComPtr<ID3DBlob> mvsByteCode = nullptr;

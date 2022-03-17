@@ -6,7 +6,9 @@
 
 CharalotteEngine::CharalotteEngine() {
 	WindowIns = this->CreateMainWindow();
+#if PLATFORM_WINDOWS
 	RenderIns = std::make_unique<DXRender>();
+#endif
 	Timer = std::make_unique<FGameTimer>();
 }
 

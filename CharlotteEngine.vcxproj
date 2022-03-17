@@ -94,6 +94,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>d3dcompiler.lib;D3D12.lib;dxgi.lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -143,8 +144,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\AActor.h" />
     <ClInclude Include="Engine\BaseStructAllPlatform.h" />
     <ClInclude Include="Engine\CharlotteEngine.h" />
+    <ClInclude Include="Engine\DX12RHI.h" />
     <ClInclude Include="Engine\FMeshAsset.h" />
     <ClInclude Include="Engine\FRender.h" />
     <ClInclude Include="Engine\GameInstance.h" />
@@ -152,8 +155,9 @@
     <ClInclude Include="Engine\FInputSystem.h" />
     <ClInclude Include="Engine\FWinEventRegisterSystem.h" />
     <ClInclude Include="Engine\FScene.h" />
-    <ClInclude Include="Engine\FDXRenderMeshDataBuffer.h" />
+    <ClInclude Include="Engine\FDXResources.h" />
     <ClInclude Include="Engine\FWindow.h" />
+    <ClInclude Include="Engine\RHI.h" />
     <ClInclude Include="Engine\stdafx.h" />
     <ClInclude Include="Engine\MaterialSystem.h" />
     <ClInclude Include="Engine\WinFrameResource.h" />
@@ -176,7 +180,7 @@
     <ClCompile Include="Engine\DDSTextureLoader.cpp" />
     <ClCompile Include="Engine\FMeshAsset.cpp" />
     <ClCompile Include="Engine\FScene.cpp" />
-    <ClCompile Include="Engine\FDXRenderMeshDataBuffer.cpp" />
+    <ClCompile Include="Engine\FDXResources.cpp" />
     <ClCompile Include="Engine\GameInstance.cpp" />
     <ClCompile Include="Engine\GameLogic.cpp" />
     <ClCompile Include="Engine\FWinEventRegisterSystem.cpp" />
@@ -187,6 +191,7 @@
     <ClCompile Include="Engine\FGameTimer.cpp" />
     <ClCompile Include="Engine\FUtil.cpp" />
     <ClCompile Include="Engine\FMathHelper.cpp" />
+    <ClCompile Include="Engine\MaterialSystem.cpp" />
     <ClCompile Include="Main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

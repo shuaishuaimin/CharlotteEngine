@@ -7,7 +7,7 @@
 #include "WinFrameResource.h"
 #include "FGameTimer.h"
 #include "FWinEventRegisterSystem.h"
-#include "FDXRenderMeshDataBuffer.h"
+#include "FDXResources.h"
 
 class FScene : public Singleton<FScene>
 {

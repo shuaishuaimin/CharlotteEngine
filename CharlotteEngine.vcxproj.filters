@@ -103,6 +103,15 @@
     <Filter Include="Header Files\Engine\Public\Material">
       <UniqueIdentifier>{b09146ce-ba1b-48e3-842a-aad28acc8d2a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Engine\Public\Material">
+      <UniqueIdentifier>{459e0276-ad50-46b1-ad46-b01c5c667620}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\RHI">
+      <UniqueIdentifier>{318ad148-ab9c-4938-b05c-3b861b158115}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\RHI">
+      <UniqueIdentifier>{d1a455d3-cea4-4094-a499-472738e389b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\d3dx12.h">
@@ -165,9 +174,6 @@
     <ClInclude Include="Engine\FInputSystem.h">
       <Filter>Header Files\Engine\Public\BaseClass</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FDXRenderMeshDataBuffer.h">
-      <Filter>Header Files\Engine\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\GameInstance.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
@@ -185,6 +191,18 @@
     </ClInclude>
     <ClInclude Include="Engine\MaterialSystem.h">
       <Filter>Header Files\Engine\Public\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\AActor.h">
+      <Filter>Header Files\Game\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FDXResources.h">
+      <Filter>Header Files\Engine\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RHI.h">
+      <Filter>Header Files\Engine\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DX12RHI.h">
+      <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -233,9 +251,6 @@
     <ClCompile Include="Engine\CharlotteEngine.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FDXRenderMeshDataBuffer.cpp">
-      <Filter>Source Files\Engine\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="UStaticMesh.cpp">
       <Filter>Source Files\Game\Actor</Filter>
     </ClCompile>
@@ -244,6 +259,12 @@
     </ClCompile>
     <ClCompile Include="Engine\FMeshAsset.cpp">
       <Filter>Source Files\Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\MaterialSystem.cpp">
+      <Filter>Source Files\Engine\Public\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FDXResources.cpp">
+      <Filter>Source Files\Engine\RHI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
