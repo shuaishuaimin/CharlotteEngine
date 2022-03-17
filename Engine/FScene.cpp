@@ -80,7 +80,7 @@ void FScene::LoadMap(const std::string& MapName) {
 	NowMapName = MapName;
 }
 
-std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FActorAsset>>>& FScene::GetActorDictionary()
+std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>>& FScene::GetActorDictionary()
 {
 	return ActorDir;
 }
@@ -88,7 +88,7 @@ std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FActorAs
 void FScene::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
 {
 	Charalotte::FMeshInfoForPrint MeshInfo = FMeshAsset::GetInstance().GetMeshInfoByName(GeometryName);
-	std::shared_ptr<Charalotte::MeshGeometry> MeshGeo = std::make_shared<Charalotte::MeshGeometry>();
+	std::shared_ptr<Charalotte::DXMeshPrimitive> MeshGeo = std::make_shared<Charalotte::DXMeshPrimitive>();
 
 	std::string Name = GeometryName;
 	if (MeshInfo.LodInfos.size() <= 0)
@@ -141,7 +141,7 @@ void FScene::CalcVerticesAndIndices(const std::string& GeometryName, const Chara
 		MeshGeo->indices.push_back(static_cast<int16_t>(VertexIndex));
 	}
 
-	Charalotte::SubmeshGeometry submesh;
+	Charalotte::DXSubmeshPrimitive submesh;
 	submesh.IndexCount = (UINT)(MeshInfo.LodInfos[0].Indices.size());
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
@@ -188,7 +188,7 @@ void FScene::BuildActors(const std::string& MapName)
 			continue;
 		}
 		assetName.erase(assetName.size() - 1, 1);
-		std::shared_ptr<Charalotte::FActorAsset> ActorAsset = std::make_shared<Charalotte::FActorAsset>();
+		std::shared_ptr<Charalotte::FDXActorPrimitive> ActorAsset = std::make_shared<Charalotte::FDXActorPrimitive>();
 
 		ActorAsset->MeshAsset = FDXResources::GetInstance().GetMeshAsset(assetName);
 		if (ActorAsset->MeshAsset != nullptr)
@@ -200,7 +200,7 @@ void FScene::BuildActors(const std::string& MapName)
 	}
 }
 
-std::vector<std::shared_ptr<Charalotte::FActorAsset>>& FScene::GetSceneActorByName(const std::string& MapName)
+std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>& FScene::GetSceneActorByName(const std::string& MapName)
 {
 	const auto& ActorVecIter = ActorDir.find(MapName);
 	if (ActorVecIter != ActorDir.end())

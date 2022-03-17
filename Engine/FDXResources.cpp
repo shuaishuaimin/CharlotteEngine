@@ -10,7 +10,7 @@ FDXResources::~FDXResources() {
 	MeshResources.clear();
 }
 
-void FDXResources::AddMeshData(const std::string& AssetName, std::shared_ptr<Charalotte::MeshGeometry>& MeshAsset)
+void FDXResources::AddMeshData(const std::string& AssetName, std::shared_ptr<Charalotte::DXMeshPrimitive>& MeshAsset)
 {
 	if (MeshResources.find(AssetName) != MeshResources.end())
 	{
@@ -19,7 +19,7 @@ void FDXResources::AddMeshData(const std::string& AssetName, std::shared_ptr<Cha
 	MeshResources.insert(std::make_pair(AssetName, std::move(MeshAsset)));
 }
 
-Charalotte::MeshGeometry* FDXResources::GetMeshAsset(const std::string& Assetname)
+Charalotte::DXMeshPrimitive* FDXResources::GetMeshAsset(const std::string& Assetname)
 {
 	auto AssetIter = MeshResources.find(Assetname);
 	if (AssetIter != MeshResources.end())
@@ -32,7 +32,7 @@ Charalotte::MeshGeometry* FDXResources::GetMeshAsset(const std::string& Assetnam
 	}
 }
 
-std::unordered_map<std::string, std::shared_ptr<Charalotte::MeshGeometry>>& FDXResources::GetMeshAssets()
+std::unordered_map<std::string, std::shared_ptr<Charalotte::DXMeshPrimitive>>& FDXResources::GetMeshAssets()
 {
 	return MeshResources;
 }
@@ -42,7 +42,7 @@ Charalotte::DXTextureResource* FDXResources::GetTextResourceByName(const std::st
 	const auto& Iter = TextureResources.find(TextureName);
 	if (Iter != TextureResources.end())
 	{
-		return Iter->second.lock().get();
+		return Iter->second.get();
 	}
 	else
 	{

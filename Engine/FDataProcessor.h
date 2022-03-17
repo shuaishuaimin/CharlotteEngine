@@ -1,5 +1,5 @@
 #pragma once
-#include "WinFrameResource.h"
+#include "DXPrimitives.h"
 
 class FDataProcessor
 {

@@ -10,6 +10,7 @@ CharalotteEngine::CharalotteEngine() {
 	RenderIns = std::make_unique<DXRender>();
 #endif
 	Timer = std::make_unique<FGameTimer>();
+	TextureArray = {"bricks", "bricks2", "bricks3", "grass", "ice", "stone", "tile", "WireFence", "WoodCrate01"};
 }
 
 bool CharalotteEngine::Init() {
@@ -87,4 +88,9 @@ FWindow* CharalotteEngine::GetWindowPtr()
 FRender* CharalotteEngine::GetRenderPtr()
 {
 	return RenderIns.get();
+}
+
+std::vector<std::string>& CharalotteEngine::GetTextureArray()
+{
+	return TextureArray;
 }

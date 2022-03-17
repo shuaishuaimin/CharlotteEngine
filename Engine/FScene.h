@@ -4,7 +4,7 @@
 #include <set>
 #include "Singleton.h"
 #include "FCamera.h"
-#include "WinFrameResource.h"
+#include "DXPrimitives.h"
 #include "FGameTimer.h"
 #include "FWinEventRegisterSystem.h"
 #include "FDXResources.h"
@@ -29,9 +29,9 @@ public:
 	void LoadMap(const std::string& MapName);
 
 
-	std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FActorAsset>>>& GetActorDictionary();
+	std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>>& GetActorDictionary();
 
-	std::vector<std::shared_ptr<Charalotte::FActorAsset>>& GetSceneActorByName(const std::string& MapName);
+	std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>& GetSceneActorByName(const std::string& MapName);
 protected:
 
 	void CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform);
@@ -50,9 +50,9 @@ private:
 	std::unordered_map<std::string, Charalotte::FActorsInfoForPrint> ActorInfors;
 
 	// save the actor information have been rendered;
-	std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FActorAsset>>> ActorDir;
+	std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>> ActorDir;
 
-	std::vector<std::shared_ptr<Charalotte::FActorAsset>> EmptyActorVec;
+	std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>> EmptyActorVec;
 
 	std::string NowMapName;
 };

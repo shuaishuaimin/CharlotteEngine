@@ -29,10 +29,12 @@ public:
 
 	FRender* GetRenderPtr();
 
+	std::vector<std::string>& GetTextureArray();
+
 private:
 	std::unique_ptr<FRender> RenderIns;
 	std::shared_ptr<FWindow> WindowIns;
 	std::unique_ptr<FGameTimer> Timer;
-
+	std::vector<std::string> TextureArray;
 };
 

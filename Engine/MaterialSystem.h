@@ -8,7 +8,7 @@ public:
 	MaterialSystem(){
 		
 	}
-	void LoadMaterial();
+	void LoadMaterial(){};
 
 private:
 	std::vector<std::string> Textures;

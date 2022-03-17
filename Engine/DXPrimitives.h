@@ -2,8 +2,10 @@
 #include "stdafx.h"
 #include "BaseStructAllPlatform.h"
 #include "FUploadBuffer.h"
+#include "WinMaterialData.h"
+#include "MaterialSystem.h"
 
-class WinFrameResource
+class DXPrimitives
 {
 
 };
@@ -28,7 +30,7 @@ namespace Charalotte
 	// geometries are stored in one vertex and index buffer.  It provides the offsets
 	// and data needed to draw a subset of geometry stores in the vertex and index 
 	// buffers so that we can implement the technique described by Figure 6.3.
-	struct SubmeshGeometry
+	struct DXSubmeshPrimitive
 	{
 		UINT IndexCount = 0;
 		UINT StartIndexLocation = 0;
@@ -39,12 +41,14 @@ namespace Charalotte
 		DirectX::BoundingBox Bounds;
 	};
 
-	struct MeshGeometry
+	struct DXMeshPrimitive
 	{
+	
+		using index_type_t = int16_t;
 		// Give it a name so we can look it up by name.
 		std::string Name;
 		std::vector<Charalotte::Vertex> vertices;
-		std::vector<int16_t> indices;
+		std::vector<index_type_t> indices;
 
 		// System memory copies.  Use Blobs because the vertex/index format can be generic.
 		// It is up to the client to cast appropriately.  
@@ -66,7 +70,7 @@ namespace Charalotte
 		// A MeshGeometry may store multiple geometries in one vertex/index buffer.
 		// Use this container to define the Submesh geometries so we can draw
 		// the Submeshes individually.
-		std::unordered_map<std::string, SubmeshGeometry> DrawArgs;
+		std::unordered_map<std::string, DXSubmeshPrimitive> DrawArgs;
 
 		D3D12_VERTEX_BUFFER_VIEW VertexBufferView()const
 		{
@@ -94,11 +98,21 @@ namespace Charalotte
 			VertexBufferUploader = nullptr;
 			IndexBufferUploader = nullptr;
 		}
+
+		UINT GetVerticesSize()
+		{
+			return (UINT)vertices.size() * sizeof(Charalotte::Vertex);
+		}
+
+		UINT GetIndicesSize()
+		{
+			return (UINT)indices.size() * sizeof(Charalotte::DXMeshPrimitive::index_type_t);
+		}
 	};
 
-	struct FActorAsset
+	struct FDXActorPrimitive
 	{
-		Charalotte::MeshGeometry* MeshAsset = nullptr;
+		Charalotte::DXMeshPrimitive* MeshAsset = nullptr;
 		Charalotte::FTransform Transform;
 		std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>> ObjectCB = nullptr;
 
@@ -106,6 +120,7 @@ namespace Charalotte
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> SrvHeap = nullptr;
 		glm::mat4 VPTrans = glm::mat4(1.0f);
 		glm::mat4 MTrans = glm::mat4(1.0f);
+		
 	};
 }
 

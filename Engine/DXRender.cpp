@@ -8,6 +8,8 @@
 #include "FDXResources.h"
 #include "CharlotteEngine.h"
 
+#include "DX12RHI.h"
+
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 using namespace DirectX::PackedVector;
@@ -26,6 +28,8 @@ DXRender::DXRender() : NowMapName(""), IsDeviceSucceed(false)
 	mhAppInst = GetModuleHandle(0);
 	assert(render == nullptr);
 	render = this;
+
+	RHIIns = std::make_unique<DX12RHI>();
 }
 
 DXRender* DXRender::GetRender()
@@ -42,6 +46,16 @@ DXRender::~DXRender()
 		IsDeviceSucceed = false;
 	}
 	IsDeviceSucceed = false;
+}
+
+void DXRender::Render()
+{
+	if (!RHIIns->InitRenderPlatform(CharalotteEngine::GetInstance().GetWindowPtr()))
+	{
+		return;
+	}
+	RHIIns->OnResize();
+	RHIIns->InitRenderPipeline();
 }
 
 bool DXRender::Initialize()
@@ -277,6 +291,7 @@ void DXRender::Draw()
 
 bool DXRender::InitDirect3D()
 {
+
 #if defined(DEBUG) || defined(_DEBUG)
 	//enable the d3d12 debug layer
 	{
@@ -452,21 +467,25 @@ void DXRender::BuildMeshGeometrys()
 {
 	for (auto& MeshGeoIter : FDXResources::GetInstance().GetMeshAssets())
 	{
-		Charalotte::MeshGeometry* MeshGeo = MeshGeoIter.second.get();
+		Charalotte::DXMeshPrimitive* MeshGeo = MeshGeoIter.second.get();
 		if (MeshGeo == nullptr)
 		{
 			continue;
 		}
-		const UINT vbByteSize = (UINT)MeshGeo->vertices.size() * sizeof(Charalotte::Vertex);
-		const UINT ibByteSize = (UINT)MeshGeo->indices.size() * sizeof(int);
+		const UINT vbByteSize = MeshGeo->GetVerticesSize() ;
+		const UINT ibByteSize = MeshGeo->GetIndicesSize();
 		ThrowIfFailed(D3DCreateBlob(vbByteSize, &MeshGeo->VertexBufferCPU));
 		CopyMemory(MeshGeo->VertexBufferCPU->GetBufferPointer(), MeshGeo->vertices.data(), vbByteSize);
 
 		ThrowIfFailed(D3DCreateBlob(ibByteSize, &MeshGeo->IndexBufferCPU));
 		CopyMemory(MeshGeo->IndexBufferCPU->GetBufferPointer(), MeshGeo->indices.data(), ibByteSize);
 
-		MeshGeo->VertexBufferGPU = FUtil::CreateDefaultBuffer(md3dDevice.Get(),
-			mCommandList.Get(), MeshGeo->vertices.data(), vbByteSize, MeshGeo->VertexBufferUploader);
+		auto Device = md3dDevice.Get();
+		auto VerticeData = MeshGeo->vertices.data();
+		auto Commandlist = mCommandList.Get();
+
+		MeshGeo->VertexBufferGPU = FUtil::CreateDefaultBuffer(Device,
+			Commandlist, VerticeData, vbByteSize, MeshGeo->VertexBufferUploader);
 
 		MeshGeo->IndexBufferGPU = FUtil::CreateDefaultBuffer(md3dDevice.Get(),
 			mCommandList.Get(), MeshGeo->indices.data(), ibByteSize, MeshGeo->IndexBufferUploader);
@@ -475,6 +494,8 @@ void DXRender::BuildMeshGeometrys()
 		MeshGeo->VertexBufferByteSize = vbByteSize;
 		MeshGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
 		MeshGeo->IndexBufferByteSize = ibByteSize;
+
+
 	}
 }
 

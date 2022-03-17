@@ -126,9 +126,6 @@
     <ClInclude Include="Engine\FMathHelper.h">
       <Filter>Header Files\Engine\Public\BaseCode</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\WinFrameResource.h">
-      <Filter>Header Files\Engine\Public\Data</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\FGameTimer.h">
       <Filter>Header Files\Engine\Public\BaseClass</Filter>
     </ClInclude>
@@ -204,6 +201,9 @@
     <ClInclude Include="Engine\DX12RHI.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\DXPrimitives.h">
+      <Filter>Header Files\Engine\RHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\DDSTextureLoader.cpp">
@@ -264,6 +264,9 @@
       <Filter>Source Files\Engine\Public\Material</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FDXResources.cpp">
+      <Filter>Source Files\Engine\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\DX12RHI.cpp">
       <Filter>Source Files\Engine\RHI</Filter>
     </ClCompile>
   </ItemGroup>

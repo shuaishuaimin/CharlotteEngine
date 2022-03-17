@@ -33,7 +33,7 @@
 #include <DirectXCollision.h>
 #include "d3dx12.h"
 #include "DDSTextureLoader.h"
-#include "WinFrameResource.h"
+#include "DXPrimitives.h"
 #include "WinMaterialData.h"
 #include "FDataProcessor.h"
 #include "FCamera.h"

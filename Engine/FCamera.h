@@ -1,5 +1,5 @@
 #pragma once
-#include "WinFrameResource.h"
+#include "DXPrimitives.h"
 #include "FMathHelper.h"
 
 class FCamera

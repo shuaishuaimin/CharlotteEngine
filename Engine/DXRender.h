@@ -11,11 +11,12 @@
 #include "FWin32Window.h"
 #include "FMathHelper.h"
 #include "FUploadBuffer.h"
-#include "WinFrameResource.h"
+#include "DXPrimitives.h"
 #include "FCamera.h"
 #include "FWinEventRegisterSystem.h"
 #include "FScene.h"
 #include "WinMaterialData.h"
+#include "RHI.h"
 // link necessary lib
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
@@ -29,6 +30,8 @@ public:
 	DXRender(const DXRender& dm) = delete;
 	DXRender operator= (const DXRender& dm) = delete;
 	virtual ~DXRender();
+
+	void Render();
 
 	virtual bool Initialize()override;
 
@@ -138,7 +141,7 @@ private:
 	int mClientWidth = 1980;
 	int mClientHeight = 1280;
 
-	std::vector<std::shared_ptr<Charalotte::FActorAsset>> ActorArray;
+	std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>> ActorArray;
 	std::unordered_map<std::string, std::unique_ptr<Charalotte::DXTextureResource>> mTextures;
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
@@ -153,4 +156,6 @@ private:
 	std::string NowMapName;
 
 	bool IsDeviceSucceed;
+
+	std::unique_ptr<RHI> RHIIns;
 };

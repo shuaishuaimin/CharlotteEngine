@@ -160,7 +160,7 @@
     <ClInclude Include="Engine\RHI.h" />
     <ClInclude Include="Engine\stdafx.h" />
     <ClInclude Include="Engine\MaterialSystem.h" />
-    <ClInclude Include="Engine\WinFrameResource.h" />
+    <ClInclude Include="Engine\DXPrimitives.h" />
     <ClInclude Include="Engine\d3dx12.h" />
     <ClInclude Include="Engine\FCamera.h" />
     <ClInclude Include="Engine\FDataProcessor.h" />
@@ -178,6 +178,7 @@
   <ItemGroup>
     <ClCompile Include="Engine\CharlotteEngine.cpp" />
     <ClCompile Include="Engine\DDSTextureLoader.cpp" />
+    <ClCompile Include="Engine\DX12RHI.cpp" />
     <ClCompile Include="Engine\FMeshAsset.cpp" />
     <ClCompile Include="Engine\FScene.cpp" />
     <ClCompile Include="Engine\FDXResources.cpp" />

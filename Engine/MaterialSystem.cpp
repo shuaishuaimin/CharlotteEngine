@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "MaterialSystem.h"
-#include "WinFrameResource.h"
+#include "DXPrimitives.h"
 
 
 void LoadMaterial()

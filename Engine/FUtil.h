@@ -1,7 +1,7 @@
 #pragma once
 
 #include "stdafx.h"
-#include "WinFrameResource.h"
+#include "DXPrimitives.h"
 #include "FMathHelper.h"
 
 extern const int gNumFrameResources;
