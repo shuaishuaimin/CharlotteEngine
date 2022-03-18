@@ -237,7 +237,7 @@ void DXRender::Draw()
 
 	for (auto& ActorIns : FScene::GetInstance().GetSceneActorByName(NowMapName))
 	{
-		auto MeshGeo = ActorIns->MeshAsset;
+		auto MeshGeo = ActorIns->DXMeshPrimitive;
 		if (MeshGeo == nullptr)
 		{
 			continue;
@@ -465,9 +465,9 @@ void DXRender::BuildShadersAndInputLayOut()
 
 void DXRender::BuildMeshGeometrys()
 {
-	for (auto& MeshGeoIter : FDXResources::GetInstance().GetMeshAssets())
+	for (auto& MeshGeoIter : FDXResources::GetInstance().GetDXMeshResources())
 	{
-		Charalotte::DXMeshPrimitive* MeshGeo = MeshGeoIter.second.get();
+		Charalotte::FDXMeshPrimitive* MeshGeo = MeshGeoIter.second.get();
 		if (MeshGeo == nullptr)
 		{
 			continue;

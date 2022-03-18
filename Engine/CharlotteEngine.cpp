@@ -2,7 +2,9 @@
 #include "CharlotteEngine.h"
 #include "FScene.h"
 #include "thread"
-
+#if PLATFORM_WINDOWS
+#include "DXRender.h"
+#endif
 
 CharalotteEngine::CharalotteEngine() {
 	WindowIns = this->CreateMainWindow();

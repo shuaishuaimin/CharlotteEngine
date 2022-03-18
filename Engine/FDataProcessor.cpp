@@ -16,9 +16,9 @@ FDataProcessor::~FDataProcessor()
 
 }
 
-void FDataProcessor::LoadMesh(const std::string& FileName, Charalotte::FMeshInfoForPrint& MeshInfo)
+void FDataProcessor::LoadMesh(const std::string& FileName, Charalotte::FMeshPrimitive& MeshInfo)
 {
-	Charalotte::FMeshInfoForPrint& TempMeshInfo = MeshInfo;
+	Charalotte::FMeshPrimitive& TempMeshInfo = MeshInfo;
 	ifstream file("BinaryMeshFiles/" + FileName, ios::in | ios::binary);
 	if (!file)
 	{	
@@ -98,9 +98,9 @@ void FDataProcessor::LoadMesh(const std::string& FileName, Charalotte::FMeshInfo
 	}
 }
 
-void FDataProcessor::LoadActors(const std::string& FileName, Charalotte::FActorsInfoForPrint& ActorInfos)
+void FDataProcessor::LoadActors(const std::string& FileName, Charalotte::FActorPrimitive& ActorInfos)
 {
-	Charalotte::FActorsInfoForPrint& TempActorInfos = ActorInfos;
+	Charalotte::FActorPrimitive& TempActorInfos = ActorInfos;
 
 	int ActorsNum;
 	ifstream file("BinaryActorFiles/" + FileName, ios::in | ios::binary);
@@ -125,8 +125,8 @@ void FDataProcessor::LoadActors(const std::string& FileName, Charalotte::FActors
 
 		int AssetNameLength = 0;
 		file.read((char*)&AssetNameLength, sizeof(int32_t));
-		ActorInfo.AssetName.resize(AssetNameLength);
-		file.read((char*)(ActorInfo.AssetName.data()), AssetNameLength);
+		ActorInfo.MeshPrimitiveName.resize(AssetNameLength);
+		file.read((char*)(ActorInfo.MeshPrimitiveName.data()), AssetNameLength);
 		TempActorInfos.ActorsInfo.push_back(ActorInfo);
 	}
 }

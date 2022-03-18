@@ -23,7 +23,7 @@ public:
 
 	void Update();
 
-	std::unordered_map<std::string, Charalotte::FActorsInfoForPrint> GetActorInfos();
+	std::unordered_map<std::string, Charalotte::FActorPrimitive> GetActorInfos();
 
 
 	void LoadMap(const std::string& MapName);
@@ -47,7 +47,7 @@ private:
 	Charalotte::CameraTransform DefaultCameraTrans;
 
 	// save the actor information without render
-	std::unordered_map<std::string, Charalotte::FActorsInfoForPrint> ActorInfors;
+	std::unordered_map<std::string, Charalotte::FActorPrimitive> ActorInfors;
 
 	// save the actor information have been rendered;
 	std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>> ActorDir;

@@ -39,20 +39,20 @@ void FScene::InitCameraTrans()
 	CameraTrans = DefaultCameraTrans;
 }
 
-std::unordered_map<std::string, Charalotte::FActorsInfoForPrint> FScene::GetActorInfos()
+std::unordered_map<std::string, Charalotte::FActorPrimitive> FScene::GetActorInfos()
 {
 	return ActorInfors;
 }
 
 void FScene::LoadMap(const std::string& MapName) {
 	
-	Charalotte::FActorsInfoForPrint TempActorInfors;
+	Charalotte::FActorPrimitive TempActorInfors;
 	FDataProcessor::LoadActors(MapName, TempActorInfors);
 	ActorInfors.insert({ MapName, TempActorInfors });
 	std::set<std::string> AssetNames;
 	for (const auto& ActorInfor : TempActorInfors.ActorsInfo)
 	{
-		std::string AssetName = ActorInfor.AssetName;
+		std::string AssetName = ActorInfor.MeshPrimitiveName;
 		if (AssetName.size() > 0)
 		{
 			AssetName.erase(AssetName.size() - 1, 1);
@@ -62,7 +62,7 @@ void FScene::LoadMap(const std::string& MapName) {
 	}
 	for (const auto& AssetName : AssetNames)
 	{
-		Charalotte::FMeshInfoForPrint MeshInfo;
+		Charalotte::FMeshPrimitive MeshInfo;
 		FDataProcessor::LoadMesh(AssetName, MeshInfo);
 		std::string NameWithout = AssetName;
 
@@ -72,8 +72,6 @@ void FScene::LoadMap(const std::string& MapName) {
 			FMeshAsset::GetInstance().AddMeshInfors(NameWithout, MeshInfo);
 		}
 	}
-	FScene::GetInstance().BuilMeshAsset(MapName);
-	FScene::GetInstance().BuildActors(MapName);
 
 	FWinEventRegisterSystem::GetInstance().ExecuteMapLoadEvent(MapName);
 
@@ -87,8 +85,8 @@ std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FDXActor
 
 void FScene::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
 {
-	Charalotte::FMeshInfoForPrint MeshInfo = FMeshAsset::GetInstance().GetMeshInfoByName(GeometryName);
-	std::shared_ptr<Charalotte::DXMeshPrimitive> MeshGeo = std::make_shared<Charalotte::DXMeshPrimitive>();
+	Charalotte::FMeshPrimitive MeshInfo = FMeshAsset::GetInstance().GetMeshInfoByName(GeometryName);
+	std::shared_ptr<Charalotte::FDXMeshPrimitive> MeshGeo = std::make_shared<Charalotte::FDXMeshPrimitive>();
 
 	std::string Name = GeometryName;
 	if (MeshInfo.LodInfos.size() <= 0)
@@ -141,7 +139,7 @@ void FScene::CalcVerticesAndIndices(const std::string& GeometryName, const Chara
 		MeshGeo->indices.push_back(static_cast<int16_t>(VertexIndex));
 	}
 
-	Charalotte::DXSubmeshPrimitive submesh;
+	Charalotte::FDXSubmeshPrimitive submesh;
 	submesh.IndexCount = (UINT)(MeshInfo.LodInfos[0].Indices.size());
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
@@ -149,7 +147,7 @@ void FScene::CalcVerticesAndIndices(const std::string& GeometryName, const Chara
 	MeshGeo->DrawArgs[GeometryName] = submesh;
 	MeshGeo->Name = GeometryName;
 
-	FDXResources::GetInstance().AddMeshData(GeometryName, MeshGeo);
+	FDXResources::GetInstance().AddDXMeshPrimitive(GeometryName, MeshGeo);
 }
 
 void FScene::BuilMeshAsset(const std::string& MapName)
@@ -160,7 +158,7 @@ void FScene::BuilMeshAsset(const std::string& MapName)
 	{
 		for (const auto& EnviroumentActor : ActorInfosIter->second.ActorsInfo)
 		{
-			std::string assetName = EnviroumentActor.AssetName;
+			std::string assetName = EnviroumentActor.MeshPrimitiveName;
 			if (assetName.size() <= 0)
 			{
 				continue;
@@ -182,7 +180,7 @@ void FScene::BuildActors(const std::string& MapName)
 	if (ActorInfosIter->second.ActorsInfo.size() <= 0) return;
 	for (const auto& EnviroumentActor : ActorInfosIter->second.ActorsInfo)
 	{
-		std::string assetName = EnviroumentActor.AssetName;
+		std::string assetName = EnviroumentActor.MeshPrimitiveName;
 		if (assetName.size() <= 0)
 		{
 			continue;
@@ -190,8 +188,8 @@ void FScene::BuildActors(const std::string& MapName)
 		assetName.erase(assetName.size() - 1, 1);
 		std::shared_ptr<Charalotte::FDXActorPrimitive> ActorAsset = std::make_shared<Charalotte::FDXActorPrimitive>();
 
-		ActorAsset->MeshAsset = FDXResources::GetInstance().GetMeshAsset(assetName);
-		if (ActorAsset->MeshAsset != nullptr)
+		ActorAsset->DXMeshPrimitive = FDXResources::GetInstance().GetDXMeshResourceByName(assetName);
+		if (ActorAsset->DXMeshPrimitive != nullptr)
 		{
 			ActorAsset->Transform = EnviroumentActor.Transform;
 

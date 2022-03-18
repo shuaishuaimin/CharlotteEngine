@@ -27,8 +27,9 @@ DX12RHI::~DX12RHI()
 	IsDeviceSucceed = false;
 }
 
-void DX12RHI::LoadTextureAsset(const std::string& FileName, const std::string& FilePath)
+void DX12RHI::LoadTextureResource(const std::string& FileName, const std::string& FilePath)
 {
+	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 	auto Texture = std::make_shared<Charalotte::DXTextureResource>();
 	Texture->Name = FileName;
 	Texture->Filename = String2wString(FilePath);
@@ -37,6 +38,10 @@ void DX12RHI::LoadTextureAsset(const std::string& FileName, const std::string& F
 		Texture->Resource, Texture->UploadHeap));
 
 	FDXResources::GetInstance().AddDxTextureResource(Texture->Name, Texture);
+	ThrowIfFailed(mCommandList->Close());
+	ID3D12CommandList* cmdLists[] = { mCommandList.Get() };
+	mCommandQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
+	FlushCommandQueue();
 }
 
 bool DX12RHI::InitRenderPlatform(FWindow* WindowPtr)
@@ -234,10 +239,132 @@ void DX12RHI::OnResize()
 	mScissorRect = { 0, 0, mClientWidth, mClientHeight };
 }
 
+bool DX12RHI::GetIsDeviceSucceed()
+{
+	return IsDeviceSucceed;
+}
+
+void DX12RHI::BuildMeshAndActorPrimitives(const Charalotte::FActorPrimitive& Actors,
+	const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs)
+{
+	BuildDXMeshPrimiteives(Actors, Meshs);
+	BuildDXActorPrimitives(Actors);
+}
 // when input heap, we should two heap, that is rtvHeap and dsvHeap
 // their type is D3D12_DESCRIPTOR_HEAP_DESC
 // we should create description and its own information, that is way to explain heap 
 //	data in heap can not be explained by computer without explain
+void DX12RHI::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform,
+	const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs)
+{
+	if (Meshs.find(GeometryName) == Meshs.end())
+	{
+		return;
+	}
+	const Charalotte::FMeshPrimitive& MeshPri = Meshs.find(GeometryName)->second;
+	
+	std::string Name = GeometryName;
+	if (MeshPri.LodInfos.size() <= 0)
+	{
+		std::stringstream ss;
+		ss << GeometryName << "No result";
+		OutputDebugStringA(ss.str().c_str());
+		return;
+	}
+	std::shared_ptr<Charalotte::FDXMeshPrimitive> DXMeshPri = std::make_shared<Charalotte::FDXMeshPrimitive>();
+	int VertexIndex = 0;
+	// use normal to vertex color
+	bool IsUseNormalToColor = false;
+	if (MeshPri.LodInfos[0].VerticesLocation.size() == MeshPri.LodInfos[0].VerticesNormal.size())
+	{
+		IsUseNormalToColor = true;
+	}
+
+	for (const auto& VertexLocation : MeshPri.LodInfos[0].VerticesLocation)
+	{
+		glm::vec4 VertexColor = glm::vec4(1.0f);
+
+		Charalotte::Vertex vertex;
+		glm::vec3 Float3 = glm::vec3(1.0f);
+		// execute scale transport
+		Float3.x = VertexLocation.x;
+		Float3.y = VertexLocation.y;
+		Float3.z = VertexLocation.z;
+
+		const auto& MeshLod = MeshPri.LodInfos[0];
+		vertex.Pos = Float3;
+		if (IsUseNormalToColor)
+		{
+			VertexColor.x = MeshLod.VerticesNormal[VertexIndex].x * 0.5f + 0.5f;
+			VertexColor.y = MeshLod.VerticesNormal[VertexIndex].y * 0.5f + 0.5f;
+			VertexColor.z = MeshLod.VerticesNormal[VertexIndex].z * 0.5f + 0.5f;
+			VertexColor.w = MeshLod.VerticesNormal[VertexIndex].w * 0.5f + 0.5f;
+		}
+		vertex.Color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+		vertex.Normal = VertexColor;
+		vertex.UV.x = MeshLod.UVs[VertexIndex].X;
+		vertex.UV.y = MeshLod.UVs[VertexIndex].Y;
+		DXMeshPri->vertices.push_back(vertex);
+		VertexIndex++;
+	}
+
+	for (const auto& index : MeshPri.LodInfos[0].Indices)
+	{
+		int32_t VertexIndex = index;
+		DXMeshPri->indices.push_back(static_cast<int16_t>(VertexIndex));
+	}
+
+	Charalotte::FDXSubmeshPrimitive submesh;
+	submesh.IndexCount = (UINT)(MeshPri.LodInfos[0].Indices.size());
+	submesh.StartIndexLocation = 0;
+	submesh.BaseVertexLocation = 0;
+
+	DXMeshPri->DrawArgs[GeometryName] = submesh;
+	DXMeshPri->Name = GeometryName;
+
+	FDXResources::GetInstance().AddDXMeshPrimitive(GeometryName, DXMeshPri);
+}
+
+void DX12RHI::BuildDXMeshPrimiteives(const Charalotte::FActorPrimitive& ActorPrimitive,
+			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs)
+{
+	for (const auto& Actor : ActorPrimitive.ActorsInfo)
+	{
+		std::string MeshName = Actor.MeshPrimitiveName;
+		if (MeshName.size() <= 0)
+		{
+			continue;
+		}
+		MeshName.erase(MeshName.size() - 1, 1);
+		CalcVerticesAndIndices(MeshName, Actor.Transform, Meshs);
+	}	
+}
+
+void DX12RHI::BuildDXActorPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive)
+{
+	FDXResources::GetInstance().ClearDXActorPrimitives();
+
+	const auto& ActorInfors = ActorPrimitive.ActorsInfo;
+	for (const auto& Actors : ActorPrimitive.ActorsInfo)
+	{
+		std::string ActorMeshPrimitiveName = Actors.MeshPrimitiveName;
+		if (ActorMeshPrimitiveName.size() <= 0)
+		{
+			continue;
+		}
+		ActorMeshPrimitiveName.erase(ActorMeshPrimitiveName.size() - 1, 1);
+		auto MeshResourcePtr = FDXResources::GetInstance().GetDXMeshResourceByName(ActorMeshPrimitiveName);
+		if (MeshResourcePtr != nullptr)
+		{
+			std::shared_ptr<Charalotte::FDXActorPrimitive> DXActorPrimitive = std::make_shared<Charalotte::FDXActorPrimitive>();
+			DXActorPrimitive->DXMeshPrimitive = MeshResourcePtr;
+			DXActorPrimitive->DXActorPrimitiveName = Actors.ActorPrimitiveName;
+			DXActorPrimitive->Transform = Actors.Transform;
+			FDXResources::GetInstance().AddDXActorPrimitive(Actors.ActorPrimitiveName, DXActorPrimitive);
+		}
+	}
+}
+
 void DX12RHI::CreateRtvAndDsvDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;

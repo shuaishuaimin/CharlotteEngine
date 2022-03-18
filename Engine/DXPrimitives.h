@@ -30,7 +30,7 @@ namespace Charalotte
 	// geometries are stored in one vertex and index buffer.  It provides the offsets
 	// and data needed to draw a subset of geometry stores in the vertex and index 
 	// buffers so that we can implement the technique described by Figure 6.3.
-	struct DXSubmeshPrimitive
+	struct FDXSubmeshPrimitive
 	{
 		UINT IndexCount = 0;
 		UINT StartIndexLocation = 0;
@@ -41,7 +41,7 @@ namespace Charalotte
 		DirectX::BoundingBox Bounds;
 	};
 
-	struct DXMeshPrimitive
+	struct FDXMeshPrimitive
 	{
 	
 		using index_type_t = int16_t;
@@ -70,7 +70,7 @@ namespace Charalotte
 		// A MeshGeometry may store multiple geometries in one vertex/index buffer.
 		// Use this container to define the Submesh geometries so we can draw
 		// the Submeshes individually.
-		std::unordered_map<std::string, DXSubmeshPrimitive> DrawArgs;
+		std::unordered_map<std::string, FDXSubmeshPrimitive> DrawArgs;
 
 		D3D12_VERTEX_BUFFER_VIEW VertexBufferView()const
 		{
@@ -106,19 +106,21 @@ namespace Charalotte
 
 		UINT GetIndicesSize()
 		{
-			return (UINT)indices.size() * sizeof(Charalotte::DXMeshPrimitive::index_type_t);
+			return (UINT)indices.size() * sizeof(Charalotte::FDXMeshPrimitive::index_type_t);
 		}
 	};
 
 	struct FDXActorPrimitive
 	{
-		Charalotte::DXMeshPrimitive* MeshAsset = nullptr;
+		std::string DXActorPrimitiveName;
+		Charalotte::FDXMeshPrimitive* DXMeshPrimitive = nullptr;
 		Charalotte::FTransform Transform;
 		std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>> ObjectCB = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CbvHeap = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> SrvHeap = nullptr;
 		glm::mat4 VPTrans = glm::mat4(1.0f);
+
 		glm::mat4 MTrans = glm::mat4(1.0f);
 		
 	};

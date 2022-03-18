@@ -9,17 +9,22 @@ public:
 	FDXResources();
 	~FDXResources();
 	
-	void AddMeshData(const std::string& AssetName, std::shared_ptr<Charalotte::DXMeshPrimitive>& MeshAsset);
+	void AddDXMeshPrimitive(const std::string& AssetName, std::shared_ptr<Charalotte::FDXMeshPrimitive>& MeshAsset);
 
-	Charalotte::DXMeshPrimitive* GetMeshAsset(const std::string& Assetname);
+	Charalotte::FDXMeshPrimitive* GetDXMeshResourceByName(const std::string& Assetname);
 
-	std::unordered_map<std::string, std::shared_ptr<Charalotte::DXMeshPrimitive>>& GetMeshAssets();
+	std::unordered_map<std::string, std::shared_ptr<Charalotte::FDXMeshPrimitive>>& GetDXMeshResources();
 
-	Charalotte::DXTextureResource* GetTextResourceByName(const std::string& TextureName);
+	Charalotte::DXTextureResource* GetDXTextResourceByName(const std::string& TextureName);
 
 	void AddDxTextureResource(const std::string& Name, std::shared_ptr<Charalotte::DXTextureResource>& DXTexture);
+
+	void AddDXActorPrimitive(const std::string& ActorName, std::shared_ptr<Charalotte::FDXActorPrimitive>& DXActor);
+
+	void ClearDXActorPrimitives();
 private:
-	std::unordered_map<std::string, std::shared_ptr<Charalotte::DXMeshPrimitive>> MeshResources;
+	std::unordered_map<std::string, std::shared_ptr<Charalotte::FDXMeshPrimitive>> MeshResources;
 	std::unordered_map<std::string, std::shared_ptr<Charalotte::DXTextureResource>> TextureResources;
 	std::unordered_map<std::string, std::shared_ptr<Charalotte::FDXActorPrimitive>> ActorResources;
+
 };

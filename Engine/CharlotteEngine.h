@@ -2,12 +2,11 @@
 #include "FWindow.h"
 #include "FRender.h"
 #include "Singleton.h"
-#if PLATFORM_WINDOWS
-#include "DXRender.h"
-#endif
+
 
 class CharalotteEngine : public Singleton<CharalotteEngine>
 {
+
 public:
 	CharalotteEngine();
 

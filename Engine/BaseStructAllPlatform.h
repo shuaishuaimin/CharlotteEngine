@@ -85,7 +85,7 @@ namespace Charalotte
 		std::vector<Charalotte::FVector2D> UVs;
 	};
 
-	struct FMeshInfoForPrint
+	struct FMeshPrimitive
 	{
 		std::string MeshName;
 
@@ -98,11 +98,12 @@ namespace Charalotte
 	{
 		Charalotte::FTransform Transform;
 
-		std::string AssetName;
+		std::string MeshPrimitiveName;
 
+		std::string ActorPrimitiveName;
 	};
 
-	struct FActorsInfoForPrint
+	struct FActorPrimitive
 	{
 		std::vector<Charalotte::FActorInfo> ActorsInfo;
 	};

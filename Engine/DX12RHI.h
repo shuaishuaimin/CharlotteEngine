@@ -28,13 +28,18 @@ public:
 	DX12RHI();
 	virtual ~DX12RHI(); 
 
-	virtual void LoadTextureAsset(const std::string& FileName, const std::string& FilePath) override;
+	virtual void LoadTextureResource(const std::string& FileName, const std::string& FilePath) override;
 
 	virtual bool InitRenderPlatform(FWindow* WindowPtr) override;
 
 	virtual bool InitRenderPipeline() override;
 
 	virtual void OnResize() override; 
+
+	virtual bool GetIsDeviceSucceed() override;
+
+	virtual void BuildMeshAndActorPrimitives(const Charalotte::FActorPrimitive& Actors,
+		const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs) override;
 protected:
 	// flush fence
 	void FlushCommandQueue();
@@ -56,6 +61,14 @@ protected:
 	void BuildRootSignature();
 	void BuildShadersAndInputLayOut();
 	void BuildPSO();
+
+	// Build
+	void BuildDXMeshPrimiteives(const Charalotte::FActorPrimitive& ActorPrimitive, 
+			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs);
+	void CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform,
+			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs);
+	
+	void BuildDXActorPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive);
 
 protected:
 	// function for all
@@ -130,6 +143,5 @@ private:
 
 // parameters for self
 private:
-	std::string NowMapName;
 };
 

@@ -10,8 +10,8 @@ public:
 	FDataProcessor& operator=(const FDataProcessor& datahandler) = delete;
 	virtual ~FDataProcessor();
 
-	static void LoadMesh(const std::string& FileName, Charalotte::FMeshInfoForPrint& MeshInfo);
+	static void LoadMesh(const std::string& FileName, Charalotte::FMeshPrimitive& MeshInfo);
 
-	static void LoadActors(const std::string& FileName, Charalotte::FActorsInfoForPrint& ActorInfos);
+	static void LoadActors(const std::string& FileName, Charalotte::FActorPrimitive& ActorInfos);
 };
 

@@ -9,20 +9,20 @@ FMeshAsset::~FMeshAsset()
 {
 	MeshsInfors.clear();
 }
-Charalotte::FMeshInfoForPrint FMeshAsset::GetMeshInfoByName(const std::string& MeshName)
+Charalotte::FMeshPrimitive FMeshAsset::GetMeshInfoByName(const std::string& MeshName)
 {
 	auto MeshInfoIter = MeshsInfors.find(MeshName);
 	if (MeshInfoIter != MeshsInfors.end())
 	{
 		return MeshInfoIter->second;
 	}
-	return Charalotte::FMeshInfoForPrint();
+	return Charalotte::FMeshPrimitive();
 }
-std::unordered_map<std::string, Charalotte::FMeshInfoForPrint> FMeshAsset::GetMeshInfors()
+std::unordered_map<std::string, Charalotte::FMeshPrimitive> FMeshAsset::GetMeshInfors()
 {
 	return MeshsInfors;
 }
-void FMeshAsset::AddMeshInfors(const std::string& MeshName, Charalotte::FMeshInfoForPrint MeshInfo)
+void FMeshAsset::AddMeshInfors(const std::string& MeshName, Charalotte::FMeshPrimitive MeshInfo)
 {
 	if (MeshNames.find(MeshName) != MeshNames.end())
 	{
