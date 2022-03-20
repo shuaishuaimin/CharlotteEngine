@@ -150,7 +150,7 @@
     <ClInclude Include="Engine\BaseStructAllPlatform.h">
       <Filter>Header Files\Engine\Public\Data</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DXRender.h">
+    <ClInclude Include="Engine\FWinRender.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GameLogic.h">
@@ -207,6 +207,9 @@
     <ClInclude Include="Engine\RHIResource.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Primitive.h">
+      <Filter>Header Files\Engine\RHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\DDSTextureLoader.cpp">
@@ -257,7 +260,7 @@
     <ClCompile Include="UStaticMesh.cpp">
       <Filter>Source Files\Game\Actor</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DXRender.cpp">
+    <ClCompile Include="Engine\FWinRender.cpp">
       <Filter>Source Files\Engine\Platform</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FMeshAsset.cpp">

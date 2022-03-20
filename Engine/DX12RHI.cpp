@@ -251,7 +251,7 @@ void DX12RHI::BuildMeshAndActorPrimitives(const Charalotte::FActorPrimitive& Act
 	BuildDXActorPrimitives(Actors);
 }
 
-void DX12RHI::BuildSceneResourceForRenderPlatform()
+void DX12RHI::BuildSceneResourcesForRenderPlatform()
 {
 	CompleteDXMeshPrimitives();
 	for (auto& DXActorResource : FDXResources::GetInstance().GetDXActorResources())
@@ -516,6 +516,7 @@ void DX12RHI::BuildDXActorPrimitives(const Charalotte::FActorPrimitive& ActorPri
 			DXActorPrimitive->DXMeshPrimitive = MeshResourcePtr;
 			DXActorPrimitive->DXActorPrimitiveName = Actors.ActorPrimitiveName;
 			DXActorPrimitive->Transform = Actors.Transform;
+			DXActorPrimitive->Material = Actors.Material.get();
 			FDXResources::GetInstance().AddDXActorPrimitive(Actors.ActorPrimitiveName, DXActorPrimitive);
 		}
 	}
@@ -709,13 +710,13 @@ void DX12RHI::BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>&
 }
 
 void DX12RHI::BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap, 
-			const FMaterial& Material)
+			FMaterial* Material)
 {
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	srvDesc = {};
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	std::string TextureName = Material.GetTexture();
-	std::string NormalName =Material.GetNormal();
+	std::string TextureName = Material->GetTexture();
+	std::string NormalName = Material->GetNormal();
 
 	auto TextureResource = FDXResources::GetInstance().GetDXTextResourceByName(TextureName);
 	auto NormalResource = FDXResources::GetInstance().GetDXTextResourceByName(NormalName);

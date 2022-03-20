@@ -157,6 +157,7 @@
     <ClInclude Include="Engine\FScene.h" />
     <ClInclude Include="Engine\FDXResources.h" />
     <ClInclude Include="Engine\FWindow.h" />
+    <ClInclude Include="Engine\Primitive.h" />
     <ClInclude Include="Engine\RHI.h" />
     <ClInclude Include="Engine\RHIResource.h" />
     <ClInclude Include="Engine\stdafx.h" />
@@ -165,7 +166,7 @@
     <ClInclude Include="Engine\d3dx12.h" />
     <ClInclude Include="Engine\FCamera.h" />
     <ClInclude Include="Engine\FDataProcessor.h" />
-    <ClInclude Include="Engine\DXRender.h" />
+    <ClInclude Include="Engine\FWinRender.h" />
     <ClInclude Include="Engine\DDSTextureLoader.h" />
     <ClInclude Include="Engine\FGameTimer.h" />
     <ClInclude Include="Engine\FUploadBuffer.h" />
@@ -189,7 +190,7 @@
     <ClCompile Include="Engine\FWin32Window.cpp" />
     <ClCompile Include="Engine\FCamera.cpp" />
     <ClCompile Include="Engine\FDataProcessor.cpp" />
-    <ClCompile Include="Engine\DXRender.cpp" />
+    <ClCompile Include="Engine\FWinRender.cpp" />
     <ClCompile Include="Engine\FGameTimer.cpp" />
     <ClCompile Include="Engine\FUtil.cpp" />
     <ClCompile Include="Engine\FMathHelper.cpp" />

@@ -22,14 +22,14 @@
 #pragma comment(lib, "D3D12.lib")
 #pragma comment(lib, "dxgi.lib")
 
-class DXRender : public FRender
+class FWinRender : public FRender
 {
 public:
-	DXRender();
+	FWinRender();
 	// ban copy constructor and assignment
-	DXRender(const DXRender& dm) = delete;
-	DXRender operator= (const DXRender& dm) = delete;
-	virtual ~DXRender();
+	FWinRender(const FWinRender& dm) = delete;
+	FWinRender operator= (const FWinRender& dm) = delete;
+	virtual ~FWinRender();
 
 	virtual bool Initialize()override;
 
@@ -37,14 +37,12 @@ public:
 
 	void Destory(){};
 
-	static DXRender* GetRender();
-
 	void Update() override;
 
 	virtual bool GetIsDevicedSucceed()override;
 private:
 
-	static DXRender* render;
-
 	std::unique_ptr<RHI> RHIIns;
+
+	std::shared_ptr<Charalotte::DrawNecessaryData> DrawData;
 };

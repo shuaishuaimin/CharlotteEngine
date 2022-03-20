@@ -6,6 +6,7 @@
 #include "BaseStructAllPlatform.h"
 #include "FMaterial.h"
 #include "RHIResource.h"
+#include "Primitive.h"
 
 class RHI
 {
@@ -22,7 +23,7 @@ public:
 	virtual void BuildMeshAndActorPrimitives(const Charalotte::FActorPrimitive& Actors, 
 				const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs) = 0;
 
-	virtual void BuildSceneResourceForRenderPlatform() = 0;
+	virtual void BuildSceneResourcesForRenderPlatform() = 0;
 
 	virtual void CompileMaterial() = 0;
 

@@ -4,10 +4,9 @@
 #include <set>
 #include "Singleton.h"
 #include "FCamera.h"
-#include "DXPrimitives.h"
+#include "Primitive.h"
 #include "FGameTimer.h"
 #include "FWinEventRegisterSystem.h"
-#include "FDXResources.h"
 
 class FScene : public Singleton<FScene>
 {

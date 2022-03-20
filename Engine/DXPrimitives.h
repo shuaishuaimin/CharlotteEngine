@@ -5,10 +5,6 @@
 #include "WinMaterialData.h"
 #include "FMaterial.h"
 
-class DXPrimitives
-{
-
-};
 namespace Charalotte
 {
 
@@ -123,7 +119,7 @@ namespace Charalotte
 
 		glm::mat4 MTrans = glm::mat4(1.0f);
 
-		FMaterial Material;
+		FMaterial* Material = nullptr;
 	};
 }
 

@@ -17,6 +17,7 @@
 #include "FMathHelper.h"
 #include "FUploadBuffer.h"
 #include "FWinEventRegisterSystem.h"
+#include "FDXResources.h"
 
 //#pragma comment(lib,"d3dcompiler.lib")
 //#pragma comment(lib, "D3D12.lib")
@@ -41,7 +42,7 @@ public:
 	virtual void BuildMeshAndActorPrimitives(const Charalotte::FActorPrimitive& Actors,
 		const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs) override;
 
-	virtual void BuildSceneResourceForRenderPlatform() override;
+	virtual void BuildSceneResourcesForRenderPlatform() override;
 
 	virtual void CompileMaterial() override;
 
@@ -85,7 +86,7 @@ protected:
 		std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>>& ObjectCb);
 
 	void BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap, 
-				const FMaterial& Material);
+		FMaterial* Material);
 
 	void DebugDevice();
 protected:

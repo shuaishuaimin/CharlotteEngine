@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FScene.h"
 #include "FMeshAsset.h"
+#include "CharlotteEngine.h"
 
 FScene::FScene() {
 	MainCamera = std::make_shared<FCamera>();
@@ -49,7 +50,9 @@ void FScene::LoadMap(const std::string& MapName) {
 	
 	Charalotte::FActorPrimitive TempActorInfors;
 	FDataProcessor::LoadActors(MapName, TempActorInfors);
-	
+	const auto& TextureNames = CharalotteEngine::GetInstance().GetTextureArray();
+	int TextureNum = TextureNames.size();
+	int TempTextureIndex = 0;
 	std::set<std::string> AssetNames;
 	for (auto& ActorInfor : TempActorInfors.ActorsInfo)
 	{
@@ -73,6 +76,22 @@ void FScene::LoadMap(const std::string& MapName) {
 
 		AssetName += ".dat";
 		AssetNames.insert(AssetName);
+
+		// test use different texture
+		if (TextureNum <= 0)
+		{
+			continue;
+		}
+		ActorInfor.Material->SetTexture("ice");
+		/*if (TempTextureIndex < TextureNum)
+		{
+			ActorInfor.Material->SetTexture(TextureNames[1]);
+			TempTextureIndex++;
+		}
+		else
+		{
+			TempTextureIndex = 0;
+		}*/
 	}
 	ActorInfors.insert({ MapName, TempActorInfors });
 

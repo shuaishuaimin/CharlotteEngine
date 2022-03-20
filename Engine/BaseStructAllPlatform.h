@@ -67,47 +67,6 @@ namespace Charalotte
 		glm::mat4 Rotate = glm::mat4(1.0f);
 	};
 
-	struct FLODInfo
-	{
-
-		int VerticesNum;
-
-		int TrianglesNum;
-
-		int IndicesNum;
-
-		std::vector<Charalotte::FVector> VerticesLocation;
-
-		std::vector<int> Indices;
-
-		std::vector<Charalotte::FVector4> VerticesNormal;
-
-		std::vector<Charalotte::FVector2D> UVs;
-	};
-
-	struct FMeshPrimitive
-	{
-		std::string MeshName;
-
-		int LODNums;
-
-		std::vector<Charalotte::FLODInfo> LodInfos;
-	};
-
-	struct FActorInfo
-	{
-		Charalotte::FTransform Transform;
-
-		std::string MeshPrimitiveName;
-
-		std::string ActorPrimitiveName;
-	};
-
-	struct FActorPrimitive
-	{
-		std::vector<Charalotte::FActorInfo> ActorsInfo;
-	};
-
 	struct CameraData
 	{
 		glm::vec4 Location = glm::vec4();

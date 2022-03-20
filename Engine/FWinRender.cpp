@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <WindowsX.h>
 #include <string>
-#include "DXRender.h"
+#include "FWinRender.h"
 #include "FDataProcessor.h"
 #include "FDXResources.h"
 #include "CharlotteEngine.h"
@@ -17,9 +17,7 @@ using Microsoft::WRL::ComPtr;
 using namespace DirectX::PackedVector;
 using std::string;
 
-DXRender* DXRender::render = nullptr;
-
-DXRender::DXRender()
+FWinRender::FWinRender()
 {
 	RHIIns = std::make_unique<DX12RHI>();
 	FWinEventRegisterSystem::GetInstance().RegisterMapLoadEventForDender(Charalotte::BaseMapLoad, [this](const std::string& MapName) {
@@ -28,21 +26,16 @@ DXRender::DXRender()
 	FWinEventRegisterSystem::GetInstance().RegisterOnResize(Charalotte::DXRenderResize, [this](){
 		this->RHIIns->OnResize();
 	});
-	assert(render == nullptr);
-	render = this;
+	DrawData = std::make_shared<Charalotte::DrawNecessaryData>();
 }
 
-DXRender* DXRender::GetRender()
-{
-	return render;
-}
 
-DXRender::~DXRender()
+FWinRender::~FWinRender()
 {
 	
 }
 
-bool DXRender::Initialize()
+bool FWinRender::Initialize()
 {
 	if (!RHIIns->InitRenderPlatform(CharalotteEngine::GetInstance().GetWindowPtr()))
 	{
@@ -55,20 +48,19 @@ bool DXRender::Initialize()
 }
 
 // draw by camera data
-void DXRender::Update()
+void FWinRender::Update()
 {
-	std::shared_ptr<Charalotte::DrawNecessaryData> DrawData = std::make_shared<Charalotte::DrawNecessaryData>();
 	FScene::GetInstance().GetCamera()->GetCameraData(DrawData->MainCameraData);
 	FScene::GetInstance().GetCamera()->GetVPTransform(DrawData->VPTransform.VPMatrix);
 	RHIIns->DrawSceneByResource(DrawData.get());
 }
 
-bool DXRender::GetIsDevicedSucceed()
+bool FWinRender::GetIsDevicedSucceed()
 {
 	return RHIIns->GetIsDeviceSucceed();
 }
 
-void DXRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
+void FWinRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 {
 	const auto& ActorPrimitiveIter = FScene::GetInstance().GetActorInfos().find(MapName);
 	auto Actors = FScene::GetInstance().GetActorInfos();
@@ -90,7 +82,7 @@ void DXRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 	}
 
 	// Build scene andl compile material
-	RHIIns->BuildSceneResourceForRenderPlatform();
+	RHIIns->BuildSceneResourcesForRenderPlatform();
 	RHIIns->CompileMaterial();
 }
 
