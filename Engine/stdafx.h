@@ -20,6 +20,8 @@
 #include "FMathHelper.h"
 #include "Singleton.h"
 #include "FGameTimer.h"
+#include "FMaterial.h"
+#include "RHI.h"
 
 
 #if PLATFORM_WINDOWS

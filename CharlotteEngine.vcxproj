@@ -158,8 +158,9 @@
     <ClInclude Include="Engine\FDXResources.h" />
     <ClInclude Include="Engine\FWindow.h" />
     <ClInclude Include="Engine\RHI.h" />
+    <ClInclude Include="Engine\RHIResource.h" />
     <ClInclude Include="Engine\stdafx.h" />
-    <ClInclude Include="Engine\MaterialSystem.h" />
+    <ClInclude Include="Engine\FMaterial.h" />
     <ClInclude Include="Engine\DXPrimitives.h" />
     <ClInclude Include="Engine\d3dx12.h" />
     <ClInclude Include="Engine\FCamera.h" />
@@ -192,7 +193,7 @@
     <ClCompile Include="Engine\FGameTimer.cpp" />
     <ClCompile Include="Engine\FUtil.cpp" />
     <ClCompile Include="Engine\FMathHelper.cpp" />
-    <ClCompile Include="Engine\MaterialSystem.cpp" />
+    <ClCompile Include="Engine\FMaterial.cpp" />
     <ClCompile Include="Main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

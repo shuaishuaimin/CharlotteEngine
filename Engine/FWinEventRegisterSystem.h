@@ -7,7 +7,7 @@
 #include "FGameTimer.h"
 #include "Singleton.h"
 #include "FInputSystem.h"
-#include "DXPrimitives.h"
+
 
 namespace Charalotte
 {

@@ -64,3 +64,8 @@ void FDXResources::ClearDXActorPrimitives()
 {
 	ActorResources.clear();
 }
+
+std::unordered_map<std::string, std::shared_ptr<Charalotte::FDXActorPrimitive>>& FDXResources::GetDXActorResources()
+{
+	return ActorResources;
+}

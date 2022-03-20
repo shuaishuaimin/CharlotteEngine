@@ -22,6 +22,8 @@ public:
 	void AddDXActorPrimitive(const std::string& ActorName, std::shared_ptr<Charalotte::FDXActorPrimitive>& DXActor);
 
 	void ClearDXActorPrimitives();
+
+	std::unordered_map<std::string, std::shared_ptr<Charalotte::FDXActorPrimitive>>& GetDXActorResources();
 private:
 	std::unordered_map<std::string, std::shared_ptr<Charalotte::FDXMeshPrimitive>> MeshResources;
 	std::unordered_map<std::string, std::shared_ptr<Charalotte::DXTextureResource>> TextureResources;

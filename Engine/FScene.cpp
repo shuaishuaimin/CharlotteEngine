@@ -11,6 +11,7 @@ FScene::FScene() {
 	ActorDir = {};
 	EmptyActorVec = {};
 	NowMapName = "";
+	MeshPrimitiveTimes = {};
 }
 FScene::~FScene() {
 	MainCamera = nullptr;
@@ -39,7 +40,7 @@ void FScene::InitCameraTrans()
 	CameraTrans = DefaultCameraTrans;
 }
 
-std::unordered_map<std::string, Charalotte::FActorPrimitive> FScene::GetActorInfos()
+std::unordered_map<std::string, Charalotte::FActorPrimitive>& FScene::GetActorInfos()
 {
 	return ActorInfors;
 }
@@ -48,18 +49,33 @@ void FScene::LoadMap(const std::string& MapName) {
 	
 	Charalotte::FActorPrimitive TempActorInfors;
 	FDataProcessor::LoadActors(MapName, TempActorInfors);
-	ActorInfors.insert({ MapName, TempActorInfors });
+	
 	std::set<std::string> AssetNames;
-	for (const auto& ActorInfor : TempActorInfors.ActorsInfo)
+	for (auto& ActorInfor : TempActorInfors.ActorsInfo)
 	{
 		std::string AssetName = ActorInfor.MeshPrimitiveName;
 		if (AssetName.size() > 0)
 		{
 			AssetName.erase(AssetName.size() - 1, 1);
 		}
+
+		const auto& MeshPrimitiveIter = MeshPrimitiveTimes.find(AssetName);
+		if (MeshPrimitiveIter != MeshPrimitiveTimes.end())
+		{
+			MeshPrimitiveIter->second++;
+			ActorInfor.ActorPrimitiveName = AssetName + "_" + std::to_string(MeshPrimitiveIter->second);
+		}
+		else
+		{
+			MeshPrimitiveTimes.insert({ AssetName, 0 });
+			ActorInfor.ActorPrimitiveName = AssetName;
+		}
+
 		AssetName += ".dat";
 		AssetNames.insert(AssetName);
 	}
+	ActorInfors.insert({ MapName, TempActorInfors });
+
 	for (const auto& AssetName : AssetNames)
 	{
 		Charalotte::FMeshPrimitive MeshInfo;
@@ -78,125 +94,12 @@ void FScene::LoadMap(const std::string& MapName) {
 	NowMapName = MapName;
 }
 
+
 std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>>& FScene::GetActorDictionary()
 {
 	return ActorDir;
 }
 
-void FScene::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform)
-{
-	Charalotte::FMeshPrimitive MeshInfo = FMeshAsset::GetInstance().GetMeshInfoByName(GeometryName);
-	std::shared_ptr<Charalotte::FDXMeshPrimitive> MeshGeo = std::make_shared<Charalotte::FDXMeshPrimitive>();
-
-	std::string Name = GeometryName;
-	if (MeshInfo.LodInfos.size() <= 0)
-	{
-		std::stringstream ss;
-		ss << GeometryName << "No result";
-		OutputDebugStringA(ss.str().c_str());
-		return;
-	}
-
-	int VertexIndex = 0;
-	// use normal to vertex color
-	bool IsUseNormalToColor = false;
-	if (MeshInfo.LodInfos[0].VerticesLocation.size() == MeshInfo.LodInfos[0].VerticesNormal.size())
-	{
-		IsUseNormalToColor = true;
-	}
-
-	for (const auto& VertexLocation : MeshInfo.LodInfos[0].VerticesLocation)
-	{
-		glm::vec4 VertexColor = glm::vec4(1.0f);
-
-		Charalotte::Vertex vertex;
-		glm::vec3 Float3 = glm::vec3(1.0f);
-		// execute scale transport
-		Float3.x = VertexLocation.x;
-		Float3.y = VertexLocation.y;
-		Float3.z = VertexLocation.z;
-
-		const auto& MeshLod = MeshInfo.LodInfos[0];
-		vertex.Pos = Float3;
-		if (IsUseNormalToColor)
-		{
-			VertexColor.x = MeshLod.VerticesNormal[VertexIndex].x * 0.5f + 0.5f;
-			VertexColor.y = MeshLod.VerticesNormal[VertexIndex].y * 0.5f + 0.5f;
-			VertexColor.z = MeshLod.VerticesNormal[VertexIndex].z * 0.5f + 0.5f;
-			VertexColor.w = MeshLod.VerticesNormal[VertexIndex].w * 0.5f + 0.5f;
-		}
-		vertex.Color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-		vertex.Normal = VertexColor;
-		vertex.UV.x = MeshLod.UVs[VertexIndex].X;
-		vertex.UV.y = MeshLod.UVs[VertexIndex].Y;
-		MeshGeo->vertices.push_back(vertex);
-		VertexIndex++;
-	}
-
-	for (const auto& index : MeshInfo.LodInfos[0].Indices)
-	{
-		int32_t VertexIndex = index;
-		MeshGeo->indices.push_back(static_cast<int16_t>(VertexIndex));
-	}
-
-	Charalotte::FDXSubmeshPrimitive submesh;
-	submesh.IndexCount = (UINT)(MeshInfo.LodInfos[0].Indices.size());
-	submesh.StartIndexLocation = 0;
-	submesh.BaseVertexLocation = 0;
-
-	MeshGeo->DrawArgs[GeometryName] = submesh;
-	MeshGeo->Name = GeometryName;
-
-	FDXResources::GetInstance().AddDXMeshPrimitive(GeometryName, MeshGeo);
-}
-
-void FScene::BuilMeshAsset(const std::string& MapName)
-{
-	const auto& ActorInfors = FScene::GetInstance().GetActorInfos();
-	auto ActorInfosIter = ActorInfors.find(MapName);
-	if (ActorInfosIter != ActorInfors.end())
-	{
-		for (const auto& EnviroumentActor : ActorInfosIter->second.ActorsInfo)
-		{
-			std::string assetName = EnviroumentActor.MeshPrimitiveName;
-			if (assetName.size() <= 0)
-			{
-				continue;
-			}
-			assetName.erase(assetName.size() - 1, 1);
-			//OutputDebugStringA(assetName.c_str());
-			CalcVerticesAndIndices(assetName, EnviroumentActor.Transform);
-		}
-	}
-}
-
-void FScene::BuildActors(const std::string& MapName)
-{
-	ActorDir.clear();
-	ActorDir.insert({ MapName, {} });
-	auto Iter = ActorDir.find(MapName);
-	const auto& ActorInfors = FScene::GetInstance().GetActorInfos();
-	auto ActorInfosIter = ActorInfors.find(MapName);
-	if (ActorInfosIter->second.ActorsInfo.size() <= 0) return;
-	for (const auto& EnviroumentActor : ActorInfosIter->second.ActorsInfo)
-	{
-		std::string assetName = EnviroumentActor.MeshPrimitiveName;
-		if (assetName.size() <= 0)
-		{
-			continue;
-		}
-		assetName.erase(assetName.size() - 1, 1);
-		std::shared_ptr<Charalotte::FDXActorPrimitive> ActorAsset = std::make_shared<Charalotte::FDXActorPrimitive>();
-
-		ActorAsset->DXMeshPrimitive = FDXResources::GetInstance().GetDXMeshResourceByName(assetName);
-		if (ActorAsset->DXMeshPrimitive != nullptr)
-		{
-			ActorAsset->Transform = EnviroumentActor.Transform;
-
-			Iter->second.push_back(std::move(ActorAsset));
-		}
-	}
-}
 
 std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>& FScene::GetSceneActorByName(const std::string& MapName)
 {

@@ -186,7 +186,7 @@
     <ClInclude Include="Engine\WinMaterialData.h">
       <Filter>Header Files\Engine\Public\Material</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\MaterialSystem.h">
+    <ClInclude Include="Engine\FMaterial.h">
       <Filter>Header Files\Engine\Public\Material</Filter>
     </ClInclude>
     <ClInclude Include="Engine\AActor.h">
@@ -202,6 +202,9 @@
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
     <ClInclude Include="Engine\DXPrimitives.h">
+      <Filter>Header Files\Engine\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RHIResource.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
   </ItemGroup>
@@ -260,7 +263,7 @@
     <ClCompile Include="Engine\FMeshAsset.cpp">
       <Filter>Source Files\Engine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\MaterialSystem.cpp">
+    <ClCompile Include="Engine\FMaterial.cpp">
       <Filter>Source Files\Engine\Public\Material</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FDXResources.cpp">

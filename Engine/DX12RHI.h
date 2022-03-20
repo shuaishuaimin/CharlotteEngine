@@ -40,6 +40,12 @@ public:
 
 	virtual void BuildMeshAndActorPrimitives(const Charalotte::FActorPrimitive& Actors,
 		const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs) override;
+
+	virtual void BuildSceneResourceForRenderPlatform() override;
+
+	virtual void CompileMaterial() override;
+
+	virtual void DrawSceneByResource(Charalotte::DrawNecessaryData*) override;
 protected:
 	// flush fence
 	void FlushCommandQueue();
@@ -63,13 +69,25 @@ protected:
 	void BuildPSO();
 
 	// Build
-	void BuildDXMeshPrimiteives(const Charalotte::FActorPrimitive& ActorPrimitive, 
+	void BuildDXMeshPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive, 
 			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs);
+
+	void CompleteDXMeshPrimitives();
 	void CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform,
 			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs);
 	
 	void BuildDXActorPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive);
 
+	// Build heaps
+	void BuildDescriptorHeapsAndTables(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& Heap);
+
+	void BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap,
+		std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>>& ObjectCb);
+
+	void BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap, 
+				const FMaterial& Material);
+
+	void DebugDevice();
 protected:
 	// function for all
 	inline std::string wString2String(const std::wstring& ws) 

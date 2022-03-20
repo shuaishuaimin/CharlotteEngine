@@ -23,22 +23,13 @@ public:
 
 	void Update();
 
-	std::unordered_map<std::string, Charalotte::FActorPrimitive> GetActorInfos();
-
+	std::unordered_map<std::string, Charalotte::FActorPrimitive>& GetActorInfos();
 
 	void LoadMap(const std::string& MapName);
-
 
 	std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>>& GetActorDictionary();
 
 	std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>& GetSceneActorByName(const std::string& MapName);
-protected:
-
-	void CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform);
-
-	void BuilMeshAsset(const std::string& MapName);
-
-	void BuildActors(const std::string& MapName);
 
 private:
 	std::vector<std::shared_ptr<FCamera>> Cameras;
@@ -55,4 +46,6 @@ private:
 	std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>> EmptyActorVec;
 
 	std::string NowMapName;
+
+	std::unordered_map<std::string, int32_t> MeshPrimitiveTimes;
 };

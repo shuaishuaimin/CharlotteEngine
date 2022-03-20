@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FWinEventRegisterSystem.h"
+#include "DXPrimitives.h"
 
 FWinEventRegisterSystem::FWinEventRegisterSystem()
 {

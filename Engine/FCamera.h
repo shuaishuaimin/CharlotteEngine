@@ -1,5 +1,5 @@
 #pragma once
-#include "DXPrimitives.h"
+
 #include "FMathHelper.h"
 
 class FCamera

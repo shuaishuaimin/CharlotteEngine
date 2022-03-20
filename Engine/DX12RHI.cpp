@@ -247,9 +247,124 @@ bool DX12RHI::GetIsDeviceSucceed()
 void DX12RHI::BuildMeshAndActorPrimitives(const Charalotte::FActorPrimitive& Actors,
 	const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs)
 {
-	BuildDXMeshPrimiteives(Actors, Meshs);
+	BuildDXMeshPrimitives(Actors, Meshs);
 	BuildDXActorPrimitives(Actors);
 }
+
+void DX12RHI::BuildSceneResourceForRenderPlatform()
+{
+	CompleteDXMeshPrimitives();
+	for (auto& DXActorResource : FDXResources::GetInstance().GetDXActorResources())
+	{
+		BuildDescriptorHeapsAndTables(DXActorResource.second->CbvHeap);
+		BuildDescriptorHeapsAndTables(DXActorResource.second->SrvHeap);
+		BulidConstantBuffers(DXActorResource.second->CbvHeap, DXActorResource.second->ObjectCB);
+	}
+}
+
+void DX12RHI::CompileMaterial()
+{
+	for (auto& DXActorResource : FDXResources::GetInstance().GetDXActorResources())
+	{
+		BulidSRV(DXActorResource.second->SrvHeap, DXActorResource.second->Material);
+	}
+}
+
+void DX12RHI::DrawSceneByResource(Charalotte::DrawNecessaryData* DrawData)
+{
+	// Reuse the memory associated with command recording.
+	// we can only  reset when the associated command lists have finished execution on the GPU.
+	ThrowIfFailed(mDirectCmdListAlloc->Reset());
+
+	// A command list can be reset after it has been added to the command queue via ExecuteCommandList.
+	// Reusing the command list reuses memory.
+	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), mPSO.Get()));
+
+	// Set the viewport and scissor rect. This needs to be reset whenever the command list is reset.
+	mCommandList->RSSetViewports(1, &mScreenViewport);
+	mCommandList->RSSetScissorRects(1, &mScissorRect);
+
+	// Indicate a state transition on the resource usage.
+	auto BarrierTransPresentToRT = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	mCommandList->ResourceBarrier(1, &BarrierTransPresentToRT);
+
+	// Clear the back buffer and depth buffer.
+	mCommandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::LightPink, 0, nullptr);
+	mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
+	// Specify the buffers we are going to render to
+	auto CBV = CurrentBackBufferView();
+	auto DSV = DepthStencilView();
+	mCommandList->OMSetRenderTargets(1, &CBV, true, &DSV);
+
+	// IA
+	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
+
+	for (auto& ActorIns : FDXResources::GetInstance().GetDXActorResources())
+	{
+		auto MeshGeo = ActorIns.second->DXMeshPrimitive;
+		if (MeshGeo == nullptr)
+		{
+			continue;
+		}
+		ID3D12DescriptorHeap* descriptorHeaps[] = { ActorIns.second->SrvHeap.Get() };
+		mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
+		auto VertexBufferView = MeshGeo->VertexBufferView();
+		auto IndexBufferView = MeshGeo->IndexBufferView();
+		mCommandList->IASetVertexBuffers(0, 1, &VertexBufferView);
+		mCommandList->IASetIndexBuffer(&IndexBufferView);
+		mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		mCommandList->SetName(L"COOL");
+
+		auto count = MeshGeo->DrawArgs[MeshGeo->Name].IndexCount;
+		// use resource
+
+		mCommandList->SetGraphicsRoot32BitConstants(0, 4, &(DrawData->MainCameraData.Location), 0);
+
+		mCommandList->SetGraphicsRootConstantBufferView(1, ActorIns.second->ObjectCB->Resource()->GetGPUVirtualAddress());
+
+		mCommandList->SetGraphicsRootDescriptorTable(2, ActorIns.second->SrvHeap->GetGPUDescriptorHandleForHeapStart());
+
+		// update the constant buffer with the latest worldviewproj glm::mat4
+		Charalotte::ObjectConstants objConstants;
+		glm::mat4 NowVPTrans = DrawData->VPTransform.VPMatrix;
+		glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorIns.second->Transform);
+		auto& RotateStruct = ActorIns.second->Transform.Rotation;
+		glm::vec4 Rotate(RotateStruct.X, RotateStruct.Y, RotateStruct.Z, RotateStruct.W);
+		glm::mat4 NowRotate = FMathHelper::GetRotateMatrix(Rotate);
+		glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
+		objConstants.TransMatrix = glm::transpose(NowMVPTrans);
+		objConstants.Rotate = (NowRotate);
+		ActorIns.second->ObjectCB->CopyData(0, objConstants);
+
+		mCommandList->DrawIndexedInstanced(
+			MeshGeo->DrawArgs[MeshGeo->Name].IndexCount,
+			1, 0, 0, 0);
+	}
+
+	// Indicate a state transition on the resource usage.
+	auto BarrierTransRTToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+	mCommandList->ResourceBarrier(1, &BarrierTransRTToPresent);
+
+	// Done recording commands ! important ,otherwise gpu instantce will stop
+	ThrowIfFailed(mCommandList->Close());
+
+	// Add the command list to the queue for execution.
+	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
+	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+
+	// swap the back and front buffers
+	ThrowIfFailed(mSwapChain->Present(0, 0));
+	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
+
+	// Wait until frame commands are complete, this waiting is inefficient and is done for simplicity
+	// Later we will show how to organize our rendering code so we do not have to wait per frame
+	FlushCommandQueue();
+}
+
 // when input heap, we should two heap, that is rtvHeap and dsvHeap
 // their type is D3D12_DESCRIPTOR_HEAP_DESC
 // we should create description and its own information, that is way to explain heap 
@@ -325,7 +440,7 @@ void DX12RHI::CalcVerticesAndIndices(const std::string& GeometryName, const Char
 	FDXResources::GetInstance().AddDXMeshPrimitive(GeometryName, DXMeshPri);
 }
 
-void DX12RHI::BuildDXMeshPrimiteives(const Charalotte::FActorPrimitive& ActorPrimitive,
+void DX12RHI::BuildDXMeshPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive,
 			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs)
 {
 	for (const auto& Actor : ActorPrimitive.ActorsInfo)
@@ -340,6 +455,47 @@ void DX12RHI::BuildDXMeshPrimiteives(const Charalotte::FActorPrimitive& ActorPri
 	}	
 }
 
+// build dxmesh primitives and push it into dxresource
+void DX12RHI::CompleteDXMeshPrimitives()
+{
+	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
+	for (auto& MeshGeoIter : FDXResources::GetInstance().GetDXMeshResources())
+	{
+		Charalotte::FDXMeshPrimitive* MeshGeo = MeshGeoIter.second.get();
+		if (MeshGeo == nullptr)
+		{
+			continue;
+		}
+		const UINT vbByteSize = MeshGeo->GetVerticesSize();
+		const UINT ibByteSize = MeshGeo->GetIndicesSize();
+		ThrowIfFailed(D3DCreateBlob(vbByteSize, &MeshGeo->VertexBufferCPU));
+		CopyMemory(MeshGeo->VertexBufferCPU->GetBufferPointer(), MeshGeo->vertices.data(), vbByteSize);
+
+		ThrowIfFailed(D3DCreateBlob(ibByteSize, &MeshGeo->IndexBufferCPU));
+		CopyMemory(MeshGeo->IndexBufferCPU->GetBufferPointer(), MeshGeo->indices.data(), ibByteSize);
+
+		auto Device = md3dDevice.Get();
+		auto VerticeData = MeshGeo->vertices.data();
+		auto Commandlist = mCommandList.Get();
+
+		MeshGeo->VertexBufferGPU = FUtil::CreateDefaultBuffer(Device,
+			Commandlist, VerticeData, vbByteSize, MeshGeo->VertexBufferUploader);
+
+		MeshGeo->IndexBufferGPU = FUtil::CreateDefaultBuffer(md3dDevice.Get(),
+			mCommandList.Get(), MeshGeo->indices.data(), ibByteSize, MeshGeo->IndexBufferUploader);
+
+		MeshGeo->VertexByteStride = sizeof(Charalotte::Vertex);
+		MeshGeo->VertexBufferByteSize = vbByteSize;
+		MeshGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
+		MeshGeo->IndexBufferByteSize = ibByteSize;
+	}
+	ThrowIfFailed(mCommandList->Close());
+	ID3D12CommandList* cmdLists[] = { mCommandList.Get() };
+	mCommandQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
+	FlushCommandQueue();
+}
+
+// build dxactor primitives and push it into dxresource
 void DX12RHI::BuildDXActorPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive)
 {
 	FDXResources::GetInstance().ClearDXActorPrimitives();
@@ -516,6 +672,71 @@ void DX12RHI::BuildPSO()
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
 }
 
+// Build heaps
+void DX12RHI::BuildDescriptorHeapsAndTables(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& Heap)
+{
+	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
+	cbvHeapDesc.NumDescriptors = 10;
+	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	cbvHeapDesc.NodeMask = 0;
+	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&cbvHeapDesc,
+		IID_PPV_ARGS(&Heap)));
+}
+
+void DX12RHI::BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap,
+	std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>>& ObjectCb)
+{
+	ObjectCb = std::make_shared<UploadBuffer<Charalotte::ObjectConstants>>(md3dDevice.Get(), 1, true);
+
+	UINT objCBByteSize = FUtil::CalcConstantBufferByteSize(sizeof(Charalotte::ObjectConstants));
+
+	D3D12_GPU_VIRTUAL_ADDRESS cbAddress = ObjectCb->Resource()->GetGPUVirtualAddress();
+	// Offset to the ith object constant buffer in the buffer.
+
+	// why we use 0??
+	int boxCBufIndex = 0;
+
+	cbAddress += boxCBufIndex * objCBByteSize;
+
+	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
+	cbvDesc.BufferLocation = cbAddress;
+	cbvDesc.SizeInBytes = FUtil::CalcConstantBufferByteSize(sizeof(Charalotte::ObjectConstants));
+
+	md3dDevice->CreateConstantBufferView(
+		&cbvDesc,
+		CbvHeap->GetCPUDescriptorHandleForHeapStart());
+}
+
+void DX12RHI::BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap, 
+			const FMaterial& Material)
+{
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	std::string TextureName = Material.GetTexture();
+	std::string NormalName =Material.GetNormal();
+
+	auto TextureResource = FDXResources::GetInstance().GetDXTextResourceByName(TextureName);
+	auto NormalResource = FDXResources::GetInstance().GetDXTextResourceByName(NormalName);
+	srvDesc.Format = TextureResource->Resource->GetDesc().Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = TextureResource->Resource->GetDesc().MipLevels;
+	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE CPUHandle = SrvHeap->GetCPUDescriptorHandleForHeapStart();
+
+	md3dDevice->CreateShaderResourceView(
+		TextureResource->Resource.Get(),
+		&srvDesc,
+		CPUHandle);
+	CPUHandle.ptr += mCbvSrvUavDescriptorSize;
+	md3dDevice->CreateShaderResourceView(
+		NormalResource->Resource.Get(),
+		&srvDesc,
+		CPUHandle);
+}
 D3D12_CPU_DESCRIPTOR_HANDLE DX12RHI::DepthStencilView()const
 {
 	return mDsvHeap->GetCPUDescriptorHandleForHeapStart();
@@ -604,4 +825,16 @@ void DX12RHI::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 
 		::OutputDebugString(text.c_str());
 	}
+}
+
+void DX12RHI::DebugDevice()
+{
+#if defined(DEBUG) || defined(_DEBUG)
+{
+	ID3D12DebugDevice* pDebugDevice = nullptr;
+	md3dDevice->QueryInterface(&pDebugDevice);
+	pDebugDevice->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
+	pDebugDevice->Release();
+}
+#endif
 }

@@ -2,6 +2,7 @@
 #include "FCamera.h"
 #include "FScene.h"
 #include "CharlotteEngine.h"
+#include "DXPrimitives.h"
 
 #if PLATFORM_WINDOWS
 #include "FWinEventRegisterSystem.h"

@@ -3,7 +3,7 @@
 #include "BaseStructAllPlatform.h"
 #include "FUploadBuffer.h"
 #include "WinMaterialData.h"
-#include "MaterialSystem.h"
+#include "FMaterial.h"
 
 class DXPrimitives
 {
@@ -122,7 +122,8 @@ namespace Charalotte
 		glm::mat4 VPTrans = glm::mat4(1.0f);
 
 		glm::mat4 MTrans = glm::mat4(1.0f);
-		
+
+		FMaterial Material;
 	};
 }
 
