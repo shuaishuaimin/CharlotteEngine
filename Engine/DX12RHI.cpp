@@ -718,8 +718,8 @@ void DX12RHI::BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap,
 	std::string TextureName = Material->GetTexture();
 	std::string NormalName = Material->GetNormal();
 
-	auto TextureResource = FDXResources::GetInstance().GetDXTextResourceByName(TextureName);
-	auto NormalResource = FDXResources::GetInstance().GetDXTextResourceByName(NormalName);
+	const auto& TextureResource = FDXResources::GetInstance().GetDXTextResourceByName(TextureName);
+	const auto& NormalResource = FDXResources::GetInstance().GetDXTextResourceByName(NormalName);
 	srvDesc.Format = TextureResource->Resource->GetDesc().Format;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;

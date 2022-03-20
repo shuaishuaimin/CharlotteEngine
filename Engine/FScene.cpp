@@ -54,6 +54,7 @@ void FScene::LoadMap(const std::string& MapName) {
 	int TextureNum = TextureNames.size();
 	int TempTextureIndex = 0;
 	std::set<std::string> AssetNames;
+	bool cool = false;
 	for (auto& ActorInfor : TempActorInfors.ActorsInfo)
 	{
 		std::string AssetName = ActorInfor.MeshPrimitiveName;
@@ -78,17 +79,24 @@ void FScene::LoadMap(const std::string& MapName) {
 		AssetNames.insert(AssetName);
 
 		// test use different texture
-		if (TextureNum <= 0)
+		if (cool)
 		{
-			continue;
+			ActorInfor.Material->SetTexture("ice");
+			cool = false;
 		}
-		ActorInfor.Material->SetTexture("ice");
+		else
+		{
+			ActorInfor.Material->SetTexture("bricks");
+			cool = true;
+		}
+		
 		/*if (TempTextureIndex < TextureNum)
 		{
 			ActorInfor.Material->SetTexture(TextureNames[1]);
 			TempTextureIndex++;
 		}
 		else
+
 		{
 			TempTextureIndex = 0;
 		}*/
