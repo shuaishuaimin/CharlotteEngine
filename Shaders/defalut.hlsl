@@ -58,7 +58,7 @@ float4 PS(VertexOut pin) : SV_Target
 	float4 diffuseAlbedo = gDiffuseMap.Sample(gsamLiner, pin.TexC);
 	float4 normal = gNormalMap.Sample(gsamLiner, pin.TexC);
 	float4 Result = float4( diffuseAlbedo.x*normal.x, diffuseAlbedo.y * normal.y, diffuseAlbedo.z * normal.z, 1.0f);
-    return diffuseAlbedo;
+    return Result;
 }
 
 
