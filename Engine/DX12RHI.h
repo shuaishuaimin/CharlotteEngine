@@ -75,7 +75,7 @@ protected:
 	void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
 
 	// pipeline
-	void BuildRootSignature();
+	void BuildRootSignature(Charalotte::PSOType psoType);
 	void BuildShadersAndInputLayOut();
 	void BuildPSO();
 

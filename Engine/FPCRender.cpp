@@ -58,12 +58,12 @@ void FPCRender::Update()
 	const auto& ActorIter = Actors.find(NowMapName);
 	if (ActorIter != Actors.end())
 	{
-		RHIIns->DrawPrepare(Charalotte::Default);
+		RHIIns->DrawPrepare(Charalotte::Shadow);
 		for (const auto& ActorPri : ActorIter->second.ActorsInfo)
 		{
 			RHIIns->DrawActor(ActorPri, DrawData.get());
 		}
-		RHIIns->DrawEnd();
+		RHIIns->DrawShadowEnd() ;
 	}
 }
 

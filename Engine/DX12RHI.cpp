@@ -124,7 +124,7 @@ bool DX12RHI::InitRenderPlatform(FWindow* WindowPtr)
 bool DX12RHI::InitRenderPipeline()
 {
 	BuildShadersAndInputLayOut();
-	BuildRootSignature();
+	BuildRootSignature(Charalotte::Default);
 	BuildPSO();
 	return true;
 }
@@ -401,6 +401,7 @@ void DX12RHI::BuildShadowPSO()
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&ShadowPso.mPSO)));
 
 	PSOs->InsertNewPSO(Charalotte::Shadow, ShadowPso);
+	BuildRootSignature(Charalotte::Shadow);
 }
 
 void DX12RHI::BuildShadowDescriptors()
@@ -679,10 +680,10 @@ void DX12RHI::FlushCommandQueue()
 		CloseHandle(eventHandle);
 	}
 }
-void DX12RHI::BuildRootSignature()
+void DX12RHI::BuildRootSignature(Charalotte::PSOType psoType)
 {
 	bool GetPSOSuccess = false;
-	auto& Pso = PSOs->GetPSOReference(Charalotte::Default, GetPSOSuccess);
+	auto& Pso = PSOs->GetPSOReference(psoType, GetPSOSuccess);
 	if (!GetPSOSuccess)
 	{
 		return;
@@ -982,13 +983,12 @@ void DX12RHI::RegisterPSOFunc()
 		mCommandList->RSSetScissorRects(1, &mScissorRect);
 
 		// Indicate a state transition on the resource usage.
-		auto BarrierTransPresentToRT = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+		auto BarrierTransPresentToRT = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
 			D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 		mCommandList->ResourceBarrier(1, &BarrierTransPresentToRT);
 
 		auto DSV = ShadowMap->GetDsv();
 		// Clear the back buffer and depth buffer.
-		mCommandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::LightPink, 0, nullptr);
 		mCommandList->ClearDepthStencilView(ShadowMap->GetDsv(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
 		mCommandList->OMSetRenderTargets(0, nullptr, true, &DSV);

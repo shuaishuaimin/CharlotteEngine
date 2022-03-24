@@ -51,6 +51,10 @@ namespace Charalotte
 				return EmptyPSO;
 			}
 		}
+		std::unordered_map<Charalotte::PSOType, Charalotte::PSO>& GetPSOs()
+		{
+			return PSOs;
+		}
 	private:
 		std::unordered_map<Charalotte::PSOType, Charalotte::PSO> PSOs;
 		Charalotte::PSO EmptyPSO;
