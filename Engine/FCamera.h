@@ -10,7 +10,7 @@ public:
 	~FCamera();
 
 	void GetVPTransform(glm::mat4& Matrix);
-	void TransformCamera(const Charalotte::CameraTransform& Transform);
+	void TransformObject(const Charalotte::CameraTransform& Transform);
 	void ChangeAspectRatio(float NewAspectRatio);
 	void ChangeFovAngle(float NewFovAngle);
 	void AddFovAngle(float AngleForAdd);
@@ -21,7 +21,7 @@ public:
 	static Charalotte::FPoint2D LastCameraMousePos;
 protected:
 	void CalcVPMatrix();
-	void RegisterCameraInput();
+	void RegisterObjectInput();
 
 private:
 	Charalotte::VPTransformData VPTransform;

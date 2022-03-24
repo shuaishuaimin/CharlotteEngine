@@ -18,6 +18,8 @@
 #include "FUploadBuffer.h"
 #include "FWinEventRegisterSystem.h"
 #include "FDXResources.h"
+#include "DX12RHIData.h"
+#include "FDXPSOs.h"
 
 //#pragma comment(lib,"d3dcompiler.lib")
 //#pragma comment(lib, "D3D12.lib")
@@ -46,7 +48,11 @@ public:
 
 	virtual void CompileMaterial() override;
 
-	virtual void DrawSceneByResource(Charalotte::DrawNecessaryData*) override;
+	virtual void DrawPrepare(Charalotte::PSOType psoType) override;
+	virtual void DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData) override;
+	virtual void DrawEnd() override;
+
+	virtual void BuildShadowPSO() override;
 protected:
 	// flush fence
 	void FlushCommandQueue();
@@ -139,12 +145,7 @@ private:
 	UINT mCurrentFence = 0;
 
 	// pipeline
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
-	Microsoft::WRL::ComPtr<ID3DBlob> mvsByteCode = nullptr;
-	Microsoft::WRL::ComPtr<ID3DBlob> mpsByteCode = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> mPSO = nullptr;
-
-	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
+	std::unique_ptr<Charalotte::FDXPSOs> PSOs; 
 
 	// set true to use 4X MSAA ,the default is false
 	bool m4xMsaaState = false; // 4X MSAA enabled;

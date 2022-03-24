@@ -22,14 +22,14 @@
 #pragma comment(lib, "D3D12.lib")
 #pragma comment(lib, "dxgi.lib")
 
-class FWinRender : public FRender
+class FPCRender : public FRender
 {
 public:
-	FWinRender();
+	FPCRender();
 	// ban copy constructor and assignment
-	FWinRender(const FWinRender& dm) = delete;
-	FWinRender operator= (const FWinRender& dm) = delete;
-	virtual ~FWinRender();
+	FPCRender(const FPCRender& dm) = delete;
+	FPCRender operator= (const FPCRender& dm) = delete;
+	virtual ~FPCRender();
 
 	virtual bool Initialize()override;
 
@@ -45,4 +45,6 @@ private:
 	std::unique_ptr<RHI> RHIIns;
 
 	std::shared_ptr<Charalotte::DrawNecessaryData> DrawData;
+
+	std::string NowMapName;
 };

@@ -13,7 +13,7 @@ FCamera::FCamera(const Charalotte::CameraData& Data) : MainCameraData(Data), Sen
 	VPTransform.ViewTransform = glm::mat4(1.0f);
 	VPTransform.ProjectionTransform = glm::mat4(1.0f);;
 	CalcVPMatrix();
-	RegisterCameraInput();
+	RegisterObjectInput();
 	
 }
 FCamera::FCamera() : Sensitivity(1.5)
@@ -32,7 +32,7 @@ FCamera::FCamera() : Sensitivity(1.5)
 	VPTransform.ViewTransform = glm::mat4(1.0f);
 	VPTransform.ProjectionTransform = glm::mat4(1.0f);;
 	CalcVPMatrix();
-	RegisterCameraInput();
+	RegisterObjectInput();
 	CharalotteEngine::GetInstance().GetWindowPtr()->SetCameraSen(this->Sensitivity);
 }
 
@@ -49,7 +49,7 @@ void FCamera::GetVPTransform(glm::mat4& Matrix)
 }
 
 // Can not use
-void FCamera::TransformCamera(const Charalotte::CameraTransform& Transform)
+void FCamera::TransformObject(const Charalotte::CameraTransform& Transform)
 {
 	auto Result = MainCameraData.Target;
 	glm::mat4 DisplacementMatrix = glm::mat4(1.0f);
@@ -112,49 +112,49 @@ void FCamera::BackCameraLocation(const glm::vec4& CameraLocation, const glm::vec
 	CalcVPMatrix();
 }
 
-void FCamera::RegisterCameraInput()
+void FCamera::RegisterObjectInput()
 {
 	//float KeySe = 0.3f;
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('A', [this]() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
 		float KeySe = this->Sensitivity;
 		Trans.Translation.y -= KeySe;
-		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
+		FScene::GetInstance().GetCamera()->TransformObject(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('D', [this]() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
 		float KeySe = 1.5f;
 		Trans.Translation.y += this->Sensitivity;
-		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
+		FScene::GetInstance().GetCamera()->TransformObject(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('W', [this]() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
 		float KeySe = 1.5f;
 		Trans.Translation.x += this->Sensitivity;
-		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
+		FScene::GetInstance().GetCamera()->TransformObject(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('S', [this]() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
 		float KeySe = 1.5f;
 		Trans.Translation.x -= this->Sensitivity;
-		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
+		FScene::GetInstance().GetCamera()->TransformObject(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('Q', [this]() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
 		float KeySe = 1.5f;
 		Trans.Translation.z -= this->Sensitivity;
-		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
+		FScene::GetInstance().GetCamera()->TransformObject(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('E', [this]() {
 		auto Trans = FScene::GetInstance().GetCameraTrans();
 		float KeySe = 1.5f;
 		Trans.Translation.z += this->Sensitivity;
-		FScene::GetInstance().GetCamera()->TransformCamera(Trans);
+		FScene::GetInstance().GetCamera()->TransformObject(Trans);
 		FScene::GetInstance().InitCameraTrans();
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('O', []() {
@@ -200,7 +200,7 @@ void FCamera::RegisterCameraInput()
 			float dy = -MouseSe * static_cast<float>(Mouse.y - FCamera::LastCameraMousePos.y);
 			auto& CameraTrans = FScene::GetInstance().GetCameraTrans();
 			CameraTrans.row += (dx + dy);
-			FScene::GetInstance().GetCamera()->TransformCamera(CameraTrans);
+			FScene::GetInstance().GetCamera()->TransformObject(CameraTrans);
 			FScene::GetInstance().InitCameraTrans();
 		}
 		else if ((Mouse.btnState & MK_RBUTTON) != 0)
@@ -211,7 +211,7 @@ void FCamera::RegisterCameraInput()
 			float dy = MouseSe * static_cast<float>(Mouse.y - FCamera::LastCameraMousePos.y);
 			auto& CameraTrans = FScene::GetInstance().GetCameraTrans();
 			CameraTrans.pitch += (dx + dy);
-			FScene::GetInstance().GetCamera()->TransformCamera(CameraTrans);
+			FScene::GetInstance().GetCamera()->TransformObject(CameraTrans);
 			FScene::GetInstance().InitCameraTrans();
 		}
 

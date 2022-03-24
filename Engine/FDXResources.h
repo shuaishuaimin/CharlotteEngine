@@ -24,6 +24,8 @@ public:
 	void ClearDXActorPrimitives();
 
 	std::unordered_map<std::string, std::shared_ptr<Charalotte::FDXActorPrimitive>>& GetDXActorResources();
+
+	Charalotte::FDXActorPrimitive* GetDXActorResourcesByName(const std::string& DXActorName);
 private:
 	std::unordered_map<std::string, std::shared_ptr<Charalotte::FDXMeshPrimitive>> MeshResources;
 	std::unordered_map<std::string, std::shared_ptr<Charalotte::DXTextureResource>> TextureResources;

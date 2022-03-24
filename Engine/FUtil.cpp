@@ -107,6 +107,7 @@ ComPtr<ID3DBlob> FUtil::CompileShader(
 		entrypoint.c_str(), target.c_str(), compileFlags, 0, &byteCode, &errors);
 
 	if (errors != nullptr)
+
 		OutputDebugStringA((char*)errors->GetBufferPointer());
 
 	ThrowIfFailed(hr);

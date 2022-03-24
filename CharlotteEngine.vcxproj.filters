@@ -112,6 +112,15 @@
     <Filter Include="Source Files\Engine\RHI">
       <UniqueIdentifier>{d1a455d3-cea4-4094-a499-472738e389b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Engine\Platform\Render\Shadow">
+      <UniqueIdentifier>{971aa123-ed43-4e15-a377-972ce0c6b60e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Platform\Render\Device">
+      <UniqueIdentifier>{6d1eb19c-2dda-45fd-a160-54aae299b53c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Render">
+      <UniqueIdentifier>{c289e6da-a823-4e5d-8bac-0468f926c317}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\d3dx12.h">
@@ -149,9 +158,6 @@
     </ClInclude>
     <ClInclude Include="Engine\BaseStructAllPlatform.h">
       <Filter>Header Files\Engine\Public\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\FWinRender.h">
-      <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GameLogic.h">
       <Filter>Header Files\Game</Filter>
@@ -210,6 +216,24 @@
     <ClInclude Include="Engine\Primitive.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\FDXShadowMap.h">
+      <Filter>Header Files\Engine\Platform\Render\Shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FDevice.h">
+      <Filter>Header Files\Engine\Platform\Render\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FDXDevice.h">
+      <Filter>Header Files\Engine\Platform\Render\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DX12RHIData.h">
+      <Filter>Header Files\Engine\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FPCRender.h">
+      <Filter>Header Files\Engine\Platform\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FDXPSOs.h">
+      <Filter>Header Files\Engine\RHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\DDSTextureLoader.cpp">
@@ -260,9 +284,6 @@
     <ClCompile Include="UStaticMesh.cpp">
       <Filter>Source Files\Game\Actor</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FWinRender.cpp">
-      <Filter>Source Files\Engine\Platform</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\FMeshAsset.cpp">
       <Filter>Source Files\Engine\Scene</Filter>
     </ClCompile>
@@ -274,6 +295,12 @@
     </ClCompile>
     <ClCompile Include="Engine\DX12RHI.cpp">
       <Filter>Source Files\Engine\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FPCRender.cpp">
+      <Filter>Source Files\Engine\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FDXShadowMap.cpp">
+      <Filter>Source Files\Engine\Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

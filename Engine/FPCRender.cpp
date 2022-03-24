@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <WindowsX.h>
 #include <string>
-#include "FWinRender.h"
+#include "FPCRender.h"
 #include "FDataProcessor.h"
 #include "FDXResources.h"
 #include "CharlotteEngine.h"
@@ -17,7 +17,7 @@ using Microsoft::WRL::ComPtr;
 using namespace DirectX::PackedVector;
 using std::string;
 
-FWinRender::FWinRender()
+FPCRender::FPCRender()
 {
 	RHIIns = std::make_unique<DX12RHI>();
 	FWinEventRegisterSystem::GetInstance().RegisterMapLoadEventForDender(Charalotte::BaseMapLoad, [this](const std::string& MapName) {
@@ -30,12 +30,12 @@ FWinRender::FWinRender()
 }
 
 
-FWinRender::~FWinRender()
+FPCRender::~FPCRender()
 {
 	
 }
 
-bool FWinRender::Initialize()
+bool FPCRender::Initialize()
 {
 	if (!RHIIns->InitRenderPlatform(CharalotteEngine::GetInstance().GetWindowPtr()))
 	{
@@ -48,20 +48,31 @@ bool FWinRender::Initialize()
 }
 
 // draw by camera data
-void FWinRender::Update()
+void FPCRender::Update()
 {
 	FScene::GetInstance().GetCamera()->GetCameraData(DrawData->MainCameraData);
 	FScene::GetInstance().GetCamera()->GetVPTransform(DrawData->VPTransform.VPMatrix);
-	RHIIns->DrawSceneByResource(DrawData.get());
+	const auto& Actors = FScene::GetInstance().GetActorInfos();
+	const auto& ActorIter = Actors.find(NowMapName);
+	if (ActorIter != Actors.end())
+	{
+		RHIIns->DrawPrepare(Charalotte::Default);
+		for (const auto& ActorPri : ActorIter->second.ActorsInfo)
+		{
+			RHIIns->DrawActor(ActorPri, DrawData.get());
+		}
+		RHIIns->DrawEnd();
+	}
 }
 
-bool FWinRender::GetIsDevicedSucceed()
+bool FPCRender::GetIsDevicedSucceed()
 {
 	return RHIIns->GetIsDeviceSucceed();
 }
 
-void FWinRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
+void FPCRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 {
+	NowMapName = MapName;
 	const auto& ActorPrimitiveIter = FScene::GetInstance().GetActorInfos().find(MapName);
 	auto Actors = FScene::GetInstance().GetActorInfos();
 	if (ActorPrimitiveIter != FScene::GetInstance().GetActorInfos().end())

@@ -105,4 +105,10 @@ namespace Charalotte
 	{
 		DXRenderResize
 	};
+
+	enum PSOType
+	{
+		Default,
+		Shadow
+	};
 }

@@ -69,3 +69,16 @@ std::unordered_map<std::string, std::shared_ptr<Charalotte::FDXActorPrimitive>>&
 {
 	return ActorResources;
 }
+
+Charalotte::FDXActorPrimitive* FDXResources::GetDXActorResourcesByName(const std::string& DXActorName)
+{
+	const auto& Iter = ActorResources.find(DXActorName);
+	if (Iter != ActorResources.end())
+	{
+		return Iter->second.get();
+	}
+	else
+	{
+		return nullptr;
+	}
+}

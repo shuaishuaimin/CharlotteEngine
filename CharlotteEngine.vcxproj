@@ -148,6 +148,11 @@
     <ClInclude Include="Engine\BaseStructAllPlatform.h" />
     <ClInclude Include="Engine\CharlotteEngine.h" />
     <ClInclude Include="Engine\DX12RHI.h" />
+    <ClInclude Include="Engine\DX12RHIData.h" />
+    <ClInclude Include="Engine\FDevice.h" />
+    <ClInclude Include="Engine\FDXDevice.h" />
+    <ClInclude Include="Engine\FDXPSOs.h" />
+    <ClInclude Include="Engine\FDXShadowMap.h" />
     <ClInclude Include="Engine\FMeshAsset.h" />
     <ClInclude Include="Engine\FRender.h" />
     <ClInclude Include="Engine\GameInstance.h" />
@@ -166,7 +171,7 @@
     <ClInclude Include="Engine\d3dx12.h" />
     <ClInclude Include="Engine\FCamera.h" />
     <ClInclude Include="Engine\FDataProcessor.h" />
-    <ClInclude Include="Engine\FWinRender.h" />
+    <ClInclude Include="Engine\FPCRender.h" />
     <ClInclude Include="Engine\DDSTextureLoader.h" />
     <ClInclude Include="Engine\FGameTimer.h" />
     <ClInclude Include="Engine\FUploadBuffer.h" />
@@ -181,6 +186,7 @@
     <ClCompile Include="Engine\CharlotteEngine.cpp" />
     <ClCompile Include="Engine\DDSTextureLoader.cpp" />
     <ClCompile Include="Engine\DX12RHI.cpp" />
+    <ClCompile Include="Engine\FDXShadowMap.cpp" />
     <ClCompile Include="Engine\FMeshAsset.cpp" />
     <ClCompile Include="Engine\FScene.cpp" />
     <ClCompile Include="Engine\FDXResources.cpp" />
@@ -190,7 +196,7 @@
     <ClCompile Include="Engine\FWin32Window.cpp" />
     <ClCompile Include="Engine\FCamera.cpp" />
     <ClCompile Include="Engine\FDataProcessor.cpp" />
-    <ClCompile Include="Engine\FWinRender.cpp" />
+    <ClCompile Include="Engine\FPCRender.cpp" />
     <ClCompile Include="Engine\FGameTimer.cpp" />
     <ClCompile Include="Engine\FUtil.cpp" />
     <ClCompile Include="Engine\FMathHelper.cpp" />

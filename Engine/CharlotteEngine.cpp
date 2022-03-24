@@ -3,13 +3,13 @@
 #include "FScene.h"
 #include "thread"
 #if PLATFORM_WINDOWS
-#include "FWinRender.h"
+#include "FPCRender.h"
 #endif
 
 CharalotteEngine::CharalotteEngine() {
 	WindowIns = this->CreateMainWindow();
 #if PLATFORM_WINDOWS
-	RenderIns = std::make_unique<FWinRender>();
+	RenderIns = std::make_unique<FPCRender>();
 #endif
 	Timer = std::make_unique<FGameTimer>();
 	TextureArray = {"bricks", "bricks2", "bricks3", "grass", "ice", "stone", "tile", "WireFence", "WoodCrate01"};

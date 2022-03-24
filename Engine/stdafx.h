@@ -22,6 +22,7 @@
 #include "FGameTimer.h"
 #include "FMaterial.h"
 #include "RHI.h"
+#include "FRender.h"
 
 
 #if PLATFORM_WINDOWS
@@ -40,5 +41,6 @@
 #include "FDataProcessor.h"
 #include "FCamera.h"
 #include "FScene.h"
+#include "DX12RHI.h"
 #endif
 	

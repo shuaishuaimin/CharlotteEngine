@@ -14,6 +14,7 @@ DX12RHI::DX12RHI() {
 	mClientWidth = 1980;
 	mClientHeight = 1280;
 	IsDeviceSucceed = false;
+	PSOs = std::make_unique<Charalotte::FDXPSOs>();
 }
 
 DX12RHI::~DX12RHI()
@@ -270,15 +271,21 @@ void DX12RHI::CompileMaterial()
 	}
 }
 
-void DX12RHI::DrawSceneByResource(Charalotte::DrawNecessaryData* DrawData)
+void DX12RHI::DrawPrepare(Charalotte::PSOType psoType)
 {
+	bool IsPSOGetSucceed = false;
+	Charalotte::PSO& Pso = PSOs->GetPSOReference(psoType, IsPSOGetSucceed);
+	if (!IsPSOGetSucceed)
+	{
+		return;
+	}
 	// Reuse the memory associated with command recording.
 	// we can only  reset when the associated command lists have finished execution on the GPU.
 	ThrowIfFailed(mDirectCmdListAlloc->Reset());
 
 	// A command list can be reset after it has been added to the command queue via ExecuteCommandList.
 	// Reusing the command list reuses memory.
-	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), mPSO.Get()));
+	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), Pso.mPSO.Get()));
 
 	// Set the viewport and scissor rect. This needs to be reset whenever the command list is reset.
 	mCommandList->RSSetViewports(1, &mScreenViewport);
@@ -299,50 +306,55 @@ void DX12RHI::DrawSceneByResource(Charalotte::DrawNecessaryData* DrawData)
 	mCommandList->OMSetRenderTargets(1, &CBV, true, &DSV);
 
 	// IA
-	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
+	mCommandList->SetGraphicsRootSignature(Pso.mRootSignature.Get());
 
-	for (auto& ActorIns : FDXResources::GetInstance().GetDXActorResources())
+}
+void DX12RHI::DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData)
+{
+	auto ActorInsPtr = FDXResources::GetInstance().GetDXActorResourcesByName(Actor.ActorPrimitiveName);
+	if (ActorInsPtr == nullptr)
 	{
-		auto MeshGeo = ActorIns.second->DXMeshPrimitive;
-		if (MeshGeo == nullptr)
-		{
-			continue;
-		}
-		ID3D12DescriptorHeap* descriptorHeaps[] = { ActorIns.second->SrvHeap.Get() };
-		mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-
-		auto VertexBufferView = MeshGeo->VertexBufferView();
-		auto IndexBufferView = MeshGeo->IndexBufferView();
-		mCommandList->IASetVertexBuffers(0, 1, &VertexBufferView);
-		mCommandList->IASetIndexBuffer(&IndexBufferView);
-		mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		mCommandList->SetName(L"COOL");
-
-		auto count = MeshGeo->DrawArgs[MeshGeo->Name].IndexCount;
-		// use resource
-
-		mCommandList->SetGraphicsRoot32BitConstants(0, 4, &(DrawData->MainCameraData.Location), 0);
-
-		mCommandList->SetGraphicsRootConstantBufferView(1, ActorIns.second->ObjectCB->Resource()->GetGPUVirtualAddress());
-
-		mCommandList->SetGraphicsRootDescriptorTable(2, ActorIns.second->SrvHeap->GetGPUDescriptorHandleForHeapStart());
-
-		// update the constant buffer with the latest worldviewproj glm::mat4
-		Charalotte::ObjectConstants objConstants;
-		glm::mat4 NowVPTrans = DrawData->VPTransform.VPMatrix;
-		glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorIns.second->Transform);
-		auto& RotateStruct = ActorIns.second->Transform.Rotation;
-		glm::vec4 Rotate(RotateStruct.X, RotateStruct.Y, RotateStruct.Z, RotateStruct.W);
-		glm::mat4 NowRotate = FMathHelper::GetRotateMatrix(Rotate);
-		glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
-		objConstants.TransMatrix = glm::transpose(NowMVPTrans);
-		objConstants.Rotate = (NowRotate);
-		ActorIns.second->ObjectCB->CopyData(0, objConstants);
-
-		mCommandList->DrawIndexedInstanced(
-			MeshGeo->DrawArgs[MeshGeo->Name].IndexCount,
-			1, 0, 0, 0);
+		return;
 	}
+	auto MeshGeo = ActorInsPtr->DXMeshPrimitive;
+
+	ID3D12DescriptorHeap* descriptorHeaps[] = { ActorInsPtr->SrvHeap.Get() };
+	mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
+	auto VertexBufferView = MeshGeo->VertexBufferView();
+	auto IndexBufferView = MeshGeo->IndexBufferView();
+	mCommandList->IASetVertexBuffers(0, 1, &VertexBufferView);
+	mCommandList->IASetIndexBuffer(&IndexBufferView);
+	mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	mCommandList->SetName(L"COOL");
+
+	auto count = MeshGeo->DrawArgs[MeshGeo->Name].IndexCount;
+	// use resource
+
+	mCommandList->SetGraphicsRoot32BitConstants(0, 4, &(DrawData->MainCameraData.Location), 0);
+
+	mCommandList->SetGraphicsRootConstantBufferView(1, ActorInsPtr->ObjectCB->Resource()->GetGPUVirtualAddress());
+
+	mCommandList->SetGraphicsRootDescriptorTable(2, ActorInsPtr->SrvHeap->GetGPUDescriptorHandleForHeapStart());
+
+	// update the constant buffer with the latest worldviewproj glm::mat4
+	Charalotte::ObjectConstants objConstants;
+	glm::mat4 NowVPTrans = DrawData->VPTransform.VPMatrix;
+	glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorInsPtr->Transform);
+	auto& RotateStruct = ActorInsPtr->Transform.Rotation;
+	glm::vec4 Rotate(RotateStruct.X, RotateStruct.Y, RotateStruct.Z, RotateStruct.W);
+	glm::mat4 NowRotate = FMathHelper::GetRotateMatrix(Rotate);
+	glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
+	objConstants.TransMatrix = glm::transpose(NowMVPTrans);
+	objConstants.Rotate = (NowRotate);
+	ActorInsPtr->ObjectCB->CopyData(0, objConstants);
+
+	mCommandList->DrawIndexedInstanced(
+		MeshGeo->DrawArgs[MeshGeo->Name].IndexCount,
+		1, 0, 0, 0);
+}
+void DX12RHI::DrawEnd()
+{
 
 	// Indicate a state transition on the resource usage.
 	auto BarrierTransRTToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
@@ -363,6 +375,49 @@ void DX12RHI::DrawSceneByResource(Charalotte::DrawNecessaryData* DrawData)
 	// Wait until frame commands are complete, this waiting is inefficient and is done for simplicity
 	// Later we will show how to organize our rendering code so we do not have to wait per frame
 	FlushCommandQueue();
+}
+
+void DX12RHI::BuildShadowPSO()
+{
+	bool GetPSOSuccess = false;
+	auto& DefaultPso = PSOs->GetPSOReference(Charalotte::Default, GetPSOSuccess);
+	if (!GetPSOSuccess)
+	{
+		return;
+	}
+	Charalotte::PSO ShadowPso;
+	ShadowPso.mpsByteCode = DefaultPso.mpsByteCode;
+	ShadowPso.mvsByteCode = DefaultPso.mvsByteCode;
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
+	SecureZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+	psoDesc.InputLayout = { DefaultPso.mInputLayout.data(), (UINT)DefaultPso.mInputLayout.size() };
+	psoDesc.pRootSignature = DefaultPso.mRootSignature.Get();
+	psoDesc.VS =
+	{
+		reinterpret_cast<BYTE*>(DefaultPso.mvsByteCode->GetBufferPointer()),
+			DefaultPso.mvsByteCode->GetBufferSize()
+	};
+
+	psoDesc.PS =
+	{
+		reinterpret_cast<BYTE*>(DefaultPso.mpsByteCode->GetBufferPointer()),
+			DefaultPso.mpsByteCode->GetBufferSize()
+	};
+	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	psoDesc.RasterizerState.FrontCounterClockwise = TRUE;
+	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	psoDesc.SampleMask = UINT_MAX;
+	// D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE
+	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	psoDesc.NumRenderTargets = 0;
+	psoDesc.RTVFormats[0] = DXGI_FORMAT_UNKNOWN;
+	psoDesc.SampleDesc.Count = m4xMsaaState ? 4 : 1;
+	psoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
+	psoDesc.DSVFormat = mDepthStencilFormat;
+	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&ShadowPso.mPSO)));
+
+	PSOs->InsertNewPSO(Charalotte::Shadow, ShadowPso);
 }
 
 // when input heap, we should two heap, that is rtvHeap and dsvHeap
@@ -455,7 +510,7 @@ void DX12RHI::BuildDXMeshPrimitives(const Charalotte::FActorPrimitive& ActorPrim
 	}	
 }
 
-// build dxmesh primitives and push it into dxresource
+// build dx mesh primitives and push it into dx resource
 void DX12RHI::CompleteDXMeshPrimitives()
 {
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
@@ -495,7 +550,7 @@ void DX12RHI::CompleteDXMeshPrimitives()
 	FlushCommandQueue();
 }
 
-// build dxactor primitives and push it into dxresource
+// build dx actor primitives and push it into dx resource
 void DX12RHI::BuildDXActorPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive)
 {
 	FDXResources::GetInstance().ClearDXActorPrimitives();
@@ -620,20 +675,30 @@ void DX12RHI::FlushCommandQueue()
 }
 void DX12RHI::BuildRootSignature()
 {
+	bool GetPSOSuccess = false;
+	auto& Pso = PSOs->GetPSOReference(Charalotte::Default, GetPSOSuccess);
+	if (!GetPSOSuccess)
+	{
+		return;
+	}
 	ThrowIfFailed(md3dDevice->CreateRootSignature(
 		0,
-		mvsByteCode->GetBufferPointer(),
-		mvsByteCode->GetBufferSize(),
-		IID_PPV_ARGS(&mRootSignature)));
+		Pso.mvsByteCode->GetBufferPointer(),
+		Pso.mvsByteCode->GetBufferSize(),
+		IID_PPV_ARGS(&Pso.mRootSignature)));
 }
 void DX12RHI::BuildShadersAndInputLayOut()
 {
 	HRESULT hr = S_OK;
-
-	mvsByteCode = FUtil::CompileShader(L"Shaders\\defalut.hlsl", nullptr, "VS", "vs_5_0");
-	mpsByteCode = FUtil::CompileShader(L"Shaders\\defalut.hlsl", nullptr, "PS", "ps_5_0");
-
-	mInputLayout =
+	bool GetPSOSuccess = false;
+	auto& Pso = PSOs->GetPSOReference(Charalotte::Default, GetPSOSuccess);
+	if (!GetPSOSuccess)
+	{
+		return;
+	}
+	Pso.mvsByteCode = FUtil::CompileShader(L"Shaders\\defalut.hlsl", nullptr, "VS", "vs_5_0");
+	Pso.mpsByteCode = FUtil::CompileShader(L"Shaders\\defalut.hlsl", nullptr, "PS", "ps_5_0");
+	Pso.mInputLayout = 
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
@@ -644,19 +709,25 @@ void DX12RHI::BuildShadersAndInputLayOut()
 void DX12RHI::BuildPSO()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
-	ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-	psoDesc.InputLayout = { mInputLayout.data(), (UINT)mInputLayout.size() };
-	psoDesc.pRootSignature = mRootSignature.Get();
+	bool GetPSOSuccess = false;
+	auto& Pso = PSOs->GetPSOReference(Charalotte::Default, GetPSOSuccess);
+	if (!GetPSOSuccess)
+	{
+		return;
+	}
+	SecureZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+	psoDesc.InputLayout = { Pso.mInputLayout.data(), (UINT)Pso.mInputLayout.size() };
+	psoDesc.pRootSignature = Pso.mRootSignature.Get();
 	psoDesc.VS =
 	{
-		reinterpret_cast<BYTE*>(mvsByteCode->GetBufferPointer()),
-			mvsByteCode->GetBufferSize()
+		reinterpret_cast<BYTE*>(Pso.mvsByteCode->GetBufferPointer()),
+			Pso.mvsByteCode->GetBufferSize()
 	};
 
 	psoDesc.PS =
 	{
-		reinterpret_cast<BYTE*>(mpsByteCode->GetBufferPointer()),
-			mpsByteCode->GetBufferSize()
+		reinterpret_cast<BYTE*>(Pso.mpsByteCode->GetBufferPointer()),
+			Pso.mpsByteCode->GetBufferSize()
 	};
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	psoDesc.RasterizerState.FrontCounterClockwise = TRUE;
@@ -670,7 +741,7 @@ void DX12RHI::BuildPSO()
 	psoDesc.SampleDesc.Count = m4xMsaaState ? 4 : 1;
 	psoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
 	psoDesc.DSVFormat = mDepthStencilFormat;
-	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
+	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&Pso.mPSO)));
 }
 
 // Build heaps
