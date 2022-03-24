@@ -17,6 +17,7 @@ cbuffer cbPerObject : register(b1)
 
 Texture2D gDiffuseMap : register(t0);
 Texture2D gNormalMap : register(t1);
+Texture2D gShadowMap : register(t2);
 
 struct VertexIn
 {

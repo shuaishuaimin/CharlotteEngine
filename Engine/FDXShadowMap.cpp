@@ -1,15 +1,10 @@
 #include "stdafx.h"
 #include "FDXShadowMap.h"
 
-FDXShadowMap::FDXShadowMap(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuSrv,
-	CD3DX12_GPU_DESCRIPTOR_HANDLE hGpuSrv,
-	CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuDsv,
+FDXShadowMap::FDXShadowMap(
 	UINT width, UINT height, FDevice* Device) : mWidth(width), mHeight(height), Device(Device)
 {
-	mhCpuSrv = hCpuSrv;
-	mhGpuSrv = hGpuSrv;
-	mhCpuDsv = hCpuDsv;
-
+	mShadowSrvHeap = nullptr;
 	BuildShadowMapResource(this->Device);
 }
 
@@ -21,8 +16,6 @@ void FDXShadowMap::OnResize(UINT newWidth, UINT newHeight)
 		mHeight = newHeight;
 
 		BuildShadowMapResource(this->Device);
-
-		BuildShadowMapDescriptors(this->Device);
 	}
 }
 
@@ -59,8 +52,13 @@ void FDXShadowMap::BuildShadowMapResource(FDevice* Device)
 		IID_PPV_ARGS(&mShadowMap)));
 }
 
-void FDXShadowMap::BuildShadowMapDescriptors(FDevice* Device)
+void FDXShadowMap::BuildShadowMapDescriptors(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuSrv,
+	CD3DX12_GPU_DESCRIPTOR_HANDLE hGpuSrv,
+	CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuDsv)
 {
+	mhCpuSrv = hCpuSrv;
+	mhGpuSrv = hGpuSrv;
+	mhCpuDsv = hCpuDsv;
 	FDXDevice* DxDevice = dynamic_cast<FDXDevice*>(Device);
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -86,3 +84,12 @@ ID3D12Resource* FDXShadowMap::GetResource()
 	return mShadowMap.Get();
 }
 
+CD3DX12_CPU_DESCRIPTOR_HANDLE FDXShadowMap::GetDsv() const 
+{
+	return mhCpuDsv;
+}
+
+Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& FDXShadowMap::GetSrvHeap()
+{
+	return mShadowSrvHeap;
+}

@@ -28,8 +28,10 @@ public:
 	virtual void CompileMaterial() = 0;
 
 	virtual void BuildShadowPSO() = 0;
+	virtual void BuildShadowDescriptors() = 0;
 
 	virtual void DrawPrepare(Charalotte::PSOType PSOType) = 0;
 	virtual void DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData) = 0;
 	virtual void DrawEnd() = 0;
+	virtual void DrawShadowEnd() = 0;
 };

@@ -43,6 +43,8 @@ bool FPCRender::Initialize()
 	}
 	RHIIns->OnResize();
 	RHIIns->InitRenderPipeline();
+	RHIIns->BuildShadowPSO();
+	RHIIns->BuildShadowDescriptors();
 	return true;
 
 }
@@ -92,7 +94,7 @@ void FPCRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 		RHIIns->LoadTextureResource(TextureName, TexturePath);
 	}
 
-	// Build scene andl compile material
+	// Build scene and compile material
 	RHIIns->BuildSceneResourcesForRenderPlatform();
 	RHIIns->CompileMaterial();
 }

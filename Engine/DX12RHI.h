@@ -20,6 +20,7 @@
 #include "FDXResources.h"
 #include "DX12RHIData.h"
 #include "FDXPSOs.h"
+#include "FDXShadowMap.h"
 
 //#pragma comment(lib,"d3dcompiler.lib")
 //#pragma comment(lib, "D3D12.lib")
@@ -51,8 +52,11 @@ public:
 	virtual void DrawPrepare(Charalotte::PSOType psoType) override;
 	virtual void DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData) override;
 	virtual void DrawEnd() override;
+	virtual void DrawShadowEnd() override;
 
 	virtual void BuildShadowPSO() override;
+	virtual void BuildShadowDescriptors() override;
+
 protected:
 	// flush fence
 	void FlushCommandQueue();
@@ -95,6 +99,8 @@ protected:
 		FMaterial* Material);
 
 	void DebugDevice();
+
+	void RegisterPSOFunc();
 protected:
 	// function for all
 	inline std::string wString2String(const std::wstring& ws) 
@@ -135,6 +141,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mRtvHeap;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mDsvHeap;
 
+	
 	// viewport is that the window to show us all ,
 	// Scissor is that the window is to be cut and showed to us;
 	D3D12_VIEWPORT mScreenViewport;
@@ -163,5 +170,8 @@ private:
 
 // parameters for self
 private:
+	std::unordered_map<Charalotte::PSOType, std::function<void()>> PsoPrepareFunction;
+	std::unique_ptr<FDXShadowMap> ShadowMap;
+	std::shared_ptr<FDevice> DevicePtr;
 };
 

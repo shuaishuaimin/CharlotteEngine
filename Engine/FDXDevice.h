@@ -12,7 +12,7 @@ public:
 
 	ID3D12Device* GetDevice()
 	{
-		return GetDevice();
+		return Device;
 	}
 private:
 	ID3D12Device* Device;
