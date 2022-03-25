@@ -15,6 +15,7 @@ FCamera::FCamera(const Charalotte::CameraData& Data) : MainCameraData(Data), Sen
 	CalcVPMatrix();
 	RegisterObjectInput();
 	
+
 }
 FCamera::FCamera() : Sensitivity(1.5)
 {

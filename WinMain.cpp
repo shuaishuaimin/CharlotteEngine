@@ -12,7 +12,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 #endif
 
 	try
-	{
+	{	
 		std::unique_ptr<GameInstance> GameIns = std::make_unique<GameInstance>();
 		if (!GameIns->Init())
 		{

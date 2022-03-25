@@ -27,6 +27,7 @@ FPCRender::FPCRender()
 		this->RHIIns->OnResize();
 	});
 	DrawData = std::make_shared<Charalotte::DrawNecessaryData>();
+	TestLightData = std::make_shared<Charalotte::DrawNecessaryData>();
 }
 
 
@@ -45,6 +46,8 @@ bool FPCRender::Initialize()
 	RHIIns->InitRenderPipeline();
 	RHIIns->BuildShadowPSO();
 	RHIIns->BuildShadowDescriptors();
+	FScene::GetInstance().GetCamera()->GetCameraData(TestLightData->MainCameraData);
+	FScene::GetInstance().GetCamera()->GetVPTransform(TestLightData->VPTransform.VPMatrix);
 	return true;
 
 }
@@ -58,12 +61,21 @@ void FPCRender::Update()
 	const auto& ActorIter = Actors.find(NowMapName);
 	if (ActorIter != Actors.end())
 	{
+		// draw shadow
 		RHIIns->DrawPrepare(Charalotte::Shadow);
+		for (const auto& ActorPri : ActorIter->second.ActorsInfo)
+		{
+			RHIIns->DrawActor(ActorPri, TestLightData.get());
+		}
+		RHIIns->DrawShadowEnd();
+
+		// draw actor
+		RHIIns->DrawPrepare(Charalotte::Default);
 		for (const auto& ActorPri : ActorIter->second.ActorsInfo)
 		{
 			RHIIns->DrawActor(ActorPri, DrawData.get());
 		}
-		RHIIns->DrawShadowEnd() ;
+		RHIIns->DrawEnd();
 	}
 }
 

@@ -341,9 +341,12 @@ void DX12RHI::DrawEnd()
 
 void DX12RHI::DrawShadowEnd()
 {
+	//mCommandList->SetGraphicsRootDescriptorTable(4, ShadowMap->GetSrvHeap()->GetGPUDescriptorHandleForHeapStart());
 	// Indicate a state transition on the resource usage.
+	
 	auto BarrierTransRTToPresent = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
 		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ);
+	
 	mCommandList->ResourceBarrier(1, &BarrierTransRTToPresent);
 
 	// Done recording commands ! important ,otherwise gpu instantce will stop
@@ -994,5 +997,6 @@ void DX12RHI::RegisterPSOFunc()
 		mCommandList->OMSetRenderTargets(0, nullptr, true, &DSV);
 		// IA
 		mCommandList->SetGraphicsRootSignature(Pso.mRootSignature.Get());
+		mCommandList->SetGraphicsRootDescriptorTable(3, ShadowMap->GetSrvHeap()->GetGPUDescriptorHandleForHeapStart());
 	}});
 }

@@ -217,6 +217,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Engine\ShaderH.hlsli" />
+    <None Include="Engine\Shadow.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -46,5 +46,7 @@ private:
 
 	std::shared_ptr<Charalotte::DrawNecessaryData> DrawData;
 
+	std::shared_ptr<Charalotte::DrawNecessaryData> TestLightData;
+
 	std::string NowMapName;
 };
