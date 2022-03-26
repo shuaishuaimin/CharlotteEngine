@@ -33,6 +33,7 @@ public:
 
 	virtual bool Initialize()override;
 
+	void InitLight();
 	void LoadingMapDataFromAssetSystem(const std::string& MapName);
 
 	void Destory(){};

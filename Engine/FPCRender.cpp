@@ -46,12 +46,24 @@ bool FPCRender::Initialize()
 	RHIIns->InitRenderPipeline();
 	RHIIns->BuildShadowPSO();
 	RHIIns->BuildShadowDescriptors();
-	FScene::GetInstance().GetCamera()->GetCameraData(TestLightData->MainCameraData);
-	FScene::GetInstance().GetCamera()->GetVPTransform(TestLightData->VPTransform.VPMatrix);
+	InitLight();
+	
 	return true;
 
 }
 
+void FPCRender::InitLight()
+{
+	FScene::GetInstance().GetCamera()->GetCameraData(TestLightData->MainCameraData);
+	FScene::GetInstance().GetCamera()->GetVPTransform(TestLightData->VPTransform.VPMatrix);
+	/*glm::mat4 mat = {
+		 0.5f, 0.0f, 0.0f, 0.0f,
+		0.0f, -0.5f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.0f, 1.0f
+	};
+	TestLightData->VPTransform.VPMatrix = mat * TestLightData->VPTransform.VPMatrix;*/
+}
 // draw by camera data
 void FPCRender::Update()
 {

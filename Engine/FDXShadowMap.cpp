@@ -43,6 +43,7 @@ void FDXShadowMap::BuildShadowMapResource(FDevice* Device)
 	FDXDevice* DxDevice = dynamic_cast<FDXDevice*>(Device);
 	auto DevicePtr = DxDevice->GetDevice();
 	auto HeapPro = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+	
 	ThrowIfFailed(DevicePtr->CreateCommittedResource(
 		&HeapPro,
 		D3D12_HEAP_FLAG_NONE,
@@ -50,6 +51,7 @@ void FDXShadowMap::BuildShadowMapResource(FDevice* Device)
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		&optClear,
 		IID_PPV_ARGS(&mShadowMap)));
+	mShadowMap->SetName(L"shadowmap");
 }
 
 void FDXShadowMap::BuildShadowMapDescriptors(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuSrv,

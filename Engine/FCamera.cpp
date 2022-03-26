@@ -26,7 +26,7 @@ FCamera::FCamera() : Sensitivity(1.5)
 	DefaultCameraData.Width = 1980;
 	DefaultCameraData.Height = 1280;
 	DefaultCameraData.AspectRatio = static_cast<float>(DefaultCameraData.Width / DefaultCameraData.Height);
-	DefaultCameraData.Location = glm::vec4(-5000.0f, 0.0f, 0.0f, 1.0f);
+	DefaultCameraData.Location = glm::vec4(-5000.0f, 0.0f, 1000.0f, 1.0f);
 	DefaultCameraData.Target = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 	DefaultCameraData.Up = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 	MainCameraData = DefaultCameraData;

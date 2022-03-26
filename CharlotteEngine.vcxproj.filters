@@ -307,7 +307,7 @@
     <None Include="Engine\ShaderH.hlsli">
       <Filter>Header Files\Engine</Filter>
     </None>
-    <None Include="Engine\Shadow.hlsli">
+    <None Include="Engine\ShadowH.hlsli">
       <Filter>Header Files\Engine\Scene</Filter>
     </None>
   </ItemGroup>

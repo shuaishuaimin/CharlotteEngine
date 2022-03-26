@@ -173,5 +173,6 @@ private:
 	std::unordered_map<Charalotte::PSOType, std::function<void()>> PsoPrepareFunction;
 	std::unique_ptr<FDXShadowMap> ShadowMap;
 	std::shared_ptr<FDevice> DevicePtr;
+	bool IsDrawShadow;
 };
 
