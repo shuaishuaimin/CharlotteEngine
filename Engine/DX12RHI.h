@@ -50,7 +50,8 @@ public:
 	virtual void CompileMaterial() override;
 
 	virtual void DrawPrepare(Charalotte::PSOType psoType) override;
-	virtual void DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData) override;
+	virtual void DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData
+							, const Charalotte::ObjectConstants& Obj) override;
 	virtual void DrawEnd() override;
 	virtual void DrawShadowEnd() override;
 

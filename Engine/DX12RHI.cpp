@@ -271,7 +271,7 @@ void DX12RHI::DrawPrepare(Charalotte::PSOType psoType)
 		Iter->second();
 	}
 }
-void DX12RHI::DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData)
+void DX12RHI::DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData, const Charalotte::ObjectConstants& Obj)
 {
 	auto ActorInsPtr = FDXResources::GetInstance().GetDXActorResourcesByName(Actor.ActorPrimitiveName);
 	if (ActorInsPtr == nullptr)
@@ -306,16 +306,8 @@ void DX12RHI::DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNec
 		mCommandList->SetGraphicsRootDescriptorTable(3, ShadowMap->GetSrvHeap()->GetGPUDescriptorHandleForHeapStart());
 	}
 	// update the constant buffer with the latest worldviewproj glm::mat4
-	Charalotte::ObjectConstants objConstants;
-	glm::mat4 NowVPTrans = DrawData->VPTransform.VPMatrix;
-	glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorInsPtr->Transform);
-	auto& RotateStruct = ActorInsPtr->Transform.Rotation;
-	glm::vec4 Rotate(RotateStruct.X, RotateStruct.Y, RotateStruct.Z, RotateStruct.W);
-	glm::mat4 NowRotate = FMathHelper::GetRotateMatrix(Rotate);
-	glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
-	objConstants.TransMatrix = glm::transpose(NowMVPTrans);
-	objConstants.Rotate = (NowRotate);
-	ActorInsPtr->ObjectCB->CopyData(0, objConstants);
+	
+	ActorInsPtr->ObjectCB->CopyData(0, Obj);
 
 	mCommandList->DrawIndexedInstanced(
 		MeshGeo->DrawArgs[MeshGeo->Name].IndexCount,
@@ -649,7 +641,7 @@ void DX12RHI::CreateRtvAndDsvDescriptorHeaps()
 	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
 	dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	dsvHeapDesc.NodeMask = 0;
-	dsvHeapDesc.NumDescriptors = 2;
+	dsvHeapDesc.NumDescriptors = 3;
 	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(
 		&dsvHeapDesc, IID_PPV_ARGS(mDsvHeap.GetAddressOf())));
@@ -762,20 +754,6 @@ void DX12RHI::BuildShadersAndInputLayOut()
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 	};
-	bool IsGetPsoSucceed = false;
-	Charalotte::PSO& ShadowPso = PSOs->GetPSOReference(Charalotte::Shadow, IsGetPsoSucceed);
-
-	ShadowPso.mpsByteCode = FUtil::CompileShader(L"Shaders\\shadow.hlsl", nullptr, "VS", "vs_5_0");
-	ShadowPso.mvsByteCode = FUtil::CompileShader(L"Shaders\\shadow.hlsl", nullptr, "PS", "ps_5_0");
-
-	ShadowPso.mInputLayout =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-	};
-	
 }
 void DX12RHI::BuildPSO()
 {

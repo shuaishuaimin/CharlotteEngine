@@ -1,7 +1,7 @@
 #define TreeStump_RootSig \
 	"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), " \
 	"RootConstants(b0, num32BitConstants = 4), " \
-	"CBV(b1, visibility = SHADER_VISIBILITY_VERTEX), " \
+	"CBV(b1, visibility = SHADER_VISIBILITY_ALL), " \
 	"DescriptorTable(SRV(t0, numDescriptors = 2), visibility = SHADER_VISIBILITY_PIXEL), " \
 	"DescriptorTable(SRV(t2, numDescriptors = 1), visibility = SHADER_VISIBILITY_PIXEL), " \
 	"StaticSampler(s0," \

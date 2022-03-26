@@ -15,6 +15,9 @@ cbuffer cbPerObject : register(b1)
 {
 	float4x4 gWorldViewProj; 
 	float4x4 gRotate;
+	float4 IsShadow;
+	float4x4 World;
+	float4x4 ShadowVP;
 };
 
 Texture2D gDiffuseMap : register(t0);
@@ -77,11 +80,10 @@ float CalcShadowFactor(float4 shadowPosH)
 VertexOut VS(VertexIn vin)
 {
 	VertexOut vout;
-	vout.ShadowPos = float4(vin.PosL, 1.0f);
+	vout.ShadowPos = mul(float4(vin.PosL, 1.0f), World);
 	// Transform to homogeneous clip space.
 	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
-
-	float4 ResultNormal = vin.Normal;
+	float4 ResultNormal = vin.Normal ;
 
 	ResultNormal = mul(ResultNormal, gRotate);
 	
@@ -94,7 +96,26 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
-	float4 diffuseAlbedo = gDiffuseMap.Sample(gsamLiner, pin.TexC);
-	float4 Result = diffuseAlbedo;
+	float4 Result;
+	if (IsShadow.x > 0.0f)
+	{
+		float4 diffuseAlbedo = gDiffuseMap.Sample(gsamLiner, pin.TexC);
+		Result = diffuseAlbedo;
+	}
+	else
+	{
+		float4 diffuseAlbedo = gDiffuseMap.Sample(gsamLiner, pin.TexC);
+		float4 TShadowVP = mul(pin.ShadowPos, ShadowVP);
+		float4 RealShadowWithVp = (TShadowVP.x * 0.5+0.5, TShadowVP.y*0.5+0.5, TShadowVP.z, 1.0f);
+		float4 Depth = gShadowMap.Sample(gsamLiner, RealShadowWithVp.xy);
+		if (Depth.z > RealShadowWithVp.z)
+		{
+			Result = 0.1 * diffuseAlbedo;
+		}
+		else
+		{
+			Result = diffuseAlbedo;
+		}
+	}
     return Result;
 }

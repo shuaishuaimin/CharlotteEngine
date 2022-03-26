@@ -56,13 +56,13 @@ void FPCRender::InitLight()
 {
 	FScene::GetInstance().GetCamera()->GetCameraData(TestLightData->MainCameraData);
 	FScene::GetInstance().GetCamera()->GetVPTransform(TestLightData->VPTransform.VPMatrix);
-	/*glm::mat4 mat = {
+	glm::mat4 mat = {
 		 0.5f, 0.0f, 0.0f, 0.0f,
 		0.0f, -0.5f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.5f, 0.5f, 0.0f, 1.0f
 	};
-	TestLightData->VPTransform.VPMatrix = mat * TestLightData->VPTransform.VPMatrix;*/
+	TestLightData->VPTransform.VPMatrix = mat * TestLightData->VPTransform.VPMatrix;
 }
 // draw by camera data
 void FPCRender::Update()
@@ -77,7 +77,19 @@ void FPCRender::Update()
 		RHIIns->DrawPrepare(Charalotte::Shadow);
 		for (const auto& ActorPri : ActorIter->second.ActorsInfo)
 		{
-			RHIIns->DrawActor(ActorPri, TestLightData.get());
+			Charalotte::ObjectConstants objConstants;
+			glm::mat4 NowVPTrans = TestLightData->VPTransform.VPMatrix;
+			glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorPri.Transform);
+			auto& RotateStruct = ActorPri.Transform.Rotation;
+			glm::vec4 Rotate(RotateStruct.X, RotateStruct.Y, RotateStruct.Z, RotateStruct.W);
+			glm::mat4 NowRotate = FMathHelper::GetRotateMatrix(Rotate);
+			glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
+			objConstants.TransMatrix = glm::transpose(NowMVPTrans);
+			objConstants.Rotate = (NowRotate);
+			objConstants.IsShadow.x = 1.0f;
+			objConstants.WorldMatrix = NowWorldTrans;
+			objConstants.ShadowVP = TestLightData->VPTransform.VPMatrix;
+			RHIIns->DrawActor(ActorPri, TestLightData.get(), objConstants);
 		}
 		RHIIns->DrawShadowEnd();
 
@@ -85,7 +97,19 @@ void FPCRender::Update()
 		RHIIns->DrawPrepare(Charalotte::Default);
 		for (const auto& ActorPri : ActorIter->second.ActorsInfo)
 		{
-			RHIIns->DrawActor(ActorPri, DrawData.get());
+			Charalotte::ObjectConstants objConstants;
+			glm::mat4 NowVPTrans = DrawData->VPTransform.VPMatrix;
+			glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorPri.Transform);
+			auto& RotateStruct = ActorPri.Transform.Rotation;
+			glm::vec4 Rotate(RotateStruct.X, RotateStruct.Y, RotateStruct.Z, RotateStruct.W);
+			glm::mat4 NowRotate = FMathHelper::GetRotateMatrix(Rotate);
+			glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
+			objConstants.TransMatrix = glm::transpose(NowMVPTrans);
+			objConstants.Rotate = (NowRotate);
+			objConstants.IsShadow.x = -1.0f;
+			objConstants.WorldMatrix = NowWorldTrans;
+			objConstants.ShadowVP = TestLightData->VPTransform.VPMatrix;
+			RHIIns->DrawActor(ActorPri, DrawData.get(), objConstants);
 		}
 		RHIIns->DrawEnd();
 	}
