@@ -81,7 +81,7 @@ void FScene::LoadMap(const std::string& MapName) {
 		// test use different texture
 		if (cool)
 		{
-			ActorInfor.Material->SetTexture("ice");
+			ActorInfor.Material->SetTexture("bricks3");
 			cool = false;
 		}
 		else

@@ -354,7 +354,7 @@ void DX12RHI::BuildShadowPSO()
 	}
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 	SecureZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-	psoDesc.RasterizerState.DepthBias = 100000;
+	psoDesc.RasterizerState.DepthBias = 15000;
 	psoDesc.RasterizerState.DepthBiasClamp = 0.0f;
 	psoDesc.RasterizerState.SlopeScaledDepthBias = 1.0f;
 	psoDesc.InputLayout = { ShadowPso.mInputLayout.data(), (UINT)ShadowPso.mInputLayout.size() };
