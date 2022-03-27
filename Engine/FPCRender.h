@@ -41,6 +41,13 @@ public:
 	void Update() override;
 
 	virtual bool GetIsDevicedSucceed()override;
+
+protected:
+	void UpdateShadowPassCB();
+
+	void UpdateShadowCons(Charalotte::ObjectConstants& Obj, const Charalotte::FActorInfo& ActorPri);
+
+	void UpDateCommonCons(Charalotte::ObjectConstants& Obj, const Charalotte::FActorInfo& ActorPri);
 private:
 
 	std::unique_ptr<RHI> RHIIns;
@@ -50,4 +57,8 @@ private:
 	std::shared_ptr<Charalotte::DrawNecessaryData> TestLightData;
 
 	std::string NowMapName;
+
+	// test
+	glm::mat4 mLightView = glm::mat4(1.0f);
+	glm::mat4 mLightProj = glm::mat4(1.0f);
 };

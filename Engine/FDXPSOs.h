@@ -11,6 +11,7 @@ namespace Charalotte
 	public:
 		FDXPSOs() {
 			PSOs.insert({ Charalotte::Default, {} });
+			PSOs.insert({ Charalotte::Shadow, {} });
 			EmptyPSO = {};
 		}
 
@@ -35,6 +36,18 @@ namespace Charalotte
 			else
 			{
 				IsGetSuccess = false;
+				return EmptyPSO;
+			}
+		}
+		Charalotte::PSO& GetPSOReference(Charalotte::PSOType psoType)
+		{
+			const auto& Iter = PSOs.find(psoType);
+			if (Iter != PSOs.end())
+			{
+				return Iter->second;
+			}
+			else
+			{
 				return EmptyPSO;
 			}
 		}

@@ -234,6 +234,12 @@
     <ClInclude Include="Engine\FDXPSOs.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\RHIBaseData.h">
+      <Filter>Header Files\Engine\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FDX12Buffer.h">
+      <Filter>Header Files\Engine\RHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\DDSTextureLoader.cpp">

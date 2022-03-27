@@ -27,12 +27,20 @@ public:
 
 	virtual void CompileMaterial() = 0;
 
+	virtual void BuildRootSignature(Charalotte::PSOType psoType) = 0;
 	virtual void BuildShadowPSO() = 0;
-	virtual void BuildShadowDescriptors() = 0;
+	virtual void InitShadowMap() = 0;
 
 	virtual void DrawPrepare(Charalotte::PSOType PSOType) = 0;
 	virtual void DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData, 
 						const Charalotte::ObjectConstants& Obj) = 0;
+
 	virtual void DrawEnd() = 0;
 	virtual void DrawShadowEnd() = 0;
+
+	virtual void OpenCommandList(bool IsOpenPso) = 0;
+	virtual void ExecuteAndCloseCommandList() = 0;
+	virtual void FlushCommandQueue() = 0;
+
+	virtual void SwapChain() = 0;
 };

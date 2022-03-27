@@ -101,3 +101,24 @@ glm::mat4 FMathHelper::GetRotateMatrix(const glm::vec4& Qua)
 	glm::qua<float> Quater = glm::qua<float>(Qua.w, Qua.x, Qua.y, Qua.z);
 	return glm::mat4_cast(Quater);
 }
+
+glm::vec4 FMathHelper::Vector3TransformCoord(glm::vec3 V, glm::mat4 M)
+{
+	glm::vec4 Z(V.z, V.z, V.z, V.z);
+	glm::vec4 Y(V.y, V.y, V.y, V.y);
+	glm::vec4 X(V.x, V.x, V.x, V.x);
+
+	glm::vec4 Result = Z * M[2] + M[3];
+	Result = Y * M[1] + Result;
+	Result = X * M[0] + Result;
+	glm::vec4 W(Result.w, Result.w, Result.w, Result.w);
+
+	return Result / W;
+}
+
+glm::mat4 FMathHelper::GetScaleMatrix(const Charalotte::FTransform& Transform)
+{
+	glm::mat4 ScaleTrans = glm::mat4(1.0f);
+	ScaleTrans = glm::scale(ScaleTrans, glm::vec3(Transform.Scale3D.x, Transform.Scale3D.y, Transform.Scale3D.z));
+	return ScaleTrans;
+}

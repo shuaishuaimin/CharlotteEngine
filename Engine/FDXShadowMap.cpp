@@ -4,8 +4,15 @@
 FDXShadowMap::FDXShadowMap(
 	UINT width, UINT height, FDevice* Device) : mWidth(width), mHeight(height), Device(Device)
 {
-	mShadowSrvHeap = nullptr;
+	mSrvHeap = nullptr;
+}
+void FDXShadowMap::Init()
+{
 	BuildShadowMapResource(this->Device);
+	FDXDevice* DxDevice = dynamic_cast<FDXDevice*>(Device);
+	auto DevicePtr = DxDevice->GetDevice();
+	CreateHeap(DevicePtr);
+	CreateSRVAndDSV(DevicePtr);
 }
 
 void FDXShadowMap::OnResize(UINT newWidth, UINT newHeight)
@@ -48,37 +55,50 @@ void FDXShadowMap::BuildShadowMapResource(FDevice* Device)
 		&HeapPro,
 		D3D12_HEAP_FLAG_NONE,
 		&texDesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
+		D3D12_RESOURCE_STATE_DEPTH_WRITE,
 		&optClear,
 		IID_PPV_ARGS(&mShadowMap)));
 	mShadowMap->SetName(L"shadowmap");
 }
 
-void FDXShadowMap::BuildShadowMapDescriptors(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuSrv,
-	CD3DX12_GPU_DESCRIPTOR_HANDLE hGpuSrv,
-	CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuDsv)
+void FDXShadowMap::CreateHeap(ID3D12Device* device)
 {
-	mhCpuSrv = hCpuSrv;
-	mhGpuSrv = hGpuSrv;
-	mhCpuDsv = hCpuDsv;
-	FDXDevice* DxDevice = dynamic_cast<FDXDevice*>(Device);
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MostDetailedMip = 0;
-	srvDesc.Texture2D.MipLevels = 1;
-	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-	srvDesc.Texture2D.PlaneSlice = 0;
-	DxDevice->GetDevice()->CreateShaderResourceView(mShadowMap.Get(), &srvDesc, mhCpuSrv);
+	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
+	dsvHeapDesc.NumDescriptors = 1;
+	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+	dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	dsvHeapDesc.NodeMask = 0;
+	ThrowIfFailed(device->CreateDescriptorHeap(
+		&dsvHeapDesc, IID_PPV_ARGS(mDsvHeap.GetAddressOf())));
 
-	//Create DSV to resource so we can render to the shadow map
-	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	dsvDesc.Texture2D.MipSlice = 0;
-	DxDevice->GetDevice()->CreateDepthStencilView(mShadowMap.Get(), &dsvDesc, mhCpuDsv);
+	D3D12_DESCRIPTOR_HEAP_DESC SrvHeapDesc;
+	SrvHeapDesc.NumDescriptors = 1;
+	SrvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	SrvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	SrvHeapDesc.NodeMask = 0;
+	ThrowIfFailed(device->CreateDescriptorHeap(
+		&SrvHeapDesc, IID_PPV_ARGS(mSrvHeap.GetAddressOf())));
+}
+void FDXShadowMap::CreateSRVAndDSV(ID3D12Device* device)
+{
+	D3D12_SHADER_RESOURCE_VIEW_DESC srv = {};
+	srv.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srv.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+	srv.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srv.Texture2D.MostDetailedMip = 0;
+	srv.Texture2D.MipLevels = 1;
+	srv.Texture2D.ResourceMinLODClamp = 0.0f;
+	srv.Texture2D.PlaneSlice = 0;
+	device->CreateShaderResourceView(mShadowMap.Get(), &srv, mSrvHeap->GetCPUDescriptorHandleForHeapStart());
+	mSrv = srv;
+
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsv;
+	dsv.Flags = D3D12_DSV_FLAG_NONE;
+	dsv.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	dsv.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	dsv.Texture2D.MipSlice = 0;
+	device->CreateDepthStencilView(mShadowMap.Get(), &dsv, mDsvHeap->GetCPUDescriptorHandleForHeapStart());
+	mDsv = dsv;
 }
 
 ID3D12Resource* FDXShadowMap::GetResource()
@@ -86,12 +106,12 @@ ID3D12Resource* FDXShadowMap::GetResource()
 	return mShadowMap.Get();
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE FDXShadowMap::GetDsv() const 
-{
-	return mhCpuDsv;
-}
-
 Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& FDXShadowMap::GetSrvHeap()
 {
-	return mShadowSrvHeap;
+	return mSrvHeap;
+}
+
+Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& FDXShadowMap::GetDsvHeap()
+{
+	return mDsvHeap;
 }

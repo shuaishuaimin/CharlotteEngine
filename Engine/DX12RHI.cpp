@@ -2,6 +2,7 @@
 #include "DX12RHI.h"
 #include "FWin32Window.h"
 #include "FUtil.h"
+#include "RHIBaseData.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -292,66 +293,40 @@ void DX12RHI::DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNec
 
 	auto count = MeshGeo->DrawArgs[MeshGeo->Name].IndexCount;
 	// use resource
-
-	mCommandList->SetGraphicsRoot32BitConstants(0, 4, &(DrawData->MainCameraData.Location), 0);
-
-	mCommandList->SetGraphicsRootConstantBufferView(1, ActorInsPtr->ObjectCB->Resource()->GetGPUVirtualAddress());
-
-	mCommandList->SetGraphicsRootDescriptorTable(2, ActorInsPtr->SrvHeap->GetGPUDescriptorHandleForHeapStart());
-
+	
 	if (!IsDrawShadow)
 	{
+		mCommandList->SetGraphicsRoot32BitConstants(0, 4, &(DrawData->MainCameraData.Location), 0);
+
+		mCommandList->SetGraphicsRootConstantBufferView(1, ActorInsPtr->ObjectCB->Resource()->GetGPUVirtualAddress());
+
+		mCommandList->SetGraphicsRootDescriptorTable(3, ActorInsPtr->SrvHeap->GetGPUDescriptorHandleForHeapStart());
 		ID3D12DescriptorHeap* ShadowdescriptorHeaps[] = { ShadowMap->GetSrvHeap().Get() };
 		mCommandList->SetDescriptorHeaps(_countof(ShadowdescriptorHeaps), ShadowdescriptorHeaps);
-		mCommandList->SetGraphicsRootDescriptorTable(3, ShadowMap->GetSrvHeap()->GetGPUDescriptorHandleForHeapStart());
+		mCommandList->SetGraphicsRootDescriptorTable(4, ShadowMap->GetSrvHeap()->GetGPUDescriptorHandleForHeapStart());
+	}
+	else
+	{
+		mCommandList->SetGraphicsRootConstantBufferView(0, ActorInsPtr->ObjectCB->Resource()->GetGPUVirtualAddress());
 	}
 	// update the constant buffer with the latest worldviewproj glm::mat4
-	
 	ActorInsPtr->ObjectCB->CopyData(0, Obj);
-
+	
 	mCommandList->DrawIndexedInstanced(
 		MeshGeo->DrawArgs[MeshGeo->Name].IndexCount,
 		1, 0, 0, 0);
 }
+
 void DX12RHI::DrawEnd()
 {
-
 	// Indicate a state transition on the resource usage.
 	auto BarrierTransRTToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 	mCommandList->ResourceBarrier(1, &BarrierTransRTToPresent);
 
-	// Done recording commands ! important ,otherwise gpu instantce will stop
-	ThrowIfFailed(mCommandList->Close());
-
-	// Add the command list to the queue for execution.
-	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
-	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
-
-	// swap the back and front buffers
-	ThrowIfFailed(mSwapChain->Present(0, 0));
-	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
-
-	// Wait until frame commands are complete, this waiting is inefficient and is done for simplicity
-	// Later we will show how to organize our rendering code so we do not have to wait per frame
-	FlushCommandQueue();
-	bool IsSucceed = false;
-	ThrowIfFailed(mDirectCmdListAlloc->Reset());
-	Charalotte::PSO& ShadowPso = PSOs->GetPSOReference(Charalotte::Shadow, IsSucceed);
-	// A command list can be reset after it has been added to the command queue via ExecuteCommandList.
-	// Reusing the command list reuses memory.
-	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), ShadowPso.mPSO.Get()));
-
 	auto BarrierTransResourceToRead = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
-		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_GENERIC_READ);
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 	mCommandList->ResourceBarrier(1, &BarrierTransResourceToRead);
-
-	ThrowIfFailed(mCommandList->Close());
-
-	// Add the command list to the queue for execution.
-	ID3D12CommandList* ThiscmdsLists[] = { mCommandList.Get() };
-	mCommandQueue->ExecuteCommandLists(_countof(ThiscmdsLists), ThiscmdsLists);
-	FlushCommandQueue();
 }
 
 void DX12RHI::DrawShadowEnd()
@@ -363,69 +338,37 @@ void DX12RHI::DrawShadowEnd()
 		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ);
 	mCommandList->ResourceBarrier(1, &BarrierTransRTToPresent);
 
-	// Done recording commands ! important ,otherwise gpu instantce will stop
-	ThrowIfFailed(mCommandList->Close());
-
-	// Add the command list to the queue for execution.
-	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
-	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
-
-	// Wait until frame commands are complete, this waiting is inefficient and is done for simplicity
-	// Later we will show how to organize our rendering code so we do not have to wait per frame
-	FlushCommandQueue();
-
-	bool IsSucceed = false;
-	ThrowIfFailed(mDirectCmdListAlloc->Reset());
-	Charalotte::PSO& ShadowPso = PSOs->GetPSOReference(Charalotte::Shadow, IsSucceed);
-	// A command list can be reset after it has been added to the command queue via ExecuteCommandList.
-	// Reusing the command list reuses memory.
-	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), ShadowPso.mPSO.Get()));
-
 	auto BarrierTransReadToResource = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
 		D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	mCommandList->ResourceBarrier(1, &BarrierTransReadToResource);
-	
-	ThrowIfFailed(mCommandList->Close());
-
-	// Add the command list to the queue for execution.
-	ID3D12CommandList* ThiscmdsLists[] = { mCommandList.Get() };
-	mCommandQueue->ExecuteCommandLists(_countof(ThiscmdsLists), ThiscmdsLists);
-	// Done recording commands ! important ,otherwise gpu instantce will stop
-	
-
-	// Wait until frame commands are complete, this waiting is inefficient and is done for simplicity
-	// Later we will show how to organize our rendering code so we do not have to wait per frame
-	FlushCommandQueue();
 
 }
 
 void DX12RHI::BuildShadowPSO()
 {
-	ShadowMap = std::make_unique<FDXShadowMap>(mClientWidth, mClientHeight, DevicePtr.get());
-	PSOs->RemovePSO(Charalotte::Shadow);
 	bool GetPSOSuccess = false;
-	auto& DefaultPso = PSOs->GetPSOReference(Charalotte::Default, GetPSOSuccess);
+	auto& ShadowPso = PSOs->GetPSOReference(Charalotte::Shadow, GetPSOSuccess);
 	if (!GetPSOSuccess)
 	{
 		return;
 	}
-	Charalotte::PSO ShadowPso;
-	ShadowPso.mpsByteCode = DefaultPso.mpsByteCode;
-	ShadowPso.mvsByteCode = DefaultPso.mvsByteCode;
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 	SecureZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-	psoDesc.InputLayout = { DefaultPso.mInputLayout.data(), (UINT)DefaultPso.mInputLayout.size() };
-	psoDesc.pRootSignature = DefaultPso.mRootSignature.Get();
+	psoDesc.RasterizerState.DepthBias = 10000;
+	psoDesc.RasterizerState.DepthBiasClamp = 0.0f;
+	psoDesc.RasterizerState.SlopeScaledDepthBias = 1.0f;
+	psoDesc.InputLayout = { ShadowPso.mInputLayout.data(), (UINT)ShadowPso.mInputLayout.size() };
+	psoDesc.pRootSignature = ShadowPso.mRootSignature.Get();
 	psoDesc.VS =
 	{
-		reinterpret_cast<BYTE*>(DefaultPso.mvsByteCode->GetBufferPointer()),
-			DefaultPso.mvsByteCode->GetBufferSize()
+		reinterpret_cast<BYTE*>(ShadowPso.mvsByteCode->GetBufferPointer()),
+			ShadowPso.mvsByteCode->GetBufferSize()
 	};
 
 	psoDesc.PS =
 	{
-		reinterpret_cast<BYTE*>(DefaultPso.mpsByteCode->GetBufferPointer()),
-			DefaultPso.mpsByteCode->GetBufferSize()
+		reinterpret_cast<BYTE*>(ShadowPso.mpsByteCode->GetBufferPointer()),
+			ShadowPso.mpsByteCode->GetBufferSize()
 	};
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	psoDesc.RasterizerState.FrontCounterClockwise = TRUE;
@@ -440,34 +383,13 @@ void DX12RHI::BuildShadowPSO()
 	psoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
 	psoDesc.DSVFormat = mDepthStencilFormat;
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&ShadowPso.mPSO)));
-
-	PSOs->InsertNewPSO(Charalotte::Shadow, ShadowPso);
-	BuildRootSignature(Charalotte::Shadow);
 }
 
-void DX12RHI::BuildShadowDescriptors()
+void DX12RHI::InitShadowMap()
 {
-	if (ShadowMap == nullptr)
-	{
-		return;
-	}
-	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = 14;
-	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&ShadowMap->GetSrvHeap())));
-	// use the heap only for shadow
-
-	auto srvCpuStart = ShadowMap->GetSrvHeap()->GetCPUDescriptorHandleForHeapStart();
-	auto srvGpuStart = ShadowMap->GetSrvHeap()->GetGPUDescriptorHandleForHeapStart();
-	auto dsvCpuStart = mDsvHeap->GetCPUDescriptorHandleForHeapStart();
-
-	ShadowMap->BuildShadowMapDescriptors(
-		CD3DX12_CPU_DESCRIPTOR_HANDLE(srvCpuStart, 0, mCbvSrvUavDescriptorSize),
-		CD3DX12_GPU_DESCRIPTOR_HANDLE(srvGpuStart, 0, mCbvSrvUavDescriptorSize),
-		CD3DX12_CPU_DESCRIPTOR_HANDLE(dsvCpuStart, 1, mDsvDescriptorSize));
+	ShadowMap = std::make_unique<FDXShadowMap>(mClientWidth, mClientHeight, DevicePtr.get());
+	ShadowMap->Init();
 }
-
 // when input heap, we should two heap, that is rtvHeap and dsvHeap
 // their type is D3D12_DESCRIPTOR_HEAP_DESC
 // we should create description and its own information, that is way to explain heap 
@@ -741,13 +663,24 @@ void DX12RHI::BuildShadersAndInputLayOut()
 	HRESULT hr = S_OK;
 	bool GetPSOSuccess = false;
 	auto& Pso = PSOs->GetPSOReference(Charalotte::Default, GetPSOSuccess);
+	auto& ShadowPso = PSOs->GetPSOReference(Charalotte::Shadow);
 	if (!GetPSOSuccess)
 	{
 		return;
 	}
-	Pso.mvsByteCode = FUtil::CompileShader(L"Shaders\\defalut.hlsl", nullptr, "VS", "vs_5_0");
-	Pso.mpsByteCode = FUtil::CompileShader(L"Shaders\\defalut.hlsl", nullptr, "PS", "ps_5_0");
+	Pso.mvsByteCode = FUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "VS", "vs_5_0");
+	Pso.mpsByteCode = FUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "PS", "ps_5_0");
+
+	ShadowPso.mvsByteCode = FUtil::CompileShader(L"Shaders\\Shadows.hlsl", nullptr, "VS", "vs_5_0");
+	ShadowPso.mpsByteCode = FUtil::CompileShader(L"Shaders\\Shadows.hlsl", nullptr, "PS", "ps_5_0");
 	Pso.mInputLayout = 
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+	};
+	ShadowPso.mInputLayout =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
@@ -970,22 +903,20 @@ void DX12RHI::RegisterPSOFunc()
 		{
 			return;
 		}
-		// Reuse the memory associated with command recording.
-		// we can only  reset when the associated command lists have finished execution on the GPU.
-		ThrowIfFailed(mDirectCmdListAlloc->Reset());
-
-		// A command list can be reset after it has been added to the command queue via ExecuteCommandList.
-		// Reusing the command list reuses memory.
-		ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), Pso.mPSO.Get()));
-		mCommandList->SetPipelineState(Pso.mPSO.Get());
+		
+		
 		// Set the viewport and scissor rect. This needs to be reset whenever the command list is reset.
 		mCommandList->RSSetViewports(1, &mScreenViewport);
 		mCommandList->RSSetScissorRects(1, &mScissorRect);
-
+		
 		// Indicate a state transition on the resource usage.
 		auto BarrierTransPresentToRT = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 			D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 		mCommandList->ResourceBarrier(1, &BarrierTransPresentToRT);
+
+		auto BarrierWriteToResource = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
+			D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		mCommandList->ResourceBarrier(1, &BarrierWriteToResource);
 
 		// Clear the back buffer and depth buffer.
 		mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
@@ -997,45 +928,53 @@ void DX12RHI::RegisterPSOFunc()
 
 		// IA
 		mCommandList->SetGraphicsRootSignature(Pso.mRootSignature.Get());
+		mCommandList->SetPipelineState(Pso.mPSO.Get());
 	}});
 
 	PsoPrepareFunction.insert({ Charalotte::Shadow,[this](){
-		bool IsPSOGetSucceed = false;
-		bool IsDefaultSucceed = false;
-		IsDrawShadow = true;
-		Charalotte::PSO& ShadowPso = PSOs->GetPSOReference(Charalotte::Shadow, IsPSOGetSucceed);
-		Charalotte::PSO& DefaultPso = PSOs->GetPSOReference(Charalotte::Default, IsDefaultSucceed);
-		if (!IsPSOGetSucceed)
-		{
-			return;
-		}
+
+		Charalotte::PSO& ShadowPso = PSOs->GetPSOReference(Charalotte::Shadow);
+		Charalotte::PSO& DefaultPso = PSOs->GetPSOReference(Charalotte::Default);
+
 		if (ShadowMap == nullptr)
 		{
 			return;
 		}
-		// Reuse the memory associated with command recording.
-		// we can only  reset when the associated command lists have finished execution on the GPU.
-		ThrowIfFailed(mDirectCmdListAlloc->Reset());
+		IsDrawShadow = true;
+		ID3D12DescriptorHeap* descriptorHeaps[] = { ShadowMap->GetSrvHeap().Get() };
+		mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+		mCommandList->SetGraphicsRootSignature(ShadowPso.mRootSignature.Get());
 
-		// A command list can be reset after it has been added to the command queue via ExecuteCommandList.
-		// Reusing the command list reuses memory.
-		ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), DefaultPso.mPSO.Get()));
+		mCommandList->ClearDepthStencilView(ShadowMap->GetDsvHeap()->GetCPUDescriptorHandleForHeapStart(),
+			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
+		auto DsvHeapStart = ShadowMap->GetDsvHeap()->GetCPUDescriptorHandleForHeapStart();
+		mCommandList->OMSetRenderTargets(0, nullptr, false, &DsvHeapStart);
+
 		mCommandList->SetPipelineState(ShadowPso.mPSO.Get());
-		// Set the viewport and scissor rect. This needs to be reset whenever the command list is reset.
+
 		mCommandList->RSSetViewports(1, &mScreenViewport);
 		mCommandList->RSSetScissorRects(1, &mScissorRect);
 
-		// Indicate a state transition on the resource usage.
-		auto BarrierTransPresentToRT = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
-			D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-		mCommandList->ResourceBarrier(1, &BarrierTransPresentToRT);
-
-		auto DSV = ShadowMap->GetDsv();
-		// Clear the back buffer and depth buffer.
-		mCommandList->ClearDepthStencilView(DSV, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-
-		mCommandList->OMSetRenderTargets(0, nullptr, true, &DSV);
-		// IA
-		mCommandList->SetGraphicsRootSignature(ShadowPso.mRootSignature.Get());
 	}});
+}
+void DX12RHI::OpenCommandList(bool IsOpenPso)
+{
+	ThrowIfFailed(mDirectCmdListAlloc->Reset());
+	auto& Pso = PSOs->GetPSOReference(Charalotte::Default);
+	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), Pso.mPSO.Get()));
+}
+void DX12RHI::ExecuteAndCloseCommandList()
+{
+	ThrowIfFailed(mCommandList->Close());
+
+	// Add the command list to the queue for execution.
+	ID3D12CommandList* ThiscmdsLists[] = { mCommandList.Get() };
+	mCommandQueue->ExecuteCommandLists(_countof(ThiscmdsLists), ThiscmdsLists);
+}
+
+void DX12RHI::SwapChain()
+{
+	ThrowIfFailed(mSwapChain->Present(0, 0));
+	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
 }

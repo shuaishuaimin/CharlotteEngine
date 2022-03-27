@@ -15,29 +15,37 @@ public:
 	FDXShadowMap(FDXShadowMap&& rhs) = delete;
 	~FDXShadowMap() = default;
 
+	void Init();
+
 	void OnResize(UINT newWidth, UINT newHeight);
 
 	void BuildShadowMapResource(FDevice* Device);
-	
-	void BuildShadowMapDescriptors(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuSrv,
-		CD3DX12_GPU_DESCRIPTOR_HANDLE hGpuSrv,
-		CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuDsv);
 
-	CD3DX12_CPU_DESCRIPTOR_HANDLE GetDsv() const;
+	D3D12_DEPTH_STENCIL_VIEW_DESC GetDsv() const
+	{
+		return mDsv;
+	}
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC GetSrv() const {
+		return mSrv;
+	}
 
 	ID3D12Resource* GetResource();
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& GetSrvHeap();
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& GetDsvHeap();
 protected:
-	
+	void CreateHeap(ID3D12Device* device);
+	void CreateSRVAndDSV(ID3D12Device* device);
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> mShadowMap = nullptr;
 	FDevice* Device;
-	CD3DX12_CPU_DESCRIPTOR_HANDLE mhCpuSrv;
-	CD3DX12_GPU_DESCRIPTOR_HANDLE mhGpuSrv;
-	CD3DX12_CPU_DESCRIPTOR_HANDLE mhCpuDsv;
 
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mShadowSrvHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mDsvHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mSrvHeap = nullptr;
+
+	D3D12_DEPTH_STENCIL_VIEW_DESC mDsv;
+	D3D12_SHADER_RESOURCE_VIEW_DESC mSrv;
 
 	DXGI_FORMAT mFormat = DXGI_FORMAT_R24G8_TYPELESS;
 

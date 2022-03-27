@@ -148,7 +148,7 @@ void FScene::Update()
 	for (auto& ActorIns : FScene::GetInstance().GetSceneActorByName(NowMapName))
 	{
 		//// update the constant buffer with the latest worldviewproj glm::mat4
-		Charalotte::ObjectConstants objConstants;
+		/*Charalotte::ObjectConstants objConstants;
 		glm::mat4 NowVPTrans;
 		FScene::GetInstance().GetCamera()->GetVPTransform(NowVPTrans);
 		glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorIns->Transform);
@@ -158,6 +158,6 @@ void FScene::Update()
 		glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
 		objConstants.TransMatrix = glm::transpose(NowMVPTrans);
 		objConstants.Rotate = (NowRotate);
-		ActorIns->ObjectCB->CopyData(0, objConstants);
+		ActorIns->ObjectCB->CopyData(0, objConstants);*/
 	}
 }

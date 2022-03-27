@@ -63,11 +63,18 @@ namespace Charalotte
 
 	struct ObjectConstants
 	{
-		glm::mat4 TransMatrix = glm::mat4(1.0f);
+		glm::mat4 Test = glm::mat4(1.0f);
+		glm::mat4 Tans = glm::mat4(1.0f);
+		glm::mat4 World = glm::mat4(1.0f);
+		glm::mat4 MVP = glm::mat4(1.0f);
+		glm::mat4 Scale3D = glm::mat4(1.0f);
+		glm::mat4 Rotate = glm::mat4(1.0f);
+		float Offset = 0;
+		/*glm::mat4 TransMatrix = glm::mat4(1.0f);
 		glm::mat4 Rotate = glm::mat4(1.0f);
 		glm::vec4 IsShadow = glm::vec4(1.0f);
 		glm::mat4 WorldMatrix = glm::mat4(1.0f);
-		glm::mat4 ShadowVP = glm::mat4(1.0f);
+		glm::mat4 ShadowVP = glm::mat4(1.0f);*/
 	};
 
 	struct CameraData

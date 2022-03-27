@@ -76,6 +76,8 @@ public:
 	static const float Infinity;
 	static const float Pi;
 
+	static glm::vec4 Vector3TransformCoord(glm::vec3 V, glm::mat4 M) ;
 
+	static glm::mat4 GetScaleMatrix(const Charalotte::FTransform& Transform);
 };
 

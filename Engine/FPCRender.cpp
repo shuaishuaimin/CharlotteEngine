@@ -9,7 +9,7 @@
 #include "CharlotteEngine.h"
 #include "FMeshAsset.h"
 #include "RHIResource.h"
-
+#include "RHIBaseData.h "
 #include "DX12RHI.h"
 
 using namespace DirectX;
@@ -44,33 +44,32 @@ bool FPCRender::Initialize()
 	}
 	RHIIns->OnResize();
 	RHIIns->InitRenderPipeline();
+	RHIIns->BuildRootSignature(Charalotte::Shadow);
 	RHIIns->BuildShadowPSO();
-	RHIIns->BuildShadowDescriptors();
-	InitLight();
-	
+	RHIIns->InitShadowMap();
+	RHIIns->FlushCommandQueue();
 	return true;
 
 }
 
 void FPCRender::InitLight()
 {
-	FScene::GetInstance().GetCamera()->GetCameraData(TestLightData->MainCameraData);
-	FScene::GetInstance().GetCamera()->GetVPTransform(TestLightData->VPTransform.VPMatrix);
-	glm::mat4 mat = {
-		 0.5f, 0.0f, 0.0f, 0.0f,
-		0.0f, -0.5f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.5f, 0.5f, 0.0f, 1.0f
-	};
-	TestLightData->VPTransform.VPMatrix = mat * TestLightData->VPTransform.VPMatrix;
+	TestLightData->VPTransform.VPMatrix = mLightProj * mLightView;
+	TestLightData->VPTransform.ProjectionTransform = mLightProj;
+	TestLightData->VPTransform.ViewTransform = mLightView;
 }
 // draw by camera data
 void FPCRender::Update()
 {
+	RHIIns->OpenCommandList(true);
+	UpdateShadowPassCB();
+	InitLight();
 	FScene::GetInstance().GetCamera()->GetCameraData(DrawData->MainCameraData);
 	FScene::GetInstance().GetCamera()->GetVPTransform(DrawData->VPTransform.VPMatrix);
 	const auto& Actors = FScene::GetInstance().GetActorInfos();
 	const auto& ActorIter = Actors.find(NowMapName);
+
+
 	if (ActorIter != Actors.end())
 	{
 		// draw shadow
@@ -78,40 +77,25 @@ void FPCRender::Update()
 		for (const auto& ActorPri : ActorIter->second.ActorsInfo)
 		{
 			Charalotte::ObjectConstants objConstants;
-			glm::mat4 NowVPTrans = TestLightData->VPTransform.VPMatrix;
-			glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorPri.Transform);
-			auto& RotateStruct = ActorPri.Transform.Rotation;
-			glm::vec4 Rotate(RotateStruct.X, RotateStruct.Y, RotateStruct.Z, RotateStruct.W);
-			glm::mat4 NowRotate = FMathHelper::GetRotateMatrix(Rotate);
-			glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
-			objConstants.TransMatrix = glm::transpose(NowMVPTrans);
-			objConstants.Rotate = (NowRotate);
-			objConstants.IsShadow.x = 1.0f;
-			objConstants.WorldMatrix = NowWorldTrans;
-			objConstants.ShadowVP = TestLightData->VPTransform.VPMatrix;
+			UpdateShadowCons(objConstants, ActorPri);
 			RHIIns->DrawActor(ActorPri, TestLightData.get(), objConstants);
 		}
-		RHIIns->DrawShadowEnd();
+		RHIIns->ExecuteAndCloseCommandList();
+		RHIIns->FlushCommandQueue();
 
+		RHIIns->OpenCommandList(true);
 		// draw actor
 		RHIIns->DrawPrepare(Charalotte::Default);
 		for (const auto& ActorPri : ActorIter->second.ActorsInfo)
 		{
 			Charalotte::ObjectConstants objConstants;
-			glm::mat4 NowVPTrans = DrawData->VPTransform.VPMatrix;
-			glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorPri.Transform);
-			auto& RotateStruct = ActorPri.Transform.Rotation;
-			glm::vec4 Rotate(RotateStruct.X, RotateStruct.Y, RotateStruct.Z, RotateStruct.W);
-			glm::mat4 NowRotate = FMathHelper::GetRotateMatrix(Rotate);
-			glm::mat4 NowMVPTrans = NowVPTrans * NowWorldTrans;
-			objConstants.TransMatrix = glm::transpose(NowMVPTrans);
-			objConstants.Rotate = (NowRotate);
-			objConstants.IsShadow.x = -1.0f;
-			objConstants.WorldMatrix = NowWorldTrans;
-			objConstants.ShadowVP = TestLightData->VPTransform.VPMatrix;
+			UpDateCommonCons(objConstants, ActorPri);
 			RHIIns->DrawActor(ActorPri, DrawData.get(), objConstants);
 		}
 		RHIIns->DrawEnd();
+		RHIIns->ExecuteAndCloseCommandList();
+		RHIIns->SwapChain();
+		RHIIns->FlushCommandQueue();
 	}
 }
 
@@ -147,3 +131,62 @@ void FPCRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 	RHIIns->CompileMaterial();
 }
 
+void FPCRender::UpdateShadowPassCB()
+{
+	glm::vec3 lightPos = { -2000.0f,0.0f,1500.0f };
+	glm::vec3 targetPos = { 1.0f,0.0f,-0.7f };
+	glm::vec3 lightUp = glm::vec3(0.0f, 0.0f, 1.0f);
+
+	int Time = CharalotteEngine::GetInstance().GetTimer()->TotalTime();
+
+	lightPos = glm::vec4(lightPos, 0.0f) * glm::rotate(glm::mat4(1.0f), Time % 4 * glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+	targetPos = glm::vec4(targetPos, 0.0f) * glm::rotate(glm::mat4(1.0f), Time % 4 * glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 lightView = glm::lookAtLH(lightPos, lightPos + targetPos, lightUp);
+
+	glm::vec3 LS = FMathHelper::Vector3TransformCoord(targetPos, lightView);
+
+	float Radius = 2500;
+
+	float l = LS.x - Radius;
+	float b = LS.y - Radius;
+	float n = LS.z - Radius;
+	float r = LS.x + Radius;
+	float t = LS.y + Radius;
+	float f = LS.z + Radius;
+
+	glm::mat4 lightProj = glm::orthoLH_ZO(l, r, b, t, n, f);
+
+	mLightView = lightView;
+	mLightProj = lightProj;
+}
+
+void FPCRender::UpdateShadowCons(Charalotte::ObjectConstants& Obj, const Charalotte::FActorInfo& ActorPri)
+{
+	glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorPri.Transform);
+	Obj.Tans = glm::transpose(mLightProj * mLightView * NowWorldTrans);
+}
+
+void FPCRender::UpDateCommonCons(Charalotte::ObjectConstants& objConstants, const Charalotte::FActorInfo& ActorPri)
+{
+	glm::mat4 NowVPTrans;
+	FScene::GetInstance().GetCamera()->GetVPTransform(NowVPTrans);
+	glm::mat4 T(
+		0.5f, 0.0f, 0.0f, 0.0f,
+		0.0f, -0.5f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.0f, 1.0f);
+
+	auto& RotateStruct = ActorPri.Transform.Rotation;
+	glm::vec4 Rotate(RotateStruct.X, RotateStruct.Y, RotateStruct.Z, RotateStruct.W);
+	glm::mat4 NowRotate = FMathHelper::GetRotateMatrix(Rotate);
+	glm::mat4 NowWorldTrans = FMathHelper::GetWorldTransMatrix(ActorPri.Transform);
+
+	objConstants.Test = glm::transpose(mLightProj * mLightView);
+	objConstants.Tans = glm::transpose(T * mLightProj * mLightView);
+	objConstants.World = NowWorldTrans;
+
+	objConstants.MVP = NowVPTrans * NowWorldTrans;
+	objConstants.Scale3D = FMathHelper::GetScaleMatrix(ActorPri.Transform);
+	objConstants.Rotate = NowRotate;
+	objConstants.Offset = CharalotteEngine::GetInstance().GetTimer()->TotalTime();
+}

@@ -52,15 +52,25 @@ public:
 	virtual void DrawPrepare(Charalotte::PSOType psoType) override;
 	virtual void DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData
 							, const Charalotte::ObjectConstants& Obj) override;
+
 	virtual void DrawEnd() override;
 	virtual void DrawShadowEnd() override;
 
 	virtual void BuildShadowPSO() override;
-	virtual void BuildShadowDescriptors() override;
+	virtual void InitShadowMap() override;
+
+	virtual void BuildRootSignature(Charalotte::PSOType psoType) override;
+
+	virtual void OpenCommandList(bool IsOpenPso)override;
+	virtual void ExecuteAndCloseCommandList()override;
+
+	virtual void FlushCommandQueue() override;
+
+	virtual void SwapChain() override;
 
 protected:
 	// flush fence
-	void FlushCommandQueue();
+	
 
 	// function for render init
 	void CreateCommandObjects();
@@ -76,7 +86,7 @@ protected:
 	void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
 
 	// pipeline
-	void BuildRootSignature(Charalotte::PSOType psoType);
+	
 	void BuildShadersAndInputLayOut();
 	void BuildPSO();
 
