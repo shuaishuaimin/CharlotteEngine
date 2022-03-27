@@ -62,8 +62,8 @@
 				},
 				"translation":
 				{
-					"x": -1800,
-					"y": 520,
+					"x": -630,
+					"y": 930,
 					"z": 660
 				},
 				"scale3D":
@@ -124,6 +124,131 @@
 				}
 			},
 			"assetName": "Shape_Cylinder"
+		},
+		{
+			"transform":
+			{
+				"rotation":
+				{
+					"x": 0,
+					"y": 0,
+					"z": 0,
+					"w": 1
+				},
+				"translation":
+				{
+					"x": -900,
+					"y": -80,
+					"z": 650
+				},
+				"scale3D":
+				{
+					"x": 3.75,
+					"y": 4.5,
+					"z": 25
+				}
+			},
+			"assetName": "Shape_QuadPyramid"
+		},
+		{
+			"transform":
+			{
+				"rotation":
+				{
+					"x": 0,
+					"y": -0,
+					"z": 3.328951265757496e-07,
+					"w": 1
+				},
+				"translation":
+				{
+					"x": 1630,
+					"y": -80,
+					"z": 650
+				},
+				"scale3D":
+				{
+					"x": 1,
+					"y": 39.25,
+					"z": 3.5
+				}
+			},
+			"assetName": "Shape_Cube"
+		},
+		{
+			"transform":
+			{
+				"rotation":
+				{
+					"x": 0,
+					"y": -0,
+					"z": 0.70710748434066772,
+					"w": 0.70710599422454834
+				},
+				"translation":
+				{
+					"x": -430,
+					"y": 1990,
+					"z": 650
+				},
+				"scale3D":
+				{
+					"x": 1,
+					"y": 39.25,
+					"z": 2.75
+				}
+			},
+			"assetName": "Shape_Cube"
+		},
+		{
+			"transform":
+			{
+				"rotation":
+				{
+					"x": 0,
+					"y": -0,
+					"z": 0.70710748434066772,
+					"w": 0.70710599422454834
+				},
+				"translation":
+				{
+					"x": -430,
+					"y": -1960,
+					"z": 650
+				},
+				"scale3D":
+				{
+					"x": 1,
+					"y": 39.25,
+					"z": 2.75
+				}
+			},
+			"assetName": "Shape_Cube"
+		},
+		{
+			"transform":
+			{
+				"rotation":
+				{
+					"x": 0,
+					"y": -0,
+					"z": 3.3161254009428376e-07,
+					"w": 1
+				},
+				"translation":
+				{
+					"x": -2510,
+					"y": -80,
+					"z": 530
+				},
+				"scale3D":
+				{
+					"x": 1,
+					"y": 39.25,
+					"z": 3.5
+				}
+			},
+			"assetName": "Shape_Cube"
 		}
 	]
 }

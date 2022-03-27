@@ -133,7 +133,7 @@ void FPCRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 
 void FPCRender::UpdateShadowPassCB()
 {
-	glm::vec3 lightPos = { -2000.0f,0.0f,1500.0f };
+	glm::vec3 lightPos = { -5000.0f,0.0f,2500.0f };
 	glm::vec3 targetPos = { 1.0f,0.0f,-0.7f };
 	glm::vec3 lightUp = glm::vec3(0.0f, 0.0f, 1.0f);
 
@@ -183,10 +183,10 @@ void FPCRender::UpDateCommonCons(Charalotte::ObjectConstants& objConstants, cons
 
 	objConstants.Test = glm::transpose(mLightProj * mLightView);
 	objConstants.Tans = glm::transpose(T * mLightProj * mLightView);
-	objConstants.World = NowWorldTrans;
+	objConstants.World = glm::transpose(NowWorldTrans);
 
-	objConstants.MVP = NowVPTrans * NowWorldTrans;
-	objConstants.Scale3D = FMathHelper::GetScaleMatrix(ActorPri.Transform);
+	objConstants.MVP = glm::transpose(NowVPTrans * NowWorldTrans);
+	objConstants.Scale3D = glm::transpose(FMathHelper::GetScaleMatrix(ActorPri.Transform));
 	objConstants.Rotate = NowRotate;
 	objConstants.Offset = CharalotteEngine::GetInstance().GetTimer()->TotalTime();
 }

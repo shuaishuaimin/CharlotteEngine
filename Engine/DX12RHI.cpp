@@ -293,7 +293,7 @@ void DX12RHI::DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNec
 
 	auto count = MeshGeo->DrawArgs[MeshGeo->Name].IndexCount;
 	// use resource
-	
+	ActorInsPtr->ObjectCB->CopyData(0, Obj);
 	if (!IsDrawShadow)
 	{
 		mCommandList->SetGraphicsRoot32BitConstants(0, 4, &(DrawData->MainCameraData.Location), 0);
@@ -310,7 +310,7 @@ void DX12RHI::DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNec
 		mCommandList->SetGraphicsRootConstantBufferView(0, ActorInsPtr->ObjectCB->Resource()->GetGPUVirtualAddress());
 	}
 	// update the constant buffer with the latest worldviewproj glm::mat4
-	ActorInsPtr->ObjectCB->CopyData(0, Obj);
+	
 	
 	mCommandList->DrawIndexedInstanced(
 		MeshGeo->DrawArgs[MeshGeo->Name].IndexCount,
@@ -354,7 +354,7 @@ void DX12RHI::BuildShadowPSO()
 	}
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 	SecureZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-	psoDesc.RasterizerState.DepthBias = 10000;
+	psoDesc.RasterizerState.DepthBias = 100000;
 	psoDesc.RasterizerState.DepthBiasClamp = 0.0f;
 	psoDesc.RasterizerState.SlopeScaledDepthBias = 1.0f;
 	psoDesc.InputLayout = { ShadowPso.mInputLayout.data(), (UINT)ShadowPso.mInputLayout.size() };
