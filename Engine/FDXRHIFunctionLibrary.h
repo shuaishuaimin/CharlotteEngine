@@ -39,11 +39,13 @@ public:
 			return nullptr;
 		}
 		std::shared_ptr<D3D_SHADER_MACRO> ShaderMacroPtr = std::make_shared<D3D_SHADER_MACRO>();
-		ShaderMacroPtr->Definition = LPCSTR(String2wString(ShaderMacro->Definetion).c_str());
-		ShaderMacroPtr->Name = LPCSTR(String2wString(ShaderMacro->Name).c_str());
+		std::string Definetion = ShaderMacro->Definetion;
+		std::string Name = ShaderMacro->Name;
+		ShaderMacroPtr->Definition = LPCSTR(std::move(Definetion).c_str());
+		ShaderMacroPtr->Name = LPCSTR(std::move(Name).c_str());
 		return ShaderMacroPtr;
 	}
-	static std::vector<D3D12_INPUT_ELEMENT_DESC> InputDescS2DX12(const std::vector<Charalotte::FInputElementDesc>& InputElements)
+	static std::vector<D3D12_INPUT_ELEMENT_DESC> InputDescS2DX12(std::vector<Charalotte::FInputElementDesc>& InputElements)
 	{
 		std::vector<D3D12_INPUT_ELEMENT_DESC> ResultElements;
 		for (const auto& InputElement : InputElements)
@@ -55,7 +57,8 @@ public:
 			InputLayout.InputSlotClass = D3D12_INPUT_CLASSIFICATION(InputElement.InputSlotClass);
 			InputLayout.InstanceDataStepRate = InputElement.InstanceDataStepRate;
 			InputLayout.SemanticIndex = InputElement.Index;
-			InputLayout.SemanticName = LPCSTR(std::move(String2wString(InputElement.Name)).c_str());
+			auto NamePtrCopy = InputElement.Name.c_str();
+			InputLayout.SemanticName = LPCSTR(std::move(NamePtrCopy));
 			ResultElements.push_back(std::move(InputLayout));
 		}
 		return ResultElements;

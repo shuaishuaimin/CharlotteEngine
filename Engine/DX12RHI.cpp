@@ -644,26 +644,25 @@ void DX12RHI::FlushCommandQueue()
 	}
 }
 
-void DX12RHI::BuildShaderInput(const Charalotte::FShaderInput& ShaderInput)
+void DX12RHI::BuildShaderInput(std::shared_ptr<Charalotte::FShaderInput> ShaderInput)
 {
 	HRESULT hr = S_OK;
 	bool IsGetSucceed = false;
-	auto& Pso = PSOs->GetPSOReference(ShaderInput.PsoType, IsGetSucceed);
+	auto& Pso = PSOs->GetPSOReference(ShaderInput->PsoType, IsGetSucceed);
 	Charalotte::PSO TempPso;
-	std::wstring ShaderFilePath = FDXRHIFunctionLibrary::String2wString(ShaderInput.ShaderFilePath);
-	auto VSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(ShaderInput.VSShaderMacroPtr);
-	auto PSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(ShaderInput.PSShaderMacroPtr);
+	std::wstring ShaderFilePath = FDXRHIFunctionLibrary::String2wString(ShaderInput->ShaderFilePath);
+	auto VSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(ShaderInput->VSShaderMacroPtr);
+	auto PSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(ShaderInput->PSShaderMacroPtr);
 	Pso.mvsByteCode = FUtil::CompileShader(ShaderFilePath,
-		VSShaderMacroSharedPtr.get(), "VS", ShaderInput.VSShaderVersion);
+		VSShaderMacroSharedPtr.get(), "VS", ShaderInput->VSShaderVersion);
 	Pso.mpsByteCode = FUtil::CompileShader(ShaderFilePath, 
-				PSShaderMacroSharedPtr.get(), "PS", ShaderInput.PSShaderVersion);
-	Pso.mInputLayout = FDXRHIFunctionLibrary::InputDescS2DX12(ShaderInput.InputLayout);
+				PSShaderMacroSharedPtr.get(), "PS", ShaderInput->PSShaderVersion);
+	Pso.mInputLayout = FDXRHIFunctionLibrary::InputDescS2DX12(ShaderInput->InputLayout);
 	if (!IsGetSucceed)
 	{
 		TempPso = Pso;
-		PSOs->InsertNewPSO(ShaderInput.PsoType, Pso);
+		PSOs->InsertNewPSO(ShaderInput->PsoType, TempPso);
 	}
-	
 }
 void DX12RHI::BuildRootSignature(Charalotte::E_PSOTYPE psoType)
 {

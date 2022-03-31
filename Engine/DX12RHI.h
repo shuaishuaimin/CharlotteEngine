@@ -68,7 +68,9 @@ public:
 
 	virtual void SwapChain() override;
 
-	virtual void BuildShaderInput(const Charalotte::FShaderInput& ShaderInput) override;
+	virtual void BuildShaderInput(std::shared_ptr<Charalotte::FShaderInput>) override;
+
+	virtual void BuildPSO() override;
 
 protected:
 	// flush fence
@@ -86,12 +88,8 @@ protected:
 	void LogAdapters();
 	void LogAdapterOutputs(IDXGIAdapter* adapter);
 	void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
-
 	// pipeline
-	
 	void BuildShadersAndInputLayOut();
-	void BuildPSO();
-
 	// Build
 	void BuildDXMeshPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive, 
 			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs);

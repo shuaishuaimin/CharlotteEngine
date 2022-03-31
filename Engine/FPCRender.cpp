@@ -33,6 +33,8 @@ FPCRender::FPCRender()
 	});
 	DrawData = std::make_shared<Charalotte::DrawNecessaryData>();
 	TestLightData = std::make_shared<Charalotte::DrawNecessaryData>();
+	CommonShaderInput = std::make_shared<Charalotte::FShaderInput>();
+	ShadowShaderInput = std::make_shared<Charalotte::FShaderInput>();
 }
 
 
@@ -50,7 +52,8 @@ bool FPCRender::Initialize()
 	RHIIns->OnResize();
 	BuildCommonInputLayout();
 	BuildShadowInputLayout();
-	RHIIns->InitRenderPipeline();
+	RHIIns->BuildRootSignature(Charalotte::Default);
+	RHIIns->BuildPSO();
 	RHIIns->BuildRootSignature(Charalotte::Shadow);
 	RHIIns->BuildShadowPSO();
 	RHIIns->InitShadowMap();
@@ -200,14 +203,13 @@ void FPCRender::UpDateCommonCons(Charalotte::ObjectConstants& objConstants, cons
 
 void FPCRender::BuildCommonInputLayout()
 {
-	Charalotte::FShaderInput CommonShaderInput;
-	CommonShaderInput.PsoType = Charalotte::Default;
-	CommonShaderInput.PSShaderMacroPtr = nullptr;
-	CommonShaderInput.VSShaderMacroPtr = nullptr;
-	CommonShaderInput.VSShaderVersion = "vs_5_0";
-	CommonShaderInput.PSShaderVersion = "ps_5_0";
-	CommonShaderInput.ShaderFilePath = "Shaders\\color.hlsl";
-	CommonShaderInput.InputLayout =
+	CommonShaderInput->PsoType = Charalotte::Default;
+	CommonShaderInput->PSShaderMacroPtr = nullptr;
+	CommonShaderInput->VSShaderMacroPtr = nullptr;
+	CommonShaderInput->VSShaderVersion = "vs_5_0";
+	CommonShaderInput->PSShaderVersion = "ps_5_0";
+	CommonShaderInput->ShaderFilePath = "Shaders\\color.hlsl";
+	CommonShaderInput->InputLayout =
 	{
 		{ "POSITION", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT , 0, 0, Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 		{ "COLOR", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT, 0, 12,  Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
@@ -219,14 +221,13 @@ void FPCRender::BuildCommonInputLayout()
 
 void FPCRender::BuildShadowInputLayout()
 {
-	Charalotte::FShaderInput ShadowShaderInput;
-	ShadowShaderInput.PsoType = Charalotte::Shadow;
-	ShadowShaderInput.PSShaderMacroPtr = nullptr;
-	ShadowShaderInput.VSShaderMacroPtr = nullptr;
-	ShadowShaderInput.VSShaderVersion = "vs_5_0";
-	ShadowShaderInput.PSShaderVersion = "ps_5_0";
-	ShadowShaderInput.ShaderFilePath = "Shaders\\Shadows.hlsl";
-	ShadowShaderInput.InputLayout =
+	ShadowShaderInput->PsoType = Charalotte::Shadow;
+	ShadowShaderInput->PSShaderMacroPtr = nullptr;
+	ShadowShaderInput->VSShaderMacroPtr = nullptr;
+	ShadowShaderInput->VSShaderVersion = "vs_5_0";
+	ShadowShaderInput->PSShaderVersion = "ps_5_0";
+	ShadowShaderInput->ShaderFilePath = "Shaders\\Shadows.hlsl";
+	ShadowShaderInput->InputLayout =
 	{
 		{ "POSITION", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT , 0, 0, Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 		{ "COLOR", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT, 0, 12,  Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,

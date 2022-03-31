@@ -65,4 +65,7 @@ private:
 	// test
 	glm::mat4 mLightView = glm::mat4(1.0f);
 	glm::mat4 mLightProj = glm::mat4(1.0f);
+
+	std::shared_ptr<Charalotte::FShaderInput> CommonShaderInput;
+	std::shared_ptr<Charalotte::FShaderInput> ShadowShaderInput;
 };

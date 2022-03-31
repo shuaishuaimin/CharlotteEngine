@@ -44,6 +44,7 @@ public:
 	virtual void FlushCommandQueue() = 0;
 
 	virtual void SwapChain() = 0;
-	virtual void BuildShaderInput(const Charalotte::FShaderInput& ShaderInput) = 0;
+	virtual void BuildShaderInput(std::shared_ptr<Charalotte::FShaderInput> ShaderInput) = 0;
+	virtual void BuildPSO() = 0;
 
 };
