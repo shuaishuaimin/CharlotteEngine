@@ -9,8 +9,10 @@
 #include "CharlotteEngine.h"
 #include "FMeshAsset.h"
 #include "RHIResource.h"
-#include "RHIBaseData.h "
+#include "SRHIConstants.h "
+#ifdef RENDER_PLATFORM_DX12
 #include "DX12RHI.h"
+#endif
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -19,7 +21,9 @@ using std::string;
 
 FPCRender::FPCRender()
 {
+#ifdef RENDER_PLATFORM_DX12
 	RHIIns = std::make_unique<DX12RHI>();
+#endif
 	FWinEventRegisterSystem::GetInstance().RegisterMapLoadEventForDender(Charalotte::BaseMapLoad, [this](const std::string& MapName) {
 		this->LoadingMapDataFromAssetSystem(MapName);
 		});

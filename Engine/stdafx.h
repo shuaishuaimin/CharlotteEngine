@@ -16,16 +16,16 @@
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
 #include "gtc/quaternion.hpp"
-#include "BaseStructAllPlatform.h"
+#include "STransformDef.h"
 #include "FMathHelper.h"
 #include "Singleton.h"
 #include "FGameTimer.h"
 #include "FMaterial.h"
 #include "RHI.h"
 #include "FRender.h"
+#include "DDefines.h"
 
-
-#if PLATFORM_WINDOWS
+#ifdef RENDER_PLATFORM_DX12
 #include <windows.h>
 #include <wrl.h>
 #include <dxgi1_4.h>

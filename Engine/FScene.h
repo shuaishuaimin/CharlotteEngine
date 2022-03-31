@@ -4,7 +4,7 @@
 #include <set>
 #include "Singleton.h"
 #include "FCamera.h"
-#include "Primitive.h"
+#include "SPrimitive.h"
 #include "FGameTimer.h"
 #include "FWinEventRegisterSystem.h"
 

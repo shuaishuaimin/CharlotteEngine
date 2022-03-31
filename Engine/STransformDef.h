@@ -3,6 +3,10 @@
 #include "gtc/matrix_transform.hpp"
 #include "gtc/quaternion.hpp"
 
+class STransformDef
+{
+
+};
 namespace Charalotte
 {
 	struct FVector
@@ -105,6 +109,15 @@ namespace Charalotte
 		float pitch = 0.0f;
 		float yaw = 0.0f;
 	};
+	struct FLight
+	{
+		glm::vec3 Strength = { 0.5f, 0.5f, 0.5f };
+		float FalloffStart = 1.0f;                          // point/spot light only
+		glm::vec3 Direction = { 0.0f, -1.0f, 0.0f };// directional/spot light only
+		float FalloffEnd = 10.0f;                           // point/spot light only
+		glm::vec3 Position = { 0.0f, 0.0f, 0.0f };  // point/spot light only
+		float SpotPower = 64.0f;                            // spot light only
+	};
 
 	enum MapLoadType
 	{
@@ -116,9 +129,4 @@ namespace Charalotte
 		DXRenderResize
 	};
 
-	enum PSOType
-	{
-		Default,
-		Shadow
-	};
 }

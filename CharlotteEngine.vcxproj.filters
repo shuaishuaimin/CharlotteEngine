@@ -121,6 +121,9 @@
     <Filter Include="Source Files\Engine\Render">
       <UniqueIdentifier>{c289e6da-a823-4e5d-8bac-0468f926c317}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Engine\EngineDataDef">
+      <UniqueIdentifier>{da00c1c6-e782-4aa7-bfc8-a076ae757f24}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\d3dx12.h">
@@ -154,9 +157,6 @@
       <Filter>Header Files\Engine\Platform\Windows</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FDataProcessor.h">
-      <Filter>Header Files\Engine\Public\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\BaseStructAllPlatform.h">
       <Filter>Header Files\Engine\Public\Data</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GameLogic.h">
@@ -213,7 +213,7 @@
     <ClInclude Include="Engine\RHIResource.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Primitive.h">
+    <ClInclude Include="Engine\SPrimitive.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FDXShadowMap.h">
@@ -234,10 +234,22 @@
     <ClInclude Include="Engine\FDXPSOs.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\RHIBaseData.h">
+    <ClInclude Include="Engine\FDX12Buffer.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FDX12Buffer.h">
+    <ClInclude Include="Engine\STransformDef.h">
+      <Filter>Header Files\Engine\EngineDataDef</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\SRHIConstants.h">
+      <Filter>Header Files\Engine\EngineDataDef</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DDefines.h">
+      <Filter>Header Files\Engine\EngineDataDef</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\SEShaderElements.h">
+      <Filter>Header Files\Engine\EngineDataDef</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FDXRHIFunctionLibrary.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
   </ItemGroup>

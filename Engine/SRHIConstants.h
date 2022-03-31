@@ -1,9 +1,9 @@
 #pragma once
-#include "BaseStructAllPlatform.h"
+#include "STransformDef.h"
 
 namespace Charalotte
 {
-	struct ConstantBuffer
+	struct FConstantBuffer
 	{
 		glm::mat4 Test = glm::mat4(1.0f);
 		glm::mat4 Tans = glm::mat4(1.0f);
@@ -13,13 +13,13 @@ namespace Charalotte
 		glm::mat4 Rotate = glm::mat4(1.0f);
 		float Offset = 0;
 	};
-	struct scenebounds
+	struct FSceneBounds
 	{
 		glm::vec3 Center;
 		float Radius;
 	};
 
-	struct PassConstants
+	struct FPassConstants
 	{
 		glm::mat4 View = glm::mat4(1.0f);
 		glm::mat4 Proj = glm::mat4(1.0f);
@@ -41,7 +41,9 @@ namespace Charalotte
 		// indices [NUM_DIR_LIGHTS, NUM_DIR_LIGHTS+NUM_POINT_LIGHTS) are point lights;
 		// indices [NUM_DIR_LIGHTS+NUM_POINT_LIGHTS, NUM_DIR_LIGHTS+NUM_POINT_LIGHT+NUM_SPOT_LIGHTS)
 		// are spot lights for a maximum of MaxLights per object.
-		Light Lights;
+		FLight Lights;
 	};
+
+
 
 }

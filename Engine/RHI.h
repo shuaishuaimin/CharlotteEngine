@@ -3,10 +3,11 @@
 #include <string>
 #include <unordered_map>
 #include "FWindow.h"
-#include "BaseStructAllPlatform.h"
+#include "STransformDef.h"
 #include "FMaterial.h"
 #include "RHIResource.h"
-#include "Primitive.h"
+#include "SPrimitive.h"
+#include "SEShaderElements.h"
 
 class RHI
 {
@@ -27,11 +28,11 @@ public:
 
 	virtual void CompileMaterial() = 0;
 
-	virtual void BuildRootSignature(Charalotte::PSOType psoType) = 0;
+	virtual void BuildRootSignature(Charalotte::E_PSOTYPE psoType) = 0;
 	virtual void BuildShadowPSO() = 0;
 	virtual void InitShadowMap() = 0;
 
-	virtual void DrawPrepare(Charalotte::PSOType PSOType) = 0;
+	virtual void DrawPrepare(Charalotte::E_PSOTYPE PSOType) = 0;
 	virtual void DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData, 
 						const Charalotte::ObjectConstants& Obj) = 0;
 
@@ -43,4 +44,6 @@ public:
 	virtual void FlushCommandQueue() = 0;
 
 	virtual void SwapChain() = 0;
+	virtual void BuildShaderInput(const Charalotte::FShaderInput& ShaderInput) = 0;
+
 };

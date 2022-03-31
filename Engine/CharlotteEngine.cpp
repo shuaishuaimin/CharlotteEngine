@@ -12,6 +12,7 @@ CharalotteEngine::CharalotteEngine() {
 	RenderIns = std::make_unique<FPCRender>();
 #endif
 	Timer = std::make_unique<FGameTimer>();
+	//test code
 	TextureArray = {"bricks", "bricks2", "bricks3", "grass", "ice", "stone", "tile", "WireFence", "WoodCrate01"};
 }
 

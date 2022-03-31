@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseStructAllPlatform.h"
+#include "STransformDef.h"
 
 namespace Charalotte
 {

@@ -2,7 +2,8 @@
 #include "DX12RHI.h"
 #include "FWin32Window.h"
 #include "FUtil.h"
-#include "RHIBaseData.h"
+#include "SRHIConstants.h"
+#include "FDXRHIFunctionLibrary.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -35,7 +36,7 @@ void DX12RHI::LoadTextureResource(const std::string& FileName, const std::string
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 	auto Texture = std::make_shared<Charalotte::DXTextureResource>();
 	Texture->Name = FileName;
-	Texture->Filename = String2wString(FilePath);
+	Texture->Filename = FDXRHIFunctionLibrary::String2wString(FilePath);
 	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
 		mCommandList.Get(), Texture->Filename.c_str(),
 		Texture->Resource, Texture->UploadHeap));
@@ -264,7 +265,7 @@ void DX12RHI::CompileMaterial()
 	}
 }
 
-void DX12RHI::DrawPrepare(Charalotte::PSOType psoType)
+void DX12RHI::DrawPrepare(Charalotte::E_PSOTYPE psoType)
 {
 	const auto& Iter = PsoPrepareFunction.find(psoType);
 	if (Iter != PsoPrepareFunction.end())
@@ -643,7 +644,33 @@ void DX12RHI::FlushCommandQueue()
 		CloseHandle(eventHandle);
 	}
 }
-void DX12RHI::BuildRootSignature(Charalotte::PSOType psoType)
+
+void DX12RHI::BuildShaderInput(const Charalotte::FShaderInput& ShaderInput)
+{
+	HRESULT hr = S_OK;
+	bool IsGetSucceed = false;
+	auto& Pso = PSOs->GetPSOReference(ShaderInput.PsoType, IsGetSucceed);
+	if (!IsGetSucceed)
+	{
+		Charalotte::PSO TempPso;
+		PSOs->InsertNewPSO(ShaderInput.PsoType, TempPso);
+		Pso = PSOs->GetPSOReference(ShaderInput.PsoType);
+	}
+	std::wstring ShaderFilePath = FDXRHIFunctionLibrary::String2wString(ShaderInput.ShaderFilePath);
+	auto VSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(ShaderInput.VSShaderMacroPtr);
+	auto PSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(ShaderInput.PSShaderMacroPtr);
+	Pso.mvsByteCode = FUtil::CompileShader(ShaderFilePath,
+		VSShaderMacroSharedPtr.get(), "VS", ShaderInput.VSShaderVersion);
+	Pso.mpsByteCode = FUtil::CompileShader(ShaderFilePath, 
+				PSShaderMacroSharedPtr.get(), "PS", ShaderInput.PSShaderVersion);
+	for (const auto& Input : ShaderInput.InputLayout)
+	{
+		D3D12_INPUT_ELEMENT_DESC ;
+		Pso.mInputLayout
+	}
+	
+}
+void DX12RHI::BuildRootSignature(Charalotte::E_PSOTYPE psoType)
 {
 	bool GetPSOSuccess = false;
 	auto& Pso = PSOs->GetPSOReference(psoType, GetPSOSuccess);

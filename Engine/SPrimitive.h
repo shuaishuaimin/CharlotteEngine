@@ -1,8 +1,12 @@
 #pragma once
 #include <vector>
-#include "BaseStructAllPlatform.h"
+#include "STransformDef.h"
 #include "FMaterial.h"
 
+class SPrimitive
+{
+
+};
 namespace Charalotte
 {
 	struct FLODInfo

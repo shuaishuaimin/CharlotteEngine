@@ -49,7 +49,7 @@ public:
 
 	virtual void CompileMaterial() override;
 
-	virtual void DrawPrepare(Charalotte::PSOType psoType) override;
+	virtual void DrawPrepare(Charalotte::E_PSOTYPE psoType) override;
 	virtual void DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData
 							, const Charalotte::ObjectConstants& Obj) override;
 
@@ -59,7 +59,7 @@ public:
 	virtual void BuildShadowPSO() override;
 	virtual void InitShadowMap() override;
 
-	virtual void BuildRootSignature(Charalotte::PSOType psoType) override;
+	virtual void BuildRootSignature(Charalotte::E_PSOTYPE psoType) override;
 
 	virtual void OpenCommandList(bool IsOpenPso)override;
 	virtual void ExecuteAndCloseCommandList()override;
@@ -67,6 +67,8 @@ public:
 	virtual void FlushCommandQueue() override;
 
 	virtual void SwapChain() override;
+
+	virtual void BuildShaderInput(const Charalotte::FShaderInput& ShaderInput) override;
 
 protected:
 	// flush fence
@@ -181,7 +183,7 @@ private:
 
 // parameters for self
 private:
-	std::unordered_map<Charalotte::PSOType, std::function<void()>> PsoPrepareFunction;
+	std::unordered_map<Charalotte::E_PSOTYPE, std::function<void()>> PsoPrepareFunction;
 	std::unique_ptr<FDXShadowMap> ShadowMap;
 	std::shared_ptr<FDevice> DevicePtr;
 	bool IsDrawShadow;

@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-#include "BaseStructAllPlatform.h"
+#include "STransformDef.h"
 #include "FUploadBuffer.h"
 #include "WinMaterialData.h"
 #include "FMaterial.h"

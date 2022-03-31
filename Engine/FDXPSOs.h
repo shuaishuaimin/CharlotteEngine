@@ -2,7 +2,7 @@
 #include <string>
 #include "d3dx12.h"
 #include "DX12RHIData.h"
-#include "BaseStructAllPlatform.h"
+#include "STransformDef.h"
 
 namespace Charalotte
 {
@@ -10,22 +10,20 @@ namespace Charalotte
 	{
 	public:
 		FDXPSOs() {
-			PSOs.insert({ Charalotte::Default, {} });
-			PSOs.insert({ Charalotte::Shadow, {} });
 			EmptyPSO = {};
 		}
 
-		inline void InsertNewPSO(Charalotte::PSOType psoType, Charalotte::PSO& Pso)
+		inline void InsertNewPSO(Charalotte::E_PSOTYPE psoType, Charalotte::PSO& Pso)
 		{
 			PSOs.insert({ psoType, std::move(Pso) });
 		}
 
-		inline void RemovePSO(Charalotte::PSOType psoType)
+		inline void RemovePSO(Charalotte::E_PSOTYPE psoType)
 		{
 			PSOs.erase(psoType);
 		}
 
-		Charalotte::PSO& GetPSOReference(Charalotte::PSOType psoType, bool& IsGetSuccess)
+		Charalotte::PSO& GetPSOReference(Charalotte::E_PSOTYPE psoType, bool& IsGetSuccess)
 		{
 			const auto& Iter = PSOs.find(psoType);
 			if (Iter != PSOs.end())
@@ -39,7 +37,7 @@ namespace Charalotte
 				return EmptyPSO;
 			}
 		}
-		Charalotte::PSO& GetPSOReference(Charalotte::PSOType psoType)
+		Charalotte::PSO& GetPSOReference(Charalotte::E_PSOTYPE psoType)
 		{
 			const auto& Iter = PSOs.find(psoType);
 			if (Iter != PSOs.end())
@@ -52,7 +50,7 @@ namespace Charalotte
 			}
 		}
 
-		Charalotte::PSO GetPSOCopy(Charalotte::PSOType psoType)
+		Charalotte::PSO GetPSOCopy(Charalotte::E_PSOTYPE psoType)
 		{
 			const auto& Iter = PSOs.find(psoType);
 			if (Iter != PSOs.end())
@@ -64,12 +62,12 @@ namespace Charalotte
 				return EmptyPSO;
 			}
 		}
-		std::unordered_map<Charalotte::PSOType, Charalotte::PSO>& GetPSOs()
+		std::unordered_map<Charalotte::E_PSOTYPE, Charalotte::PSO>& GetPSOs()
 		{
 			return PSOs;
 		}
 	private:
-		std::unordered_map<Charalotte::PSOType, Charalotte::PSO> PSOs;
+		std::unordered_map<Charalotte::E_PSOTYPE, Charalotte::PSO> PSOs;
 		Charalotte::PSO EmptyPSO;
 	};
 }

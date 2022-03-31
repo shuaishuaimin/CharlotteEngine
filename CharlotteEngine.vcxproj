@@ -145,8 +145,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Engine\AActor.h" />
-    <ClInclude Include="Engine\BaseStructAllPlatform.h" />
+    <ClInclude Include="Engine\FDXRHIFunctionLibrary.h" />
+    <ClInclude Include="Engine\SEShaderElements.h" />
+    <ClInclude Include="Engine\STransformDef.h" />
     <ClInclude Include="Engine\CharlotteEngine.h" />
+    <ClInclude Include="Engine\DDefines.h" />
     <ClInclude Include="Engine\FDX12Buffer.h" />
     <ClInclude Include="Engine\DX12RHI.h" />
     <ClInclude Include="Engine\DX12RHIData.h" />
@@ -163,9 +166,9 @@
     <ClInclude Include="Engine\FScene.h" />
     <ClInclude Include="Engine\FDXResources.h" />
     <ClInclude Include="Engine\FWindow.h" />
-    <ClInclude Include="Engine\Primitive.h" />
+    <ClInclude Include="Engine\SPrimitive.h" />
     <ClInclude Include="Engine\RHI.h" />
-    <ClInclude Include="Engine\RHIBaseData.h" />
+    <ClInclude Include="Engine\SRHIConstants.h" />
     <ClInclude Include="Engine\RHIResource.h" />
     <ClInclude Include="Engine\stdafx.h" />
     <ClInclude Include="Engine\FMaterial.h" />

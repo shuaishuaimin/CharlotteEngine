@@ -3,7 +3,8 @@
 #include <string>
 #include <set>
 #include "Singleton.h"
-#include "BaseStructAllPlatform.h"
+#include "STransformDef.h"
+#include "SPrimitive.h"
 
 class FMeshAsset : public Singleton<FMeshAsset>
 {
