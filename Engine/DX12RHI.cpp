@@ -125,7 +125,6 @@ bool DX12RHI::InitRenderPlatform(FWindow* WindowPtr)
 
 bool DX12RHI::InitRenderPipeline()
 {
-	BuildShadersAndInputLayOut();
 	BuildRootSignature(Charalotte::Default);
 	BuildPSO();
 	return true;
@@ -650,12 +649,7 @@ void DX12RHI::BuildShaderInput(const Charalotte::FShaderInput& ShaderInput)
 	HRESULT hr = S_OK;
 	bool IsGetSucceed = false;
 	auto& Pso = PSOs->GetPSOReference(ShaderInput.PsoType, IsGetSucceed);
-	if (!IsGetSucceed)
-	{
-		Charalotte::PSO TempPso;
-		PSOs->InsertNewPSO(ShaderInput.PsoType, TempPso);
-		Pso = PSOs->GetPSOReference(ShaderInput.PsoType);
-	}
+	Charalotte::PSO TempPso;
 	std::wstring ShaderFilePath = FDXRHIFunctionLibrary::String2wString(ShaderInput.ShaderFilePath);
 	auto VSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(ShaderInput.VSShaderMacroPtr);
 	auto PSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(ShaderInput.PSShaderMacroPtr);
@@ -663,10 +657,11 @@ void DX12RHI::BuildShaderInput(const Charalotte::FShaderInput& ShaderInput)
 		VSShaderMacroSharedPtr.get(), "VS", ShaderInput.VSShaderVersion);
 	Pso.mpsByteCode = FUtil::CompileShader(ShaderFilePath, 
 				PSShaderMacroSharedPtr.get(), "PS", ShaderInput.PSShaderVersion);
-	for (const auto& Input : ShaderInput.InputLayout)
+	Pso.mInputLayout = FDXRHIFunctionLibrary::InputDescS2DX12(ShaderInput.InputLayout);
+	if (!IsGetSucceed)
 	{
-		D3D12_INPUT_ELEMENT_DESC ;
-		Pso.mInputLayout
+		TempPso = Pso;
+		PSOs->InsertNewPSO(ShaderInput.PsoType, Pso);
 	}
 	
 }

@@ -10,6 +10,7 @@
 #include "FMeshAsset.h"
 #include "RHIResource.h"
 #include "SRHIConstants.h "
+#include "SEShaderElements.h"
 #ifdef RENDER_PLATFORM_DX12
 #include "DX12RHI.h"
 #endif
@@ -47,6 +48,8 @@ bool FPCRender::Initialize()
 		return false;
 	}
 	RHIIns->OnResize();
+	BuildCommonInputLayout();
+	BuildShadowInputLayout();
 	RHIIns->InitRenderPipeline();
 	RHIIns->BuildRootSignature(Charalotte::Shadow);
 	RHIIns->BuildShadowPSO();
@@ -193,4 +196,42 @@ void FPCRender::UpDateCommonCons(Charalotte::ObjectConstants& objConstants, cons
 	objConstants.Scale3D = glm::transpose(FMathHelper::GetScaleMatrix(ActorPri.Transform));
 	objConstants.Rotate = NowRotate;
 	objConstants.Offset = CharalotteEngine::GetInstance().GetTimer()->TotalTime();
+}
+
+void FPCRender::BuildCommonInputLayout()
+{
+	Charalotte::FShaderInput CommonShaderInput;
+	CommonShaderInput.PsoType = Charalotte::Default;
+	CommonShaderInput.PSShaderMacroPtr = nullptr;
+	CommonShaderInput.VSShaderMacroPtr = nullptr;
+	CommonShaderInput.VSShaderVersion = "vs_5_0";
+	CommonShaderInput.PSShaderVersion = "ps_5_0";
+	CommonShaderInput.ShaderFilePath = "Shaders\\color.hlsl";
+	CommonShaderInput.InputLayout =
+	{
+		{ "POSITION", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT , 0, 0, Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+		{ "COLOR", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT, 0, 12,  Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
+		{ "NORMAL", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT, 0, 28,  Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
+		{ "TEXCOORD", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32_FLOAT, 0, 44,  Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+	};
+	RHIIns->BuildShaderInput(CommonShaderInput);
+}
+
+void FPCRender::BuildShadowInputLayout()
+{
+	Charalotte::FShaderInput ShadowShaderInput;
+	ShadowShaderInput.PsoType = Charalotte::Shadow;
+	ShadowShaderInput.PSShaderMacroPtr = nullptr;
+	ShadowShaderInput.VSShaderMacroPtr = nullptr;
+	ShadowShaderInput.VSShaderVersion = "vs_5_0";
+	ShadowShaderInput.PSShaderVersion = "ps_5_0";
+	ShadowShaderInput.ShaderFilePath = "Shaders\\Shadows.hlsl";
+	ShadowShaderInput.InputLayout =
+	{
+		{ "POSITION", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT , 0, 0, Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+		{ "COLOR", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT, 0, 12,  Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
+		{ "NORMAL", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT, 0, 28,  Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
+		{ "TEXCOORD", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32_FLOAT, 0, 44,  Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+	};
+	RHIIns->BuildShaderInput(ShadowShaderInput);
 }

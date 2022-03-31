@@ -48,6 +48,10 @@ protected:
 	void UpdateShadowCons(Charalotte::ObjectConstants& Obj, const Charalotte::FActorInfo& ActorPri);
 
 	void UpDateCommonCons(Charalotte::ObjectConstants& Obj, const Charalotte::FActorInfo& ActorPri);
+
+	void BuildCommonInputLayout();
+
+	void BuildShadowInputLayout();
 private:
 
 	std::unique_ptr<RHI> RHIIns;

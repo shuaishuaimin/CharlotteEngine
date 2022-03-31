@@ -144,8 +144,8 @@ namespace Charalotte
 	};
 	struct FShaderMacro
 	{
-		std::string Name;
-		std::string Definetion;
+		std::string Name = "";
+		std::string Definetion = "";
 	};
 	struct FInputElementDesc
 	{

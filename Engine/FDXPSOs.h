@@ -13,9 +13,9 @@ namespace Charalotte
 			EmptyPSO = {};
 		}
 
-		inline void InsertNewPSO(Charalotte::E_PSOTYPE psoType, Charalotte::PSO& Pso)
+		inline void InsertNewPSO(Charalotte::E_PSOTYPE psoType, const Charalotte::PSO& Pso)
 		{
-			PSOs.insert({ psoType, std::move(Pso) });
+			PSOs.insert({ psoType, Pso });
 		}
 
 		inline void RemovePSO(Charalotte::E_PSOTYPE psoType)
