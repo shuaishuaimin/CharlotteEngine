@@ -22,9 +22,9 @@
 #include "FDXPSOs.h"
 #include "FDXShadowMap.h"
 
-//#pragma comment(lib,"d3dcompiler.lib")
-//#pragma comment(lib, "D3D12.lib")
-//#pragma comment(lib, "dxgi.lib")
+#pragma comment(lib,"d3dcompiler.lib")
+#pragma comment(lib, "D3D12.lib")
+#pragma comment(lib, "dxgi.lib")
 
 class DX12RHI : public RHI
 {
@@ -35,8 +35,6 @@ public:
 	virtual void LoadTextureResource(const std::string& FileName, const std::string& FilePath) override;
 
 	virtual bool InitRenderPlatform(FWindow* WindowPtr) override;
-
-	virtual bool InitRenderPipeline() override;
 
 	virtual void OnResize() override; 
 
@@ -89,8 +87,6 @@ protected:
 	void LogAdapterOutputs(IDXGIAdapter* adapter);
 	void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
 	// pipeline
-	void BuildShadersAndInputLayOut();
-	// Build
 	void BuildDXMeshPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive, 
 			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs);
 

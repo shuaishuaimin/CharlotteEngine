@@ -18,9 +18,9 @@
 #include "WinMaterialData.h"
 #include "RHI.h"
 // link necessary lib
-#pragma comment(lib,"d3dcompiler.lib")
-#pragma comment(lib, "D3D12.lib")
-#pragma comment(lib, "dxgi.lib")
+//#pragma comment(lib,"d3dcompiler.lib")
+//#pragma comment(lib, "D3D12.lib")
+//#pragma comment(lib, "dxgi.lib")
 
 class FPCRender : public FRender
 {
@@ -50,6 +50,7 @@ protected:
 	void UpDateCommonCons(Charalotte::ObjectConstants& Obj, const Charalotte::FActorInfo& ActorPri);
 
 	void BuildCommonInputLayout();
+
 
 	void BuildShadowInputLayout();
 private:

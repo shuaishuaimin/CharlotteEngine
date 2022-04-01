@@ -123,13 +123,6 @@ bool DX12RHI::InitRenderPlatform(FWindow* WindowPtr)
 	return true;
 }
 
-bool DX12RHI::InitRenderPipeline()
-{
-	BuildRootSignature(Charalotte::Default);
-	BuildPSO();
-	return true;
-}
-
 void DX12RHI::OnResize()
 {
 	assert(md3dDevice);
@@ -679,36 +672,7 @@ void DX12RHI::BuildRootSignature(Charalotte::E_PSOTYPE psoType)
 		IID_PPV_ARGS(&Pso.mRootSignature)));
 
 }
-void DX12RHI::BuildShadersAndInputLayOut()
-{
-	HRESULT hr = S_OK;
-	bool GetPSOSuccess = false;
-	auto& Pso = PSOs->GetPSOReference(Charalotte::Default, GetPSOSuccess);
-	auto& ShadowPso = PSOs->GetPSOReference(Charalotte::Shadow);
-	if (!GetPSOSuccess)
-	{
-		return;
-	}
-	Pso.mvsByteCode = FUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "VS", "vs_5_0");
-	Pso.mpsByteCode = FUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "PS", "ps_5_0");
 
-	ShadowPso.mvsByteCode = FUtil::CompileShader(L"Shaders\\Shadows.hlsl", nullptr, "VS", "vs_5_0");
-	ShadowPso.mpsByteCode = FUtil::CompileShader(L"Shaders\\Shadows.hlsl", nullptr, "PS", "ps_5_0");
-	Pso.mInputLayout = 
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-	};
-	ShadowPso.mInputLayout =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-	};
-}
 void DX12RHI::BuildPSO()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
