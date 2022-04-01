@@ -1,13 +1,13 @@
 #pragma once
 #include <iostream>
 #include "DXPrimitives.h"
-#include "Singleton.h"
+#include "FRenderScene.h"
 
-class FDXResources : public Singleton<FDXResources>
+class FWinRenderScene : public FRenderScene
 {
 public:
-	FDXResources();
-	~FDXResources();
+	FWinRenderScene();
+	virtual ~FWinRenderScene();
 	
 	void AddDXMeshPrimitive(const std::string& AssetName, std::shared_ptr<Charalotte::FDXMeshPrimitive>& MeshAsset);
 

@@ -158,7 +158,7 @@ namespace Charalotte
 		UINT32 InstanceDataStepRate;
 	};
 
-	struct FShaderInput
+	struct FShaderInfo
 	{
 		E_PSOTYPE PsoType = E_PSOTYPE::Default;
 		std::string ShaderFilePath = "";

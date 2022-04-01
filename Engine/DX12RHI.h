@@ -17,7 +17,7 @@
 #include "FMathHelper.h"
 #include "FUploadBuffer.h"
 #include "FWinEventRegisterSystem.h"
-#include "FDXResources.h"
+#include "FWinRenderScene.h"
 #include "DX12RHIData.h"
 #include "FDXPSOs.h"
 #include "FDXShadowMap.h"
@@ -32,7 +32,7 @@ public:
 	DX12RHI();
 	virtual ~DX12RHI(); 
 
-	virtual void LoadTextureResource(const std::string& FileName, const std::string& FilePath) override;
+	virtual void LoadTextureResource(const std::string& FileName, const std::string& FilePath, FRenderScene* RenderScenePtr) override;
 
 	virtual bool InitRenderPlatform(FWindow* WindowPtr) override;
 
@@ -41,15 +41,15 @@ public:
 	virtual bool GetIsDeviceSucceed() override;
 
 	virtual void BuildMeshAndActorPrimitives(const Charalotte::FActorPrimitive& Actors,
-		const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs) override;
+		const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FRenderScene* RenderScenePtr) override;
 
-	virtual void BuildSceneResourcesForRenderPlatform() override;
+	virtual void BuildSceneResourcesForRenderPlatform(FRenderScene* RenderScenePtr) override;
 
-	virtual void CompileMaterial() override;
+	virtual void CompileMaterial(FRenderScene* RenderScenePtr) override;
 
 	virtual void DrawPrepare(Charalotte::E_PSOTYPE psoType) override;
-	virtual void DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData
-							, const Charalotte::ObjectConstants& Obj) override;
+	virtual void DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData
+							, const Charalotte::ObjectConstants& Obj, FRenderScene* RenderScenePtr) override;
 
 	virtual void DrawEnd() override;
 	virtual void DrawShadowEnd() override;
@@ -66,7 +66,7 @@ public:
 
 	virtual void SwapChain() override;
 
-	virtual void BuildShaderInput(std::shared_ptr<Charalotte::FShaderInput>) override;
+	virtual void SetShader(std::shared_ptr<Charalotte::FShaderInfo>) override;
 
 	virtual void BuildPSO() override;
 
@@ -76,6 +76,7 @@ protected:
 
 	// function for render init
 	void CreateCommandObjects();
+
 	void CreateSwapChain(FWindow* WindowPtr);
 	void CreateRtvAndDsvDescriptorHeaps();
 
@@ -88,13 +89,13 @@ protected:
 	void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
 	// pipeline
 	void BuildDXMeshPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive, 
-			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs);
+			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FWinRenderScene* DXRenderScene);
 
-	void CompleteDXMeshPrimitives();
+	void CompleteDXMeshPrimitives(FWinRenderScene* DXRenderScene);
 	void CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform,
-			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs);
+			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FWinRenderScene* DXRenderScene);
 	
-	void BuildDXActorPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive);
+	void BuildDXActorPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive, FWinRenderScene* DXRenderScene);
 
 	// Build heaps
 	void BuildDescriptorHeapsAndTables(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& Heap);
@@ -103,7 +104,7 @@ protected:
 		std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>>& ObjectCb);
 
 	void BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap, 
-		FMaterial* Material);
+		FMaterial* Material, FWinRenderScene* DXRenderScene);
 
 	void DebugDevice();
 

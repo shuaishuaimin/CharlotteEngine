@@ -4,6 +4,7 @@
 #include "FUtil.h"
 #include "SRHIConstants.h"
 #include "FDXRHIFunctionLibrary.h"
+#include "FWinRenderScene.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -31,8 +32,9 @@ DX12RHI::~DX12RHI()
 	IsDeviceSucceed = false;
 }
 
-void DX12RHI::LoadTextureResource(const std::string& FileName, const std::string& FilePath)
+void DX12RHI::LoadTextureResource(const std::string& FileName, const std::string& FilePath, FRenderScene* RenderScenePtr)
 {
+	FWinRenderScene* DXRenderScene = dynamic_cast<FWinRenderScene*>(RenderScenePtr);
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 	auto Texture = std::make_shared<Charalotte::DXTextureResource>();
 	Texture->Name = FileName;
@@ -41,7 +43,7 @@ void DX12RHI::LoadTextureResource(const std::string& FileName, const std::string
 		mCommandList.Get(), Texture->Filename.c_str(),
 		Texture->Resource, Texture->UploadHeap));
 
-	FDXResources::GetInstance().AddDxTextureResource(Texture->Name, Texture);
+	DXRenderScene->AddDxTextureResource(Texture->Name, Texture);
 	ThrowIfFailed(mCommandList->Close());
 	ID3D12CommandList* cmdLists[] = { mCommandList.Get() };
 	mCommandQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
@@ -232,16 +234,18 @@ bool DX12RHI::GetIsDeviceSucceed()
 }
 
 void DX12RHI::BuildMeshAndActorPrimitives(const Charalotte::FActorPrimitive& Actors,
-	const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs)
+	const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FRenderScene* RenderScenePtr)
 {
-	BuildDXMeshPrimitives(Actors, Meshs);
-	BuildDXActorPrimitives(Actors);
+	FWinRenderScene* DXRenderScene = dynamic_cast<FWinRenderScene*>(RenderScenePtr);
+	BuildDXMeshPrimitives(Actors, Meshs, DXRenderScene);
+	BuildDXActorPrimitives(Actors, DXRenderScene);
 }
 
-void DX12RHI::BuildSceneResourcesForRenderPlatform()
+void DX12RHI::BuildSceneResourcesForRenderPlatform(FRenderScene* RenderScenePtr)
 {
-	CompleteDXMeshPrimitives();
-	for (auto& DXActorResource : FDXResources::GetInstance().GetDXActorResources())
+	FWinRenderScene* DXRenderScene = dynamic_cast<FWinRenderScene*>(RenderScenePtr);
+	CompleteDXMeshPrimitives(DXRenderScene);
+	for (auto& DXActorResource : DXRenderScene->GetDXActorResources())
 	{
 		BuildDescriptorHeapsAndTables(DXActorResource.second->CbvHeap);
 		BuildDescriptorHeapsAndTables(DXActorResource.second->SrvHeap);
@@ -249,11 +253,12 @@ void DX12RHI::BuildSceneResourcesForRenderPlatform()
 	}
 }
 
-void DX12RHI::CompileMaterial()
-{
-	for (auto& DXActorResource : FDXResources::GetInstance().GetDXActorResources())
+void DX12RHI::CompileMaterial(FRenderScene* RenderScenePtr)
+{	
+	FWinRenderScene* DXRenderScene = dynamic_cast<FWinRenderScene*>(RenderScenePtr);
+	for (auto& DXActorResource : DXRenderScene->GetDXActorResources())
 	{
-		BulidSRV(DXActorResource.second->SrvHeap, DXActorResource.second->Material);
+		BulidSRV(DXActorResource.second->SrvHeap, DXActorResource.second->Material, DXRenderScene);
 	}
 }
 
@@ -265,9 +270,9 @@ void DX12RHI::DrawPrepare(Charalotte::E_PSOTYPE psoType)
 		Iter->second();
 	}
 }
-void DX12RHI::DrawActor(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData, const Charalotte::ObjectConstants& Obj)
+void DX12RHI::DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData, const Charalotte::ObjectConstants& Obj, FRenderScene* RenderScenePtr)
 {
-	auto ActorInsPtr = FDXResources::GetInstance().GetDXActorResourcesByName(Actor.ActorPrimitiveName);
+	auto ActorInsPtr = dynamic_cast<FWinRenderScene*>(RenderScenePtr)->GetDXActorResourcesByName(Actor.ActorPrimitiveName);
 	if (ActorInsPtr == nullptr)
 	{
 		return;
@@ -388,7 +393,7 @@ void DX12RHI::InitShadowMap()
 // we should create description and its own information, that is way to explain heap 
 //	data in heap can not be explained by computer without explain
 void DX12RHI::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform,
-	const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs)
+	const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FWinRenderScene* DXRenderScene)
 {
 	if (Meshs.find(GeometryName) == Meshs.end())
 	{
@@ -455,11 +460,11 @@ void DX12RHI::CalcVerticesAndIndices(const std::string& GeometryName, const Char
 	DXMeshPri->DrawArgs[GeometryName] = submesh;
 	DXMeshPri->Name = GeometryName;
 
-	FDXResources::GetInstance().AddDXMeshPrimitive(GeometryName, DXMeshPri);
+	DXRenderScene->AddDXMeshPrimitive(GeometryName, DXMeshPri);
 }
 
 void DX12RHI::BuildDXMeshPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive,
-			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs)
+			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FWinRenderScene* DXRenderScene)
 {
 	for (const auto& Actor : ActorPrimitive.ActorsInfo)
 	{
@@ -469,15 +474,15 @@ void DX12RHI::BuildDXMeshPrimitives(const Charalotte::FActorPrimitive& ActorPrim
 			continue;
 		}
 		MeshName.erase(MeshName.size() - 1, 1);
-		CalcVerticesAndIndices(MeshName, Actor.Transform, Meshs);
+		CalcVerticesAndIndices(MeshName, Actor.Transform, Meshs, DXRenderScene);
 	}	
 }
 
 // build dx mesh primitives and push it into dx resource
-void DX12RHI::CompleteDXMeshPrimitives()
+void DX12RHI::CompleteDXMeshPrimitives(FWinRenderScene* DXRenderScene)
 {
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
-	for (auto& MeshGeoIter : FDXResources::GetInstance().GetDXMeshResources())
+	for (auto& MeshGeoIter : DXRenderScene->GetDXMeshResources())
 	{
 		Charalotte::FDXMeshPrimitive* MeshGeo = MeshGeoIter.second.get();
 		if (MeshGeo == nullptr)
@@ -514,9 +519,9 @@ void DX12RHI::CompleteDXMeshPrimitives()
 }
 
 // build dx actor primitives and push it into dx resource
-void DX12RHI::BuildDXActorPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive)
+void DX12RHI::BuildDXActorPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive, FWinRenderScene* DXRenderScene)
 {
-	FDXResources::GetInstance().ClearDXActorPrimitives();
+	DXRenderScene->ClearDXActorPrimitives();
 
 	const auto& ActorInfors = ActorPrimitive.ActorsInfo;
 	for (const auto& Actors : ActorPrimitive.ActorsInfo)
@@ -527,7 +532,7 @@ void DX12RHI::BuildDXActorPrimitives(const Charalotte::FActorPrimitive& ActorPri
 			continue;
 		}
 		ActorMeshPrimitiveName.erase(ActorMeshPrimitiveName.size() - 1, 1);
-		auto MeshResourcePtr = FDXResources::GetInstance().GetDXMeshResourceByName(ActorMeshPrimitiveName);
+		auto MeshResourcePtr = DXRenderScene->GetDXMeshResourceByName(ActorMeshPrimitiveName);
 		if (MeshResourcePtr != nullptr)
 		{
 			std::shared_ptr<Charalotte::FDXActorPrimitive> DXActorPrimitive = std::make_shared<Charalotte::FDXActorPrimitive>();
@@ -535,7 +540,7 @@ void DX12RHI::BuildDXActorPrimitives(const Charalotte::FActorPrimitive& ActorPri
 			DXActorPrimitive->DXActorPrimitiveName = Actors.ActorPrimitiveName;
 			DXActorPrimitive->Transform = Actors.Transform;
 			DXActorPrimitive->Material = Actors.Material.get();
-			FDXResources::GetInstance().AddDXActorPrimitive(Actors.ActorPrimitiveName, DXActorPrimitive);
+			DXRenderScene->AddDXActorPrimitive(Actors.ActorPrimitiveName, DXActorPrimitive);
 		}
 	}
 }
@@ -637,7 +642,7 @@ void DX12RHI::FlushCommandQueue()
 	}
 }
 
-void DX12RHI::BuildShaderInput(std::shared_ptr<Charalotte::FShaderInput> ShaderInput)
+void DX12RHI::SetShader(std::shared_ptr<Charalotte::FShaderInfo> ShaderInput)
 {
 	HRESULT hr = S_OK;
 	bool IsGetSucceed = false;
@@ -748,7 +753,7 @@ void DX12RHI::BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>&
 }
 
 void DX12RHI::BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap, 
-			FMaterial* Material)
+			FMaterial* Material, FWinRenderScene* DXRenderScene)
 {
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	srvDesc = {};
@@ -756,8 +761,8 @@ void DX12RHI::BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap,
 	std::string TextureName = Material->GetTexture();
 	std::string NormalName = Material->GetNormal();
 
-	const auto& TextureResource = FDXResources::GetInstance().GetDXTextResourceByName(TextureName);
-	const auto& NormalResource = FDXResources::GetInstance().GetDXTextResourceByName(NormalName);
+	const auto& TextureResource = DXRenderScene->GetDXTextResourceByName(TextureName);
+	const auto& NormalResource = DXRenderScene->GetDXTextResourceByName(NormalName);
 	srvDesc.Format = TextureResource->Resource->GetDesc().Format;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;

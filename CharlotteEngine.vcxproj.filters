@@ -124,6 +124,9 @@
     <Filter Include="Header Files\Engine\EngineDataDef">
       <UniqueIdentifier>{da00c1c6-e782-4aa7-bfc8-a076ae757f24}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Engine\Platform\Render\Shader">
+      <UniqueIdentifier>{9dc9bccd-43d7-449f-b130-c69c6c392e94}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\d3dx12.h">
@@ -198,7 +201,7 @@
     <ClInclude Include="Engine\AActor.h">
       <Filter>Header Files\Game\Actor</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FDXResources.h">
+    <ClInclude Include="Engine\FWinRenderScene.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
     <ClInclude Include="Engine\RHI.h">
@@ -250,6 +253,15 @@
       <Filter>Header Files\Engine\EngineDataDef</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FDXRHIFunctionLibrary.h">
+      <Filter>Header Files\Engine\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FShader.h">
+      <Filter>Header Files\Engine\Platform\Render\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FPSO.h">
+      <Filter>Header Files\Engine\Platform\Render\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FRenderScene.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
   </ItemGroup>
@@ -308,7 +320,7 @@
     <ClCompile Include="Engine\FMaterial.cpp">
       <Filter>Source Files\Engine\Public\Material</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FDXResources.cpp">
+    <ClCompile Include="Engine\FWinRenderScene.cpp">
       <Filter>Source Files\Engine\RHI</Filter>
     </ClCompile>
     <ClCompile Include="Engine\DX12RHI.cpp">

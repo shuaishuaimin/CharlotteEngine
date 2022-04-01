@@ -5,12 +5,13 @@
 #include <string>
 #include "FPCRender.h"
 #include "FDataProcessor.h"
-#include "FDXResources.h"
+#include "FWinRenderScene.h"
 #include "CharlotteEngine.h"
 #include "FMeshAsset.h"
 #include "RHIResource.h"
 #include "SRHIConstants.h "
 #include "SEShaderElements.h"
+#include "CharlotteEngine.h"
 #ifdef RENDER_PLATFORM_DX12
 #include "DX12RHI.h"
 #endif
@@ -33,8 +34,8 @@ FPCRender::FPCRender()
 	});
 	DrawData = std::make_shared<Charalotte::DrawNecessaryData>();
 	TestLightData = std::make_shared<Charalotte::DrawNecessaryData>();
-	CommonShaderInput = std::make_shared<Charalotte::FShaderInput>();
-	ShadowShaderInput = std::make_shared<Charalotte::FShaderInput>();
+	CommonShaderInput = std::make_shared<Charalotte::FShaderInfo>();
+	ShadowShaderInput = std::make_shared<Charalotte::FShaderInfo>();
 }
 
 
@@ -88,7 +89,7 @@ void FPCRender::Update()
 		{
 			Charalotte::ObjectConstants objConstants;
 			UpdateShadowCons(objConstants, ActorPri);
-			RHIIns->DrawActor(ActorPri, TestLightData.get(), objConstants);
+			RHIIns->DrawMesh(ActorPri, TestLightData.get(), objConstants, CharalotteEngine::GetInstance().GetRenderScenePtr());
 		}
 		RHIIns->ExecuteAndCloseCommandList();
 		RHIIns->FlushCommandQueue();
@@ -100,7 +101,7 @@ void FPCRender::Update()
 		{
 			Charalotte::ObjectConstants objConstants;
 			UpDateCommonCons(objConstants, ActorPri);
-			RHIIns->DrawActor(ActorPri, DrawData.get(), objConstants);
+			RHIIns->DrawMesh(ActorPri, DrawData.get(), objConstants, CharalotteEngine::GetInstance().GetRenderScenePtr());
 		}
 		RHIIns->DrawEnd();
 		RHIIns->ExecuteAndCloseCommandList();
@@ -122,7 +123,7 @@ void FPCRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 	if (ActorPrimitiveIter != FScene::GetInstance().GetActorInfos().end())
 	{
 
-		RHIIns->BuildMeshAndActorPrimitives(ActorPrimitiveIter->second, FMeshAsset::GetInstance().GetMeshInfors());
+		RHIIns->BuildMeshAndActorPrimitives(ActorPrimitiveIter->second, FMeshAsset::GetInstance().GetMeshInfors(), CharalotteEngine::GetInstance().GetRenderScenePtr());
 	
 	}
 	else
@@ -133,12 +134,12 @@ void FPCRender::LoadingMapDataFromAssetSystem(const std::string& MapName)
 	for (const auto& TextureName : CharalotteEngine::GetInstance().GetTextureArray())
 	{
 		std::string TexturePath = "Content/Textures/" + TextureName + ".dds";
-		RHIIns->LoadTextureResource(TextureName, TexturePath);
+		RHIIns->LoadTextureResource(TextureName, TexturePath, CharalotteEngine::GetInstance().GetRenderScenePtr());
 	}
 
 	// Build scene and compile material
-	RHIIns->BuildSceneResourcesForRenderPlatform();
-	RHIIns->CompileMaterial();
+	RHIIns->BuildSceneResourcesForRenderPlatform(CharalotteEngine::GetInstance().GetRenderScenePtr());
+	RHIIns->CompileMaterial(CharalotteEngine::GetInstance().GetRenderScenePtr());
 }
 
 void FPCRender::UpdateShadowPassCB()
@@ -216,7 +217,7 @@ void FPCRender::BuildCommonInputLayout()
 		{ "NORMAL", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT, 0, 28,  Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
 		{ "TEXCOORD", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32_FLOAT, 0, 44,  Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 	};
-	RHIIns->BuildShaderInput(CommonShaderInput);
+	RHIIns->SetShader(CommonShaderInput);
 }
 
 void FPCRender::BuildShadowInputLayout()
@@ -234,5 +235,5 @@ void FPCRender::BuildShadowInputLayout()
 		{ "NORMAL", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT, 0, 28,  Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
 		{ "TEXCOORD", 0, Charalotte::E_GRAPHIC_FORMAT::FORMAT_R32G32_FLOAT, 0, 44,  Charalotte::E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 	};
-	RHIIns->BuildShaderInput(ShadowShaderInput);
+	RHIIns->SetShader(ShadowShaderInput);
 }

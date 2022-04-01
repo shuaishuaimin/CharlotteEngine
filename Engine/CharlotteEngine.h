@@ -2,7 +2,7 @@
 #include "FWindow.h"
 #include "FRender.h"
 #include "Singleton.h"
-
+#include "FRenderScene.h"
 
 class CharalotteEngine : public Singleton<CharalotteEngine>
 {
@@ -28,6 +28,8 @@ public:
 
 	FRender* GetRenderPtr();
 
+	FRenderScene* GetRenderScenePtr();
+
 	std::vector<std::string>& GetTextureArray();
 
 private:
@@ -35,5 +37,5 @@ private:
 	std::shared_ptr<FWindow> WindowIns;
 	std::unique_ptr<FGameTimer> Timer;
 	std::vector<std::string> TextureArray;
+	std::unique_ptr<FRenderScene> RenderScene;
 };
-

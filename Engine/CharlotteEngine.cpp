@@ -2,8 +2,12 @@
 #include "CharlotteEngine.h"
 #include "FScene.h"
 #include "thread"
+#include "DDefines.h"
 #if PLATFORM_WINDOWS
 #include "FPCRender.h"
+#endif
+#ifdef RENDER_PLATFORM_DX12
+#include "FWinRenderScene.h"
 #endif
 
 CharalotteEngine::CharalotteEngine() {
@@ -14,6 +18,9 @@ CharalotteEngine::CharalotteEngine() {
 	Timer = std::make_unique<FGameTimer>();
 	//test code
 	TextureArray = {"bricks", "bricks2", "bricks3", "grass", "ice", "stone", "tile", "WireFence", "WoodCrate01"};
+#ifdef RENDER_PLATFORM_DX12
+	RenderScene = std::make_unique<FWinRenderScene>();
+#endif
 }
 
 bool CharalotteEngine::Init() {
@@ -96,4 +103,16 @@ FRender* CharalotteEngine::GetRenderPtr()
 std::vector<std::string>& CharalotteEngine::GetTextureArray()
 {
 	return TextureArray;
+}
+
+FRenderScene* CharalotteEngine::GetRenderScenePtr()
+{
+	if (RenderScene != nullptr)
+	{
+		return RenderScene.get();
+	}
+	else
+	{
+		return nullptr;
+	}
 }
