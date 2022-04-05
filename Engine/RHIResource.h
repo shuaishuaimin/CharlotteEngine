@@ -3,7 +3,7 @@
 
 namespace Charalotte
 {
-	struct DrawNecessaryData
+	struct RenderUsefulData
 	{
 		VPTransformData VPTransform;
 		CameraData MainCameraData;

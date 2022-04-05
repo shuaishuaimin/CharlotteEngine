@@ -16,7 +16,7 @@ class FShadowShader : public FShader
 public:
 	virtual void SetRarameter(RHI* R) override
 	{
-
+		
 	}
 };
 

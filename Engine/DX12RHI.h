@@ -48,11 +48,10 @@ public:
 	virtual void CompileMaterial(FRenderScene* RenderScenePtr) override;
 
 	virtual void DrawPrepare(Charalotte::E_PSOTYPE psoType) override;
-	virtual void DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData
+	virtual void DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData
 							, const Charalotte::ObjectConstants& Obj, FRenderScene* RenderScenePtr) override;
 
-	virtual void DrawEnd() override;
-	virtual void DrawShadowEnd() override;
+	virtual void DrawEnd(Charalotte::E_PSOTYPE PSOType) override;
 
 	virtual void BuildShadowPSO() override;
 	virtual void InitShadowMap() override;
@@ -69,6 +68,9 @@ public:
 	virtual void SetShader(std::shared_ptr<Charalotte::FShaderInfo>) override;
 
 	virtual void BuildPSO() override;
+
+	virtual void SetPipelineParamter(Charalotte::E_PSOTYPE PSOType, 
+		const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FRenderScene* RenderScenePtr) override;
 
 protected:
 	// flush fence
@@ -109,6 +111,8 @@ protected:
 	void DebugDevice();
 
 	void RegisterPSOFunc();
+
+	
 protected:
 	// function for all
 	inline std::string wString2String(const std::wstring& ws) 
@@ -179,8 +183,10 @@ private:
 // parameters for self
 private:
 	std::unordered_map<Charalotte::E_PSOTYPE, std::function<void()>> PsoPrepareFunction;
+	std::unordered_map<Charalotte::E_PSOTYPE, std::function<void()>> PsoEndFunctions;
+	std::unordered_map<Charalotte::E_PSOTYPE, std::function<void(const Charalotte::FActorInfo& Actor,
+		Charalotte::RenderUsefulData* DrawData, FRenderScene* RenderScenePtr)>> PsoSetParamterFunctions;
 	std::unique_ptr<FDXShadowMap> ShadowMap;
 	std::shared_ptr<FDevice> DevicePtr;
-	bool IsDrawShadow;
 };
 

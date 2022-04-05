@@ -33,11 +33,10 @@ public:
 	virtual void InitShadowMap() = 0;
 
 	virtual void DrawPrepare(Charalotte::E_PSOTYPE PSOType) = 0;
-	virtual void DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData, 
+	virtual void DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, 
 						const Charalotte::ObjectConstants& Obj, FRenderScene* RenderScenePtr) = 0;
 
-	virtual void DrawEnd() = 0;
-	virtual void DrawShadowEnd() = 0;
+	virtual void DrawEnd(Charalotte::E_PSOTYPE PSOType) = 0;
 
 	virtual void OpenCommandList(bool IsOpenPso) = 0;
 	virtual void ExecuteAndCloseCommandList() = 0;
@@ -46,5 +45,6 @@ public:
 	virtual void SwapChain() = 0;
 	virtual void SetShader(std::shared_ptr<Charalotte::FShaderInfo> ShaderInput) = 0;
 	virtual void BuildPSO() = 0;
-
-};
+	virtual void SetPipelineParamter(Charalotte::E_PSOTYPE PSOType, 
+				const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FRenderScene* RenderScenePtr) = 0;
+}; 

@@ -32,8 +32,8 @@ FPCRender::FPCRender()
 	FWinEventRegisterSystem::GetInstance().RegisterOnResize(Charalotte::DXRenderResize, [this](){
 		this->RHIIns->OnResize();
 	});
-	DrawData = std::make_shared<Charalotte::DrawNecessaryData>();
-	TestLightData = std::make_shared<Charalotte::DrawNecessaryData>();
+	DrawData = std::make_shared<Charalotte::RenderUsefulData>();
+	TestLightData = std::make_shared<Charalotte::RenderUsefulData>();
 	CommonShaderInput = std::make_shared<Charalotte::FShaderInfo>();
 	ShadowShaderInput = std::make_shared<Charalotte::FShaderInfo>();
 }
@@ -89,8 +89,11 @@ void FPCRender::Update()
 		{
 			Charalotte::ObjectConstants objConstants;
 			UpdateShadowCons(objConstants, ActorPri);
+			RHIIns->SetPipelineParamter(Charalotte::Shadow, ActorPri,
+						TestLightData.get(), CharalotteEngine::GetInstance().GetRenderScenePtr());
 			RHIIns->DrawMesh(ActorPri, TestLightData.get(), objConstants, CharalotteEngine::GetInstance().GetRenderScenePtr());
 		}
+		//RHIIns->DrawEnd(Charalotte::Shadow);
 		RHIIns->ExecuteAndCloseCommandList();
 		RHIIns->FlushCommandQueue();
 
@@ -101,9 +104,11 @@ void FPCRender::Update()
 		{
 			Charalotte::ObjectConstants objConstants;
 			UpDateCommonCons(objConstants, ActorPri);
+			RHIIns->SetPipelineParamter(Charalotte::Default, ActorPri,
+				DrawData.get(), CharalotteEngine::GetInstance().GetRenderScenePtr());
 			RHIIns->DrawMesh(ActorPri, DrawData.get(), objConstants, CharalotteEngine::GetInstance().GetRenderScenePtr());
 		}
-		RHIIns->DrawEnd();
+		RHIIns->DrawEnd(Charalotte::Default);
 		RHIIns->ExecuteAndCloseCommandList();
 		RHIIns->SwapChain();
 		RHIIns->FlushCommandQueue();

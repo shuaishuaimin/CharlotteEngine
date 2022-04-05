@@ -258,11 +258,14 @@
     <ClInclude Include="Engine\FShader.h">
       <Filter>Header Files\Engine\Platform\Render\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FPSO.h">
+    <ClInclude Include="Engine\FPipeline.h">
       <Filter>Header Files\Engine\Platform\Render\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FRenderScene.h">
       <Filter>Header Files\Engine\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FCommandList.h">
+      <Filter>Header Files\Engine\Platform\Render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

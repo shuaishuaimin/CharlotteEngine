@@ -57,9 +57,9 @@ private:
 
 	std::unique_ptr<RHI> RHIIns;
 
-	std::shared_ptr<Charalotte::DrawNecessaryData> DrawData;
+	std::shared_ptr<Charalotte::RenderUsefulData> DrawData;
 
-	std::shared_ptr<Charalotte::DrawNecessaryData> TestLightData;
+	std::shared_ptr<Charalotte::RenderUsefulData> TestLightData;
 
 	std::string NowMapName;
 

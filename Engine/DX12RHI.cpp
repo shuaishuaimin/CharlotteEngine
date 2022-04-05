@@ -223,6 +223,7 @@ void DX12RHI::OnResize()
 	mScreenViewport.Width = static_cast<float>(mClientWidth);
 	mScreenViewport.Height = static_cast<float>(mClientHeight);
 	mScreenViewport.MinDepth = 0.0f;
+
 	mScreenViewport.MaxDepth = 1.0f;
 
 	mScissorRect = { 0, 0, mClientWidth, mClientHeight };
@@ -269,8 +270,9 @@ void DX12RHI::DrawPrepare(Charalotte::E_PSOTYPE psoType)
 	{
 		Iter->second();
 	}
+
 }
-void DX12RHI::DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::DrawNecessaryData* DrawData, const Charalotte::ObjectConstants& Obj, FRenderScene* RenderScenePtr)
+void DX12RHI::DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, const Charalotte::ObjectConstants& Obj, FRenderScene* RenderScenePtr)
 {
 	auto ActorInsPtr = dynamic_cast<FWinRenderScene*>(RenderScenePtr)->GetDXActorResourcesByName(Actor.ActorPrimitiveName);
 	if (ActorInsPtr == nullptr)
@@ -278,10 +280,6 @@ void DX12RHI::DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::DrawNece
 		return;
 	}
 	auto MeshGeo = ActorInsPtr->DXMeshPrimitive;
-
-	ID3D12DescriptorHeap* descriptorHeaps[] = { ActorInsPtr->SrvHeap.Get() };
-	mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-
 	auto VertexBufferView = MeshGeo->VertexBufferView();
 	auto IndexBufferView = MeshGeo->IndexBufferView();
 	mCommandList->IASetVertexBuffers(0, 1, &VertexBufferView);
@@ -292,54 +290,19 @@ void DX12RHI::DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::DrawNece
 	auto count = MeshGeo->DrawArgs[MeshGeo->Name].IndexCount;
 	// use resource
 	ActorInsPtr->ObjectCB->CopyData(0, Obj);
-	if (!IsDrawShadow)
-	{
-		mCommandList->SetGraphicsRoot32BitConstants(0, 4, &(DrawData->MainCameraData.Location), 0);
-
-		mCommandList->SetGraphicsRootConstantBufferView(1, ActorInsPtr->ObjectCB->Resource()->GetGPUVirtualAddress());
-
-		mCommandList->SetGraphicsRootDescriptorTable(3, ActorInsPtr->SrvHeap->GetGPUDescriptorHandleForHeapStart());
-		ID3D12DescriptorHeap* ShadowdescriptorHeaps[] = { ShadowMap->GetSrvHeap().Get() };
-		mCommandList->SetDescriptorHeaps(_countof(ShadowdescriptorHeaps), ShadowdescriptorHeaps);
-		mCommandList->SetGraphicsRootDescriptorTable(4, ShadowMap->GetSrvHeap()->GetGPUDescriptorHandleForHeapStart());
-	}
-	else
-	{
-		mCommandList->SetGraphicsRootConstantBufferView(0, ActorInsPtr->ObjectCB->Resource()->GetGPUVirtualAddress());
-	}
 	// update the constant buffer with the latest worldviewproj glm::mat4
-	
-	
 	mCommandList->DrawIndexedInstanced(
 		MeshGeo->DrawArgs[MeshGeo->Name].IndexCount,
 		1, 0, 0, 0);
 }
 
-void DX12RHI::DrawEnd()
+void DX12RHI::DrawEnd(Charalotte::E_PSOTYPE PSOType)
 {
-	// Indicate a state transition on the resource usage.
-	auto BarrierTransRTToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-	mCommandList->ResourceBarrier(1, &BarrierTransRTToPresent);
-
-	auto BarrierTransResourceToRead = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
-		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-	mCommandList->ResourceBarrier(1, &BarrierTransResourceToRead);
-}
-
-void DX12RHI::DrawShadowEnd()
-{
-	//mCommandList->SetGraphicsRootDescriptorTable(4, ShadowMap->GetSrvHeap()->GetGPUDescriptorHandleForHeapStart());
-	// Indicate a state transition on the resource usage.
-	
-	auto BarrierTransRTToPresent = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
-		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ);
-	mCommandList->ResourceBarrier(1, &BarrierTransRTToPresent);
-
-	auto BarrierTransReadToResource = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
-		D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-	mCommandList->ResourceBarrier(1, &BarrierTransReadToResource);
-
+	const auto& Iter = PsoEndFunctions.find(PSOType);
+	if (Iter != PsoEndFunctions.end())
+	{
+		Iter->second();
+	}
 }
 
 void DX12RHI::BuildShadowPSO()
@@ -381,6 +344,16 @@ void DX12RHI::BuildShadowPSO()
 	psoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
 	psoDesc.DSVFormat = mDepthStencilFormat;
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&ShadowPso.mPSO)));
+}
+
+void DX12RHI::SetPipelineParamter(Charalotte::E_PSOTYPE PSOType, 
+	const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FRenderScene* RenderScenePtr)
+{
+	const auto& Iter = PsoSetParamterFunctions.find(PSOType);
+	if (Iter != PsoSetParamterFunctions.end())
+	{
+		Iter->second(Actor, DrawData, RenderScenePtr);
+	}
 }
 
 void DX12RHI::InitShadowMap()
@@ -887,14 +860,11 @@ void DX12RHI::RegisterPSOFunc()
 {
 	PsoPrepareFunction.insert({Charalotte::Default, [this](){
 		bool IsPSOGetSucceed = false;
-		IsDrawShadow = false;
 		Charalotte::PSO& Pso = PSOs->GetPSOReference(Charalotte::Default, IsPSOGetSucceed);
 		if (!IsPSOGetSucceed)
 		{
 			return;
 		}
-		
-		
 		// Set the viewport and scissor rect. This needs to be reset whenever the command list is reset.
 		mCommandList->RSSetViewports(1, &mScreenViewport);
 		mCommandList->RSSetScissorRects(1, &mScissorRect);
@@ -930,7 +900,6 @@ void DX12RHI::RegisterPSOFunc()
 		{
 			return;
 		}
-		IsDrawShadow = true;
 		ID3D12DescriptorHeap* descriptorHeaps[] = { ShadowMap->GetSrvHeap().Get() };
 		mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 		mCommandList->SetGraphicsRootSignature(ShadowPso.mRootSignature.Get());
@@ -946,6 +915,60 @@ void DX12RHI::RegisterPSOFunc()
 		mCommandList->RSSetViewports(1, &mScreenViewport);
 		mCommandList->RSSetScissorRects(1, &mScissorRect);
 
+	}});
+
+	PsoEndFunctions.insert({Charalotte::Default, [this](){
+		// Indicate a state transition on the resource usage.
+		auto BarrierTransRTToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		mCommandList->ResourceBarrier(1, &BarrierTransRTToPresent);
+
+		auto BarrierTransResourceToRead = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+		mCommandList->ResourceBarrier(1, &BarrierTransResourceToRead);
+	}});
+
+	PsoEndFunctions.insert({Charalotte::Shadow, [this](){
+		//mCommandList->SetGraphicsRootDescriptorTable(4, ShadowMap->GetSrvHeap()->GetGPUDescriptorHandleForHeapStart());
+// Indicate a state transition on the resource usage.
+			auto BarrierTransRTToPresent = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
+				D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ);
+			mCommandList->ResourceBarrier(1, &BarrierTransRTToPresent);
+
+			auto BarrierTransReadToResource = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
+				D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+			mCommandList->ResourceBarrier(1, &BarrierTransReadToResource);
+	}});
+
+	PsoSetParamterFunctions.insert({ Charalotte::Default, [this](const Charalotte::FActorInfo& Actor, 
+					Charalotte::RenderUsefulData* DrawData, FRenderScene* RenderScenePtr){
+		auto ActorInsPtr = dynamic_cast<FWinRenderScene*>(RenderScenePtr)->GetDXActorResourcesByName(Actor.ActorPrimitiveName);
+		if (ActorInsPtr == nullptr)
+		{
+			return;
+		}
+		ID3D12DescriptorHeap* descriptorHeaps[] = { ActorInsPtr->SrvHeap.Get() };
+		mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+		mCommandList->SetGraphicsRoot32BitConstants(0, 4, &(DrawData->MainCameraData.Location), 0);
+
+		mCommandList->SetGraphicsRootConstantBufferView(1, ActorInsPtr->ObjectCB->Resource()->GetGPUVirtualAddress());
+
+		mCommandList->SetGraphicsRootDescriptorTable(3, ActorInsPtr->SrvHeap->GetGPUDescriptorHandleForHeapStart());
+		ID3D12DescriptorHeap* ShadowdescriptorHeaps[] = { ShadowMap->GetSrvHeap().Get() };
+		mCommandList->SetDescriptorHeaps(_countof(ShadowdescriptorHeaps), ShadowdescriptorHeaps);
+		mCommandList->SetGraphicsRootDescriptorTable(4, ShadowMap->GetSrvHeap()->GetGPUDescriptorHandleForHeapStart());
+	}});
+
+	PsoSetParamterFunctions.insert({ Charalotte::Shadow, [this](const Charalotte::FActorInfo& Actor,
+					Charalotte::RenderUsefulData* DrawData, FRenderScene* RenderScenePtr) {
+		auto ActorInsPtr = dynamic_cast<FWinRenderScene*>(RenderScenePtr)->GetDXActorResourcesByName(Actor.ActorPrimitiveName);
+		if (ActorInsPtr == nullptr)
+		{
+			return;
+		}
+		ID3D12DescriptorHeap* descriptorHeaps[] = { ActorInsPtr->SrvHeap.Get() };
+		mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+		mCommandList->SetGraphicsRootConstantBufferView(0, ActorInsPtr->ObjectCB->Resource()->GetGPUVirtualAddress());
 	}});
 }
 void DX12RHI::OpenCommandList(bool IsOpenPso)

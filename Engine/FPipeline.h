@@ -1,6 +1,6 @@
 #pragma once
 
-class PSO
+class FPipeline
 {
 public:
 	
