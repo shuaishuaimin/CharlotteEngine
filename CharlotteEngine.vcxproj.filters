@@ -127,6 +127,9 @@
     <Filter Include="Header Files\Engine\Platform\Render\Shader">
       <UniqueIdentifier>{9dc9bccd-43d7-449f-b130-c69c6c392e94}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Engine\Platform\Render\Heap">
+      <UniqueIdentifier>{dee8b7a4-b959-40b7-acc7-62eff51e6c63}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\d3dx12.h">
@@ -266,6 +269,12 @@
     </ClInclude>
     <ClInclude Include="Engine\FCommandList.h">
       <Filter>Header Files\Engine\Platform\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FHeapManager.h">
+      <Filter>Header Files\Engine\Platform\Render\Heap</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\EHeapType.h">
+      <Filter>Header Files\Engine\Platform\Render\Heap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

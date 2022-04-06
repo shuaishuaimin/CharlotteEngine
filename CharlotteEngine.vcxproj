@@ -145,8 +145,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Engine\AActor.h" />
+    <ClInclude Include="Engine\EHeapType.h" />
     <ClInclude Include="Engine\FCommandList.h" />
     <ClInclude Include="Engine\FDXRHIFunctionLibrary.h" />
+    <ClInclude Include="Engine\FHeapManager.h" />
     <ClInclude Include="Engine\FPipeline.h" />
     <ClInclude Include="Engine\FRenderScene.h" />
     <ClInclude Include="Engine\FShader.h" />
