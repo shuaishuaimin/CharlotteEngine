@@ -344,6 +344,9 @@
     <ClCompile Include="Engine\FDXShadowMap.cpp">
       <Filter>Source Files\Engine\Render</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\FHeapManager.cpp">
+      <Filter>Source Files\Engine\Render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Engine\ShaderH.hlsli">

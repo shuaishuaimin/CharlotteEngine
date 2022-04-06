@@ -198,6 +198,7 @@
     <ClCompile Include="Engine\DDSTextureLoader.cpp" />
     <ClCompile Include="Engine\DX12RHI.cpp" />
     <ClCompile Include="Engine\FDXShadowMap.cpp" />
+    <ClCompile Include="Engine\FHeapManager.cpp" />
     <ClCompile Include="Engine\FMeshAsset.cpp" />
     <ClCompile Include="Engine\FScene.cpp" />
     <ClCompile Include="Engine\FWinRenderScene.cpp" />

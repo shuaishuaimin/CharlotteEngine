@@ -4,8 +4,9 @@ namespace Charalotte
 {
 	enum class HeapType
 	{
-		RTVHeap,
-		DSVHeap,
-		UAVSRVCBVHeap
+		CBVSRVUAVHeap = 0,
+		SAMPLERHeap = (CBVSRVUAVHeap + 1),
+		RTVHeap = (SAMPLERHeap + 1),
+		DSVHeap = (RTVHeap + 1) ,
 	};
 }
