@@ -156,7 +156,7 @@ namespace Charalotte
 		glm::vec3 lightUp = glm::vec3(0.0f, 0.0f, 1.0f);
 
 		//int Time = CharalotteEngine::GetInstance().GetTimer()->TotalTime();
-		int Time = 3;
+		int Time = 0;
 		lightPos = glm::vec4(lightPos, 0.0f) * glm::rotate(glm::mat4(1.0f), Time % 4 * glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
 		targetPos = glm::vec4(targetPos, 0.0f) * glm::rotate(glm::mat4(1.0f), Time % 4 * glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
 		mNowLightPos = lightPos + targetPos;

@@ -131,9 +131,9 @@ float CalcDiffuseShadingLevel(ShadingParams Params)
 {
 	float ReflectionKd = 1.0f;
 	float Reflection = ReflectionKd * ( Params.LightStrength) * max(VecMulVec(normalize(Params.Normal),  normalize(Params.LightVec)) , 0.0f );
-	float BlingPhongKs = 50.0;
+	float BlingPhongKs = 100.0;
 	float4 bisector = normalize(normalize(Params.LightVec) + normalize(CameraLoc - float4(Params.VecPos, 1.0f)));
-	float BlingPhongP = 2.3f;
+	float BlingPhongP = 4.0f;
 	float BlingPhong = BlingPhongKs * (Params.LightStrength) * max(0.0f, pow(VecMulVec(bisector, Params.Normal), BlingPhongP));
 	float Enviroument = 0.4;
 	return Reflection + BlingPhong + Enviroument;
