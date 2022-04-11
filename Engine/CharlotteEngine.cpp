@@ -10,109 +10,113 @@
 #include "FWinRenderScene.h"
 #endif
 
-CharalotteEngine::CharalotteEngine() {
-	WindowIns = this->CreateMainWindow();
-#if PLATFORM_WINDOWS
-	RenderIns = std::make_unique<FPCRender>();
-#endif
-	Timer = std::make_unique<FGameTimer>();
-	//test code
-	TextureArray = {"bricks", "bricks2", "bricks3", "grass", "ice", "stone", "tile", "WireFence", "WoodCrate01"};
-#ifdef RENDER_PLATFORM_DX12
-	RenderScene = std::make_unique<FWinRenderScene>();
-#endif
-}
-
-bool CharalotteEngine::Init() {
-	if (!WindowIns->InitMainWindow())
-	{
-		return false;
-	}
-	if (!RenderIns->Initialize())
-	{
-		return false;
-	}
-	return true;
-}
-
-std::shared_ptr<FWindow> CharalotteEngine::CreateMainWindow()
+namespace Charalotte
 {
-#if	PLATFORM_WINDOWS
-	return std::make_shared<FWin32Window>();
-#else
-	return nullptr;
-#endif
-}
-
-int CharalotteEngine::Update() {
-	//std::thread 
+	CharalotteEngine::CharalotteEngine() {
+		WindowIns = this->CreateMainWindow();
 #if PLATFORM_WINDOWS
-	MSG msg = { 0 };
+		RenderIns = std::make_unique<FPCRender>();
+#endif
+		Timer = std::make_unique<FGameTimer>();
+		//test code
+		TextureArray = { "bricks", "bricks2", "bricks3", "grass", "ice", "stone", "tile", "WireFence", "WoodCrate01", "Stone_Texture"};
+#ifdef RENDER_PLATFORM_DX12
+		RenderScene = std::make_unique<FWinRenderScene>();
+#endif
+	}
 
-	Timer->Reset();
+	bool CharalotteEngine::Init() {
+		if (!WindowIns->InitMainWindow())
+		{
+			return false;
+		}
+		if (!RenderIns->Initialize())
+		{
+			return false;
+		}
+		return true;
+	}
 
-	// if message is not wm_quit. Refresh the window
-	while (!WindowIns->GetIsExit())
+	std::shared_ptr<FWindow> CharalotteEngine::CreateMainWindow()
 	{
-		WindowIns->Update();
+#if	PLATFORM_WINDOWS
+		return std::make_shared<FWin32Window>();
+#else
+		return nullptr;
+#endif
+	}
+
+	int CharalotteEngine::Update() {
+		//std::thread 
+#if PLATFORM_WINDOWS
+		MSG msg = { 0 };
+
+		Timer->Reset();
+
+		// if message is not wm_quit. Refresh the window
+		while (!WindowIns->GetIsExit())
+		{
+			WindowIns->Update();
+			if (!WindowIns->GetIsPaused())
+			{
+				FScene::GetInstance().Update();
+				RenderIns->Update();
+			}
+
+		}
+		return (int)0;
+#else
+		return 0;
+#endif
+	}
+
+	void CharalotteEngine::Destory()
+	{
+		Sleep(1000);
+		WindowIns = nullptr;
+
+		RenderIns = nullptr;
+	}
+
+	void CharalotteEngine::tick()
+	{
 		if (!WindowIns->GetIsPaused())
 		{
 			FScene::GetInstance().Update();
 			RenderIns->Update();
 		}
-		
 	}
-	return (int)0;
-#else
-	return 0;
-#endif
-}
 
-void CharalotteEngine::Destory()
-{
-	Sleep(1000);
-	WindowIns = nullptr;
-
-	RenderIns = nullptr;
-}
-
-void CharalotteEngine::tick()
-{
-	if (!WindowIns->GetIsPaused())
+	FGameTimer* CharalotteEngine::GetTimer()
 	{
-		FScene::GetInstance().Update();
-		RenderIns->Update();
+		return Timer.get();
 	}
-}
 
-FGameTimer* CharalotteEngine::GetTimer()
-{
-	return Timer.get();
-}
-
-FWindow* CharalotteEngine::GetWindowPtr()
-{
-	return WindowIns.get();
-}
-
-FRender* CharalotteEngine::GetRenderPtr()
-{
-	return RenderIns.get();
-}
-
-std::vector<std::string>& CharalotteEngine::GetTextureArray()
-{
-	return TextureArray;
-}
-
-FRenderScene* CharalotteEngine::GetRenderScenePtr()
-{
-	if (RenderScene != nullptr)
+	FWindow* CharalotteEngine::GetWindowPtr()
 	{
-		return RenderScene.get();
+		return WindowIns.get();
 	}
-	else
+
+	FRender* CharalotteEngine::GetRenderPtr()
 	{
-		return nullptr;
+		return RenderIns.get();
+	}
+
+	std::vector<std::string>& CharalotteEngine::GetTextureArray()
+	{
+		return TextureArray;
+	}
+
+	FRenderScene* CharalotteEngine::GetRenderScenePtr()
+	{
+		if (RenderScene != nullptr)
+		{
+			return RenderScene.get();
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 }
+

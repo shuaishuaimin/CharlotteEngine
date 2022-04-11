@@ -2,7 +2,7 @@
 #define Test_RootSig\
 	"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), "\
 	"RootConstants(b0, num32BitConstants = 4), "\
-	"CBV(b1, visibility = SHADER_VISIBILITY_VERTEX), "\
+	"CBV(b1, visibility = SHADER_VISIBILITY_ALL), "\
 	"CBV(b2, visibility = SHADER_VISIBILITY_VERTEX), "\
 	"DescriptorTable(SRV(t0, numDescriptors = 1), visibility = SHADER_VISIBILITY_PIXEL), "\
 	"DescriptorTable(SRV(t1, numDescriptors = 1), visibility = SHADER_VISIBILITY_PIXEL), "\

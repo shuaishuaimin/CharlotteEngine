@@ -130,6 +130,9 @@
     <Filter Include="Header Files\Engine\Platform\Render\Heap">
       <UniqueIdentifier>{dee8b7a4-b959-40b7-acc7-62eff51e6c63}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Engine\Platform\Render\Light">
+      <UniqueIdentifier>{f2320ef3-90d1-461d-b80f-36f737d96e2d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\d3dx12.h">
@@ -276,6 +279,9 @@
     <ClInclude Include="Engine\EHeapType.h">
       <Filter>Header Files\Engine\Platform\Render\Heap</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\FBaseLight.h">
+      <Filter>Header Files\Engine\Platform\Render\Light</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\DDSTextureLoader.cpp">
@@ -349,9 +355,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Engine\ShaderH.hlsli">
-      <Filter>Header Files\Engine</Filter>
-    </None>
     <None Include="Engine\ShadowH.hlsli">
       <Filter>Header Files\Engine\Scene</Filter>
     </None>

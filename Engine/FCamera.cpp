@@ -7,7 +7,7 @@
 #if PLATFORM_WINDOWS
 #include "FWinEventRegisterSystem.h"
 #endif
-
+using Charalotte::CharalotteEngine;
 FCamera::FCamera(const Charalotte::CameraData& Data) : MainCameraData(Data), Sensitivity(0.25)
 {
 	VPTransform.ViewTransform = glm::mat4(1.0f);

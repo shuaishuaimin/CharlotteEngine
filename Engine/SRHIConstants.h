@@ -11,6 +11,7 @@ namespace Charalotte
 		glm::mat4 MVP = glm::mat4(1.0f);
 		glm::mat4 Scale3D = glm::mat4(1.0f);
 		glm::mat4 Rotate = glm::mat4(1.0f);
+		FLightForShading LightInfo;
 		float Offset = 0;
 	};
 	struct FSceneBounds

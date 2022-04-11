@@ -22,51 +22,55 @@
 //#pragma comment(lib, "D3D12.lib")
 //#pragma comment(lib, "dxgi.lib")
 
-class FPCRender : public FRender
+namespace Charalotte
 {
-public:
-	FPCRender();
-	// ban copy constructor and assignment
-	FPCRender(const FPCRender& dm) = delete;
-	FPCRender operator= (const FPCRender& dm) = delete;
-	virtual ~FPCRender();
+	class FPCRender : public FRender
+	{
+	public:
+		FPCRender();
+		// ban copy constructor and assignment
+		FPCRender(const FPCRender& dm) = delete;
+		FPCRender operator= (const FPCRender& dm) = delete;
+		virtual ~FPCRender();
 
-	virtual bool Initialize()override;
+		virtual bool Initialize()override;
 
-	void InitLight();
-	void LoadingMapDataFromAssetSystem(const std::string& MapName);
+		void InitLight();
+		void LoadingMapDataFromAssetSystem(const std::string& MapName);
 
-	void Destory(){};
+		void Destory() {};
 
-	void Update() override;
+		void Update() override;
 
-	virtual bool GetIsDevicedSucceed()override;
+		virtual bool GetIsDevicedSucceed()override;
 
-protected:
-	void UpdateShadowPassCB();
+	protected:
+		void UpdateShadowPassCB();
 
-	void UpdateShadowCons(Charalotte::ObjectConstants& Obj, const Charalotte::FActorInfo& ActorPri);
+		void UpdateShadowCons(ObjectConstants& Obj, const FActorInfo& ActorPri);
 
-	void UpDateCommonCons(Charalotte::ObjectConstants& Obj, const Charalotte::FActorInfo& ActorPri);
+		void UpDateCommonCons(ObjectConstants& Obj, const FActorInfo& ActorPri);
 
-	void BuildCommonInputLayout();
+		void BuildCommonInputLayout();
 
 
-	void BuildShadowInputLayout();
-private:
+		void BuildShadowInputLayout();
+	private:
 
-	std::unique_ptr<RHI> RHIIns;
+		std::unique_ptr<RHI> RHIIns;
 
-	std::shared_ptr<Charalotte::RenderUsefulData> DrawData;
+		std::shared_ptr<RenderUsefulData> DrawData;
 
-	std::shared_ptr<Charalotte::RenderUsefulData> TestLightData;
+		std::shared_ptr<RenderUsefulData> TestLightData;
 
-	std::string NowMapName;
+		std::string NowMapName;
 
-	// test
-	glm::mat4 mLightView = glm::mat4(1.0f);
-	glm::mat4 mLightProj = glm::mat4(1.0f);
+		// test
+		glm::mat4 mLightView = glm::mat4(1.0f);
+		glm::mat4 mLightProj = glm::mat4(1.0f);
+		glm::vec3 mNowLightPos = glm::vec3(1.0f);
 
-	std::shared_ptr<Charalotte::FShaderInfo> CommonShaderInput;
-	std::shared_ptr<Charalotte::FShaderInfo> ShadowShaderInput;
-};
+		std::shared_ptr<FShaderInfo> CommonShaderInput;
+		std::shared_ptr<FShaderInfo> ShadowShaderInput;
+	};
+}

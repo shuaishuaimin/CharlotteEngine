@@ -16,6 +16,20 @@ struct Light
 	float SpotPower;    // spot light only
 };
 
+struct LightForShading
+{
+	float4 LightVec;
+	float LightStrength;
+	//float EnviroumentLightStrength;
+};
+
+struct ShadingParams
+{
+	float3 VecPos;
+	float4 Normal;
+	float LightStrength;
+	float4 LightVec;
+};
 
 Texture2D	gDiffuseMap	:	register(t0);
 
@@ -35,6 +49,7 @@ cbuffer cbPerObject : register(b1)
 	float4x4	gWorldViewProj; 
 	float4x4	gScale3D;
 	float4x4	gRotate;
+	LightForShading gLightInfo;
 	float		gOffset;
 };
 
@@ -107,7 +122,27 @@ float CalcShadowFactor(float4 shadowPosH)
 }
 
 
+float VecMulVec(float4 Vec1, float4 Vec2)
+{
+	return (Vec1.x * Vec2.x + Vec1.y * Vec2.y + Vec1.z * Vec2.z);
+}
 
+float CalcDiffuseShadingLevel(ShadingParams Params)
+{
+	float ReflectionKd = 1.0f;
+	float Reflection = ReflectionKd * ( Params.LightStrength) * max(VecMulVec(normalize(Params.Normal),  normalize(Params.LightVec)) , 0.0f );
+	float BlingPhongKs = 50.0;
+	float4 bisector = normalize(normalize(Params.LightVec) + normalize(CameraLoc - float4(Params.VecPos, 1.0f)));
+	float BlingPhongP = 2.3f;
+	float BlingPhong = BlingPhongKs * (Params.LightStrength) * max(0.0f, pow(VecMulVec(bisector, Params.Normal), BlingPhongP));
+	float Enviroument = 0.4;
+	return Reflection + BlingPhong + Enviroument;
+}
+
+float4 NumMulVec4(float value, float4 vec4)
+{
+	return float4(value * vec4.x, value * vec4.y, value * vec4.z, 1.0f);
+}
 
 [RootSignature(Test_RootSig)]
 
@@ -131,7 +166,14 @@ float4 PS(VertexOut pin) : SV_Target
 
 	float Shadow = CalcShadowFactor(pin.ShadowPos);
 
-    return pow(diffuseAlbedo * (Shadow + 0.1), 1 / 2.2f);
+	ShadingParams Params;
+	Params.VecPos = pin.ShadowPos;
+	Params.Normal = pin.Normal;
+	Params.LightStrength = gLightInfo.LightStrength;
+	Params.LightVec = gLightInfo.LightVec;
+	float ShadingDegree = CalcDiffuseShadingLevel(Params);
+
+	return  NumMulVec4(ShadingDegree, pow(diffuseAlbedo * (Shadow + 0.1), 1 / 2.2f));
 }
 
 

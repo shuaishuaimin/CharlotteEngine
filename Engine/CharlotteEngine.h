@@ -4,38 +4,43 @@
 #include "Singleton.h"
 #include "FRenderScene.h"
 
-class CharalotteEngine : public Singleton<CharalotteEngine>
+namespace Charalotte
 {
+	class CharalotteEngine : public Singleton<CharalotteEngine>
+	{
 
-public:
-	CharalotteEngine();
+	public:
+		CharalotteEngine();
 
-	~CharalotteEngine(){}
+		~CharalotteEngine() {}
 
-	bool Init();
+		bool Init();
 
-	int Update();
+		int Update();
 
-	std::shared_ptr<FWindow> CreateMainWindow();
+		std::shared_ptr<FWindow> CreateMainWindow();
 
-	void tick();
+		void tick();
 
-	void Destory();
+		void Destory();
 
-	FGameTimer* GetTimer();
+		FGameTimer* GetTimer();
 
-	FWindow* GetWindowPtr();
+		FWindow* GetWindowPtr();
 
-	FRender* GetRenderPtr();
+		FRender* GetRenderPtr();
 
-	FRenderScene* GetRenderScenePtr();
+		FRenderScene* GetRenderScenePtr();
 
-	std::vector<std::string>& GetTextureArray();
+		std::vector<std::string>& GetTextureArray();
 
-private:
-	std::unique_ptr<FRender> RenderIns;
-	std::shared_ptr<FWindow> WindowIns;
-	std::unique_ptr<FGameTimer> Timer;
-	std::vector<std::string> TextureArray;
-	std::unique_ptr<FRenderScene> RenderScene;
-};
+	private:
+		std::unique_ptr<FRender> RenderIns;
+		std::shared_ptr<FWindow> WindowIns;
+		std::unique_ptr<FGameTimer> Timer;
+		std::vector<std::string> TextureArray;
+		std::unique_ptr<FRenderScene> RenderScene;
+	};
+
+}
+

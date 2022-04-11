@@ -3,6 +3,7 @@
 #include "FScene.h"
 #include <thread>
 
+using Charalotte::CharalotteEngine;
 GameInstance::GameInstance()
 {
 	Game = std::make_unique<GameLogic>();

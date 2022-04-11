@@ -64,6 +64,11 @@ namespace Charalotte
 		glm::vec4 Normal;
 		glm::vec2 UV;
 	};
+	struct FLightForShading
+	{
+		glm::vec4 LightVec = glm::vec4(1.0f);
+		float LightStrength = 0.0f;
+	};
 
 	struct ObjectConstants
 	{
@@ -73,6 +78,7 @@ namespace Charalotte
 		glm::mat4 MVP = glm::mat4(1.0f);
 		glm::mat4 Scale3D = glm::mat4(1.0f);
 		glm::mat4 Rotate = glm::mat4(1.0f);
+		FLightForShading LightInfo;
 		float Offset = 0;
 		/*glm::mat4 TransMatrix = glm::mat4(1.0f);
 		glm::mat4 Rotate = glm::mat4(1.0f);

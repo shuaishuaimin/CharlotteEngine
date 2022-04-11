@@ -21,10 +21,17 @@ namespace Charalotte
 			NullHeap = nullptr;
 		}
 		
-		CD3DX12_CPU_DESCRIPTOR_HANDLE GetHandle(HeapType type)
+		CD3DX12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(HeapType type)
 		{
-			
+			return CD3DX12_CPU_DESCRIPTOR_HANDLE(Heap(type)->GetCPUDescriptorHandleForHeapStart());
 		}
+
+		CD3DX12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(HeapType type)
+		{
+			return CD3DX12_GPU_DESCRIPTOR_HANDLE(Heap(type)->GetGPUDescriptorHandleForHeapStart());
+		}
+
+
 	protected:
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& Heap(HeapType type)
 		{

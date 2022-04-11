@@ -50,7 +50,7 @@ void FScene::LoadMap(const std::string& MapName) {
 	
 	Charalotte::FActorPrimitive TempActorInfors;
 	FDataProcessor::LoadActors(MapName, TempActorInfors);
-	const auto& TextureNames = CharalotteEngine::GetInstance().GetTextureArray();
+	const auto& TextureNames = Charalotte::CharalotteEngine::GetInstance().GetTextureArray();
 	int TextureNum = TextureNames.size();
 	int TempTextureIndex = 0;
 	std::set<std::string> AssetNames;
@@ -81,7 +81,7 @@ void FScene::LoadMap(const std::string& MapName) {
 		// test use different texture
 		if (cool)
 		{
-			ActorInfor.Material->SetTexture("bricks3");
+			ActorInfor.Material->SetTexture("stone");
 			cool = false;
 		}
 		else

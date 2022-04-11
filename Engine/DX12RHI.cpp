@@ -581,7 +581,7 @@ void DX12RHI::CreateSwapChain(FWindow* WindowPtr)
 	sd.SampleDesc.Quality = m4xMsaaQuality ? (m4xMsaaQuality - 1) : 0;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.BufferCount = SwapChainBufferCount;
-	sd.OutputWindow = dynamic_cast<FWin32Window*>(WindowPtr)->MainWnd();
+	sd.OutputWindow = dynamic_cast<Charalotte::FWin32Window*>(WindowPtr)->MainWnd();
 	sd.Windowed = true;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;

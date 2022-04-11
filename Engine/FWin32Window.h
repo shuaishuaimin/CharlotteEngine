@@ -2,60 +2,63 @@
 #include "stdafx.h"
 #include "FWindow.h"
 
-class FWin32Window : public FWindow
+namespace Charalotte
 {
-public: 
+	class FWin32Window : public FWindow
+	{
+	public:
 
-	FWin32Window();
-	FWin32Window(const FWin32Window& rhs) = delete;
-	FWin32Window& operator=(const FWin32Window& rhs) = delete;
-	virtual ~FWin32Window();
+		FWin32Window();
+		FWin32Window(const FWin32Window& rhs) = delete;
+		FWin32Window& operator=(const FWin32Window& rhs) = delete;
+		virtual ~FWin32Window();
 
-	HWND MainWnd()const;
-	float AspectRatio()const;
+		HWND MainWnd()const;
+		float AspectRatio()const;
 
-	virtual bool InitMainWindow()override;
+		virtual bool InitMainWindow()override;
 
-	LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	static FWin32Window* GetMainWindow();
+		static FWin32Window* GetMainWindow();
 
-	void OnMouseDown(WPARAM btnState, int x, int y);
-	void OnMouseUp(WPARAM btnState, int x, int y);
-	void OnMouseMove(WPARAM btnState, int x, int y);
-	void OnKeyBoardInput();
+		void OnMouseDown(WPARAM btnState, int x, int y);
+		void OnMouseUp(WPARAM btnState, int x, int y);
+		void OnMouseMove(WPARAM btnState, int x, int y);
+		void OnKeyBoardInput();
 
-	virtual void Update()override;
-	virtual bool GetIsPaused() override;
-	virtual void SetCameraSen(float SenNum) override;
-	MSG GetMsg();
+		virtual void Update()override;
+		virtual bool GetIsPaused() override;
+		virtual void SetCameraSen(float SenNum) override;
+		MSG GetMsg();
 
-	virtual bool GetIsExit() override;
+		virtual bool GetIsExit() override;
 
-	void CalculateFrameStats();
-protected:
-	static FWin32Window* MainWindow;
+		void CalculateFrameStats();
+	protected:
+		static FWin32Window* MainWindow;
 
-	WNDPROC MainWndProcIns;
-	HINSTANCE mhAppInst = nullptr; // application instance handle
-	HWND	  mhMainWnd = nullptr; // main window handle
-	bool	  mMinimized = false; // is the application min?
-	bool	  mMaximized = false; // is the application max?
-	bool	  mResizing = false; // are the resize bars being dragged?
-	bool	  mFullscreenState = false; // full screen enabled
+		WNDPROC MainWndProcIns;
+		HINSTANCE mhAppInst = nullptr; // application instance handle
+		HWND	  mhMainWnd = nullptr; // main window handle
+		bool	  mMinimized = false; // is the application min?
+		bool	  mMaximized = false; // is the application max?
+		bool	  mResizing = false; // are the resize bars being dragged?
+		bool	  mFullscreenState = false; // full screen enabled
 
-	std::wstring mMainWndCaption = L"Charlotte Engine"; // name
-	std::wstring WinText;
-	int mClientWidth = 1980;
-	int mClientHeight = 1280;
+		std::wstring mMainWndCaption = L"Charlotte Engine"; // name
+		std::wstring WinText;
+		int mClientWidth = 1980;
+		int mClientHeight = 1280;
 
-	bool IsRunning;
+		bool IsRunning;
 
-	bool IsPaused;
+		bool IsPaused;
 
-	MSG msg;
+		MSG msg;
 
-	bool IsExit;
+		bool IsExit;
 
-	float CameraSen;
-};
+		float CameraSen;
+	};
+}

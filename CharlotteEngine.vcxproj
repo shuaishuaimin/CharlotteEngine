@@ -152,6 +152,7 @@
     <ClInclude Include="Engine\FPipeline.h" />
     <ClInclude Include="Engine\FRenderScene.h" />
     <ClInclude Include="Engine\FShader.h" />
+    <ClInclude Include="Engine\FBaseLight.h" />
     <ClInclude Include="Engine\SEShaderElements.h" />
     <ClInclude Include="Engine\STransformDef.h" />
     <ClInclude Include="Engine\CharlotteEngine.h" />
@@ -228,7 +229,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Engine\ShaderH.hlsli" />
     <None Include="Engine\ShadowH.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
