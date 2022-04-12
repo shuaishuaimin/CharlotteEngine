@@ -25,7 +25,7 @@ class FBassPassShader : public FShader
 public:
 	virtual void SetRarameter(RHI* R) override
 	{
-
+		
 	}
 };
 

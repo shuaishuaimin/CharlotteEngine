@@ -1,9 +1,9 @@
 #pragma once
 #include <iostream>
 #include "DXPrimitives.h"
-#include "FRenderScene.h"
+#include "FTempRenderScene.h"
 
-class FWinRenderScene : public FRenderScene
+class FWinRenderScene : public FTempRenderScene
 {
 public:
 	FWinRenderScene();

@@ -149,11 +149,17 @@
     <ClInclude Include="Engine\FCommandList.h" />
     <ClInclude Include="Engine\FDXRHIFunctionLibrary.h" />
     <ClInclude Include="Engine\FHeapManager.h" />
-    <ClInclude Include="Engine\FPipeline.h" />
+    <ClInclude Include="Engine\FRenderMesh.h" />
+    <ClInclude Include="Engine\FRenderPSO.h" />
     <ClInclude Include="Engine\FRenderScene.h" />
+    <ClInclude Include="Engine\FShadowMap.h" />
+    <ClInclude Include="Engine\FTempRenderScene.h" />
     <ClInclude Include="Engine\FShader.h" />
     <ClInclude Include="Engine\FBaseLight.h" />
+    <ClInclude Include="Engine\FTexture.h" />
+    <ClInclude Include="Engine\FVerticesAndIndicesBuffer.h" />
     <ClInclude Include="Engine\SEShaderElements.h" />
+    <ClInclude Include="Engine\SMaterialAttributes.h" />
     <ClInclude Include="Engine\STransformDef.h" />
     <ClInclude Include="Engine\CharlotteEngine.h" />
     <ClInclude Include="Engine\DDefines.h" />
@@ -165,7 +171,7 @@
     <ClInclude Include="Engine\FDXPSOs.h" />
     <ClInclude Include="Engine\FDXShadowMap.h" />
     <ClInclude Include="Engine\FMeshAsset.h" />
-    <ClInclude Include="Engine\FRender.h" />
+    <ClInclude Include="Engine\FRenderer.h" />
     <ClInclude Include="Engine\GameInstance.h" />
     <ClInclude Include="Engine\GameLogic.h" />
     <ClInclude Include="Engine\FInputSystem.h" />
@@ -183,7 +189,7 @@
     <ClInclude Include="Engine\d3dx12.h" />
     <ClInclude Include="Engine\FCamera.h" />
     <ClInclude Include="Engine\FDataProcessor.h" />
-    <ClInclude Include="Engine\FPCRender.h" />
+    <ClInclude Include="Engine\FPCRenderer.h" />
     <ClInclude Include="Engine\DDSTextureLoader.h" />
     <ClInclude Include="Engine\FGameTimer.h" />
     <ClInclude Include="Engine\FUploadBuffer.h" />
@@ -209,7 +215,7 @@
     <ClCompile Include="Engine\FWin32Window.cpp" />
     <ClCompile Include="Engine\FCamera.cpp" />
     <ClCompile Include="Engine\FDataProcessor.cpp" />
-    <ClCompile Include="Engine\FPCRender.cpp" />
+    <ClCompile Include="Engine\FPCRenderer.cpp" />
     <ClCompile Include="Engine\FGameTimer.cpp" />
     <ClCompile Include="Engine\FUtil.cpp" />
     <ClCompile Include="Engine\FMathHelper.cpp" />

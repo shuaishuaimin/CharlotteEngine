@@ -32,45 +32,39 @@ public:
 	DX12RHI();
 	virtual ~DX12RHI(); 
 
-	virtual void LoadTextureResource(const std::string& FileName, const std::string& FilePath, FRenderScene* RenderScenePtr) override;
+	virtual void BuildMeshAndActorPrimitives(const Charalotte::FActorPrimitive& Actors,
+		const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FTempRenderScene* RenderScenePtr) override;
 
+	virtual void BuildSceneResourcesForRenderPlatform(FTempRenderScene* RenderScenePtr) override;
+	virtual void BuildRootSignature(Charalotte::E_PSOTYPE psoType) override;
+	virtual void BuildShadowPSO() override;
+	virtual void BuildPSO() override;
+	virtual void BeginFrame() override;
+
+	virtual void CompileMaterial(FTempRenderScene* RenderScenePtr) override;
+
+	virtual void InitShadowMap() override;
 	virtual bool InitRenderPlatform(FWindow* WindowPtr) override;
 
-	virtual void OnResize() override; 
+	virtual void LoadTextureResource(const std::string& FileName, const std::string& FilePath, FTempRenderScene* RenderScenePtr) override;
+
+	virtual void DrawPrepare(Charalotte::E_PSOTYPE PSOType) override;
+	virtual void DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData,
+		const Charalotte::ObjectConstants& Obj, FTempRenderScene* RenderScenePtr) override;
+	virtual void DrawEnd(Charalotte::E_PSOTYPE PSOType) override;
+
+	virtual void ExecuteAndCloseCommandList() override;
+	virtual void FlushCommandQueue() override;
 
 	virtual bool GetIsDeviceSucceed() override;
 
-	virtual void BuildMeshAndActorPrimitives(const Charalotte::FActorPrimitive& Actors,
-		const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FRenderScene* RenderScenePtr) override;
-
-	virtual void BuildSceneResourcesForRenderPlatform(FRenderScene* RenderScenePtr) override;
-
-	virtual void CompileMaterial(FRenderScene* RenderScenePtr) override;
-
-	virtual void DrawPrepare(Charalotte::E_PSOTYPE psoType) override;
-	virtual void DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData
-							, const Charalotte::ObjectConstants& Obj, FRenderScene* RenderScenePtr) override;
-
-	virtual void DrawEnd(Charalotte::E_PSOTYPE PSOType) override;
-
-	virtual void BuildShadowPSO() override;
-	virtual void InitShadowMap() override;
-
-	virtual void BuildRootSignature(Charalotte::E_PSOTYPE psoType) override;
-
-	virtual void OpenCommandList(bool IsOpenPso)override;
-	virtual void ExecuteAndCloseCommandList()override;
-
-	virtual void FlushCommandQueue() override;
+	virtual void OpenCommandList(bool IsOpenPso) override;
+	virtual void OnResize() override;
 
 	virtual void SwapChain() override;
-
-	virtual void SetShader(std::shared_ptr<Charalotte::FShaderInfo>) override;
-
-	virtual void BuildPSO() override;
-
-	virtual void SetPipelineParamter(Charalotte::E_PSOTYPE PSOType, 
-		const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FRenderScene* RenderScenePtr) override;
+	virtual void SetShader(std::shared_ptr<Charalotte::FShaderInfo> ShaderInput) override;
+	virtual void SetPipelineParamter(Charalotte::E_PSOTYPE PSOType,
+		const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr) override;
 
 protected:
 	// flush fence
@@ -106,7 +100,7 @@ protected:
 		std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>>& ObjectCb);
 
 	void BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap, 
-		FMaterial* Material, FWinRenderScene* DXRenderScene);
+		Charalotte::FMaterial* Material, FWinRenderScene* DXRenderScene);
 
 	void DebugDevice();
 
@@ -185,7 +179,7 @@ private:
 	std::unordered_map<Charalotte::E_PSOTYPE, std::function<void()>> PsoPrepareFunction;
 	std::unordered_map<Charalotte::E_PSOTYPE, std::function<void()>> PsoEndFunctions;
 	std::unordered_map<Charalotte::E_PSOTYPE, std::function<void(const Charalotte::FActorInfo& Actor,
-		Charalotte::RenderUsefulData* DrawData, FRenderScene* RenderScenePtr)>> PsoSetParamterFunctions;
+		Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr)>> PsoSetParamterFunctions;
 	std::unique_ptr<FDXShadowMap> ShadowMap;
 	std::shared_ptr<FDevice> DevicePtr;
 };

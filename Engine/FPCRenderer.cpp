@@ -25,12 +25,14 @@ namespace Charalotte
 {
 	FPCRenderer::FPCRenderer()
 	{
-
-		FWinEventRegisterSystem::GetInstance().RegisterMapLoadEventForDender(BaseMapLoad, [this](const std::string& MapName) {
+#ifdef RENDER_PLATFORM_DX12
+		RHIIns = std::make_unique<DX12RHI>();
+#endif
+		FWinEventRegisterSystem::GetInstance().RegisterMapLoadEventForDender(MapLoadType::BaseMapLoad, [this](const std::string& MapName) {
 			this->LoadingMapDataFromAssetSystem(MapName);
 			});
 		FWinEventRegisterSystem::GetInstance().RegisterOnResize(DXRenderResize, [this]() {
-			this->RHIPtr->OnResize();
+			this->RHIIns->OnResize();
 			});
 		DrawData = std::make_shared<RenderUsefulData>();
 		TestLightData = std::make_shared<RenderUsefulData>();
@@ -43,29 +45,22 @@ namespace Charalotte
 	{
 
 	}
-	void FPCRenderer::GetRHI()
-	{
-#ifdef RENDER_PLATFORM_DX12
-		RHIPtr = CharalotteEngine::GetInstance().GetRHIPtr();
-#endif
-	}
 
 	bool FPCRenderer::Initialize()
 	{
-		GetRHI();
-		if (!RHIPtr->InitRenderPlatform(CharalotteEngine::GetInstance().GetWindowPtr()))
+		if (!RHIIns->InitRenderPlatform(CharalotteEngine::GetInstance().GetWindowPtr()))
 		{
 			return false;
 		}
-		RHIPtr->OnResize();
+		RHIIns->OnResize();
 		BuildCommonInputLayout();
 		BuildShadowInputLayout();
-		RHIPtr->BuildRootSignature(Default);
-		RHIPtr->BuildPSO();
-		RHIPtr->BuildRootSignature(Shadow);
-		RHIPtr->BuildShadowPSO();
-		RHIPtr->InitShadowMap();
-		RHIPtr->FlushCommandQueue();
+		RHIIns->BuildRootSignature(Default);
+		RHIIns->BuildPSO();
+		RHIIns->BuildRootSignature(Shadow);
+		RHIIns->BuildShadowPSO();
+		RHIIns->InitShadowMap();
+		RHIIns->FlushCommandQueue();
 		return true;
 
 	}
@@ -79,7 +74,7 @@ namespace Charalotte
 	// draw by camera data
 	void FPCRenderer::Update()
 	{
-		RHIPtr->OpenCommandList(true);
+		RHIIns->OpenCommandList(true);
 		UpdateShadowPassCB();
 		InitLight();
 		FScene::GetInstance().GetCamera()->GetCameraData(DrawData->MainCameraData);
@@ -91,40 +86,40 @@ namespace Charalotte
 		if (ActorIter != Actors.end())
 		{
 			// draw shadow
-			RHIPtr->DrawPrepare(Shadow);
+			RHIIns->DrawPrepare(Shadow);
 			for (const auto& ActorPri : ActorIter->second.ActorsInfo)
 			{
 				ObjectConstants objConstants;
 				UpdateShadowCons(objConstants, ActorPri);
-				RHIPtr->SetPipelineParamter(Shadow, ActorPri,
+				RHIIns->SetPipelineParamter(Shadow, ActorPri,
 					TestLightData.get(), CharalotteEngine::GetInstance().GetRenderScenePtr());
-				RHIPtr->DrawMesh(ActorPri, TestLightData.get(), objConstants, CharalotteEngine::GetInstance().GetRenderScenePtr());
+				RHIIns->DrawMesh(ActorPri, TestLightData.get(), objConstants, CharalotteEngine::GetInstance().GetRenderScenePtr());
 			}
 			//RHIIns->DrawEnd(Shadow);
-			RHIPtr->ExecuteAndCloseCommandList();
-			RHIPtr->FlushCommandQueue();
+			RHIIns->ExecuteAndCloseCommandList();
+			RHIIns->FlushCommandQueue();
 
-			RHIPtr->OpenCommandList(true);
+			RHIIns->OpenCommandList(true);
 			// draw actor
-			RHIPtr->DrawPrepare(Default);
+			RHIIns->DrawPrepare(Default);
 			for (const auto& ActorPri : ActorIter->second.ActorsInfo)
 			{
 				ObjectConstants objConstants;
 				UpDateCommonCons(objConstants, ActorPri);
-				RHIPtr->SetPipelineParamter(Default, ActorPri,
+				RHIIns->SetPipelineParamter(Default, ActorPri,
 					DrawData.get(), CharalotteEngine::GetInstance().GetRenderScenePtr());
-				RHIPtr->DrawMesh(ActorPri, DrawData.get(), objConstants, CharalotteEngine::GetInstance().GetRenderScenePtr());
+				RHIIns->DrawMesh(ActorPri, DrawData.get(), objConstants, CharalotteEngine::GetInstance().GetRenderScenePtr());
 			}
-			RHIPtr->DrawEnd(Default);
-			RHIPtr->ExecuteAndCloseCommandList();
-			RHIPtr->SwapChain();
-			RHIPtr->FlushCommandQueue();
+			RHIIns->DrawEnd(Default);
+			RHIIns->ExecuteAndCloseCommandList();
+			RHIIns->SwapChain();
+			RHIIns->FlushCommandQueue();
 		}
 	}
 
 	bool FPCRenderer::GetIsDevicedSucceed()
 	{
-		return RHIPtr->GetIsDeviceSucceed();
+		return RHIIns->GetIsDeviceSucceed();
 	}
 
 	void FPCRenderer::LoadingMapDataFromAssetSystem(const std::string& MapName)
@@ -135,7 +130,7 @@ namespace Charalotte
 		if (ActorPrimitiveIter != FScene::GetInstance().GetActorInfos().end())
 		{
 
-			RHIPtr->BuildMeshAndActorPrimitives(ActorPrimitiveIter->second, FMeshAsset::GetInstance().GetMeshInfors(), CharalotteEngine::GetInstance().GetRenderScenePtr());
+			RHIIns->BuildMeshAndActorPrimitives(ActorPrimitiveIter->second, FMeshAsset::GetInstance().GetMeshInfors(), CharalotteEngine::GetInstance().GetRenderScenePtr());
 
 		}
 		else
@@ -146,12 +141,12 @@ namespace Charalotte
 		for (const auto& TextureName : CharalotteEngine::GetInstance().GetTextureArray())
 		{
 			std::string TexturePath = "Content/Textures/" + TextureName + ".dds";
-			RHIPtr->LoadTextureResource(TextureName, TexturePath, CharalotteEngine::GetInstance().GetRenderScenePtr());
+			RHIIns->LoadTextureResource(TextureName, TexturePath, CharalotteEngine::GetInstance().GetRenderScenePtr());
 		}
 
 		// Build scene and compile material
-		RHIPtr->BuildSceneResourcesForRenderPlatform(CharalotteEngine::GetInstance().GetRenderScenePtr());
-		RHIPtr->CompileMaterial(CharalotteEngine::GetInstance().GetRenderScenePtr());
+		RHIIns->BuildSceneResourcesForRenderPlatform(CharalotteEngine::GetInstance().GetRenderScenePtr());
+		RHIIns->CompileMaterial(CharalotteEngine::GetInstance().GetRenderScenePtr());
 	}
 
 	void FPCRenderer::UpdateShadowPassCB()
@@ -232,7 +227,7 @@ namespace Charalotte
 			{ "NORMAL", 0, E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT, 0, 28,  E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
 			{ "TEXCOORD", 0, E_GRAPHIC_FORMAT::FORMAT_R32G32_FLOAT, 0, 44,  E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
-		RHIPtr->SetShader(CommonShaderInput);
+		RHIIns->SetShader(CommonShaderInput);
 	}
 
 	void FPCRenderer::BuildShadowInputLayout()
@@ -250,6 +245,77 @@ namespace Charalotte
 			{ "NORMAL", 0, E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT, 0, 28,  E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
 			{ "TEXCOORD", 0, E_GRAPHIC_FORMAT::FORMAT_R32G32_FLOAT, 0, 44,  E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
-		RHIPtr->SetShader(ShadowShaderInput);
+		RHIIns->SetShader(ShadowShaderInput);
+	}
+
+	// re construct function
+	void FPCRenderer::SceneRender()
+	{	
+		RHIIns->BeginFrame();
+		RenderShadowDepth();
+	}
+
+	void FPCRenderer::RenderShadowDepth()
+	{
+		glm::mat4 LightView;
+		glm::mat4 LightProj;
+		BuildLightMatrix(LightView, LightProj);
+
+	}
+
+	glm::mat4 FPCRenderer::BuildLightMatrix()
+	{
+		glm::vec3 lightPos = { -5000.0f,0.0f,2500.0f };
+		glm::vec3 targetPos = { 1.0f,0.0f,-0.5f };
+		glm::vec3 lightUp = glm::vec3(0.0f, 0.0f, 1.0f);
+
+		//int Time = CharalotteEngine::GetInstance().GetTimer()->TotalTime();
+		int Time = 0;
+		lightPos = glm::vec4(lightPos, 0.0f) * glm::rotate(glm::mat4(1.0f), Time % 4 * glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+		targetPos = glm::vec4(targetPos, 0.0f) * glm::rotate(glm::mat4(1.0f), Time % 4 * glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+		mNowLightPos = lightPos + targetPos;
+		glm::mat4 lightView = glm::lookAtLH(lightPos, lightPos + targetPos, lightUp);
+
+		glm::vec3 LS = FMathHelper::Vector3TransformCoord(targetPos, lightView);
+
+		float Radius = 2500;
+
+		float l = LS.x - Radius;
+		float b = LS.y - Radius;
+		float n = LS.z - Radius;
+		float r = LS.x + Radius;
+		float t = LS.y + Radius;
+		float f = LS.z + Radius;
+		glm::mat4 lightProj = glm::orthoLH_ZO(l, r, b, t, n, f);
+		return lightProj * lightView;
+	}
+
+	void FPCRenderer::BuildLightMatrix(glm::mat4& LightView, glm::mat4& LightProj)
+	{
+		glm::vec3 lightPos = { -5000.0f,0.0f,2500.0f };
+		glm::vec3 targetPos = { 1.0f,0.0f,-0.5f };
+		glm::vec3 lightUp = glm::vec3(0.0f, 0.0f, 1.0f);
+
+		//int Time = CharalotteEngine::GetInstance().GetTimer()->TotalTime();
+		int Time = 0;
+		lightPos = glm::vec4(lightPos, 0.0f) * glm::rotate(glm::mat4(1.0f), Time % 4 * glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+		targetPos = glm::vec4(targetPos, 0.0f) * glm::rotate(glm::mat4(1.0f), Time % 4 * glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+		mNowLightPos = lightPos + targetPos;
+		glm::mat4 lightView = glm::lookAtLH(lightPos, lightPos + targetPos, lightUp);
+
+		glm::vec3 LS = FMathHelper::Vector3TransformCoord(targetPos, lightView);
+
+		float Radius = 2500;
+
+		float l = LS.x - Radius;
+		float b = LS.y - Radius;
+		float n = LS.z - Radius;
+		float r = LS.x + Radius;
+		float t = LS.y + Radius;
+		float f = LS.z + Radius;
+		glm::mat4 lightProj = glm::orthoLH_ZO(l, r, b, t, n, f);
+		LightView = lightView;
+		LightProj = lightProj;
 	}
 }
+

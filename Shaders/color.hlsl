@@ -167,7 +167,7 @@ float4 PS(VertexOut pin) : SV_Target
 	float Shadow = CalcShadowFactor(pin.ShadowPos);
 
 	ShadingParams Params;
-	Params.VecPos = pin.ShadowPos;
+	Params.VecPos = float3(pin.ShadowPos.x, pin.ShadowPos.y, pin.ShadowPos.z);
 	Params.Normal = pin.Normal;
 	Params.LightStrength = gLightInfo.LightStrength;
 	Params.LightVec = gLightInfo.LightVec;

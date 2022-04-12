@@ -133,6 +133,12 @@
     <Filter Include="Header Files\Engine\Platform\Render\Light">
       <UniqueIdentifier>{f2320ef3-90d1-461d-b80f-36f737d96e2d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Engine\Platform\Render\RenderScene">
+      <UniqueIdentifier>{9360986d-5822-4068-ba7e-fd6b7e207423}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Platform\Render\RenderMesh">
+      <UniqueIdentifier>{03712378-6a82-4baf-8c5b-5ad1bbae64cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\d3dx12.h">
@@ -156,7 +162,7 @@
     <ClInclude Include="Engine\FCamera.h">
       <Filter>Header Files\Game\Actor\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FRender.h">
+    <ClInclude Include="Engine\FRenderer.h">
       <Filter>Header Files\Engine\Platform\Render</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FWindow.h">
@@ -237,7 +243,7 @@
     <ClInclude Include="Engine\DX12RHIData.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FPCRender.h">
+    <ClInclude Include="Engine\FPCRenderer.h">
       <Filter>Header Files\Engine\Platform\Render</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FDXPSOs.h">
@@ -264,12 +270,6 @@
     <ClInclude Include="Engine\FShader.h">
       <Filter>Header Files\Engine\Platform\Render\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FPipeline.h">
-      <Filter>Header Files\Engine\Platform\Render\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\FRenderScene.h">
-      <Filter>Header Files\Engine\RHI</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\FCommandList.h">
       <Filter>Header Files\Engine\Platform\Render</Filter>
     </ClInclude>
@@ -281,6 +281,30 @@
     </ClInclude>
     <ClInclude Include="Engine\FBaseLight.h">
       <Filter>Header Files\Engine\Platform\Render\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FTempRenderScene.h">
+      <Filter>Header Files\Engine\Platform\Render\RenderScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FRenderMesh.h">
+      <Filter>Header Files\Engine\Platform\Render\RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FRenderScene.h">
+      <Filter>Header Files\Engine\Platform\Render\RenderScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FShadowMap.h">
+      <Filter>Header Files\Engine\Platform\Render\Shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FRenderPSO.h">
+      <Filter>Header Files\Engine\Public\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FVerticesAndIndicesBuffer.h">
+      <Filter>Header Files\Engine\Platform\Render\RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FTexture.h">
+      <Filter>Header Files\Engine\Public\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\SMaterialAttributes.h">
+      <Filter>Header Files\Engine\Public\Material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -344,7 +368,7 @@
     <ClCompile Include="Engine\DX12RHI.cpp">
       <Filter>Source Files\Engine\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FPCRender.cpp">
+    <ClCompile Include="Engine\FPCRenderer.cpp">
       <Filter>Source Files\Engine\Render</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FDXShadowMap.cpp">

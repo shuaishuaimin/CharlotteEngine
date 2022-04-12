@@ -1,6 +1,6 @@
 #pragma once
 #include "FWindow.h"
-#include "FRender.h"
+#include "FRenderer.h"
 #include "Singleton.h"
 #include "FRenderScene.h"
 
@@ -28,18 +28,19 @@ namespace Charalotte
 
 		FWindow* GetWindowPtr();
 
-		FRender* GetRenderPtr();
+		FRenderer* GetRenderPtr();
 
-		FRenderScene* GetRenderScenePtr();
+		FTempRenderScene* GetRenderScenePtr();
 
 		std::vector<std::string>& GetTextureArray();
 
 	private:
-		std::unique_ptr<FRender> RenderIns;
+		std::unique_ptr<FRenderer> RenderIns;
 		std::shared_ptr<FWindow> WindowIns;
 		std::unique_ptr<FGameTimer> Timer;
 		std::vector<std::string> TextureArray;
-		std::unique_ptr<FRenderScene> RenderScene;
+		std::unique_ptr<FTempRenderScene> RenderScene;
+		std::unique_ptr<FRenderScene> RealRenderScene;
 	};
 
 }

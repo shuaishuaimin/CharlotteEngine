@@ -2,36 +2,49 @@
 #include <memory>
 #include <vector>
 #include <string>
-class FMaterial
+#include "SMaterialAttributes.h"
+
+namespace Charalotte
 {
-public:
-	FMaterial() : mTextureName("bricks"), mNormalName("bricks")
-	{	
-	}
-
-	~FMaterial(){}
-	void LoadMaterial(){}
-
-	inline void SetTexture(const std::string& TextureName)
+	class FMaterial
 	{
-		mTextureName = TextureName;
-	}
+	public:
+		FMaterial() : mTextureName("bricks"), mNormalName("bricks")
+		{
+			MaterialAttributes = std::make_unique<FMaterialAttributes>();
+		}
 
-	std::string GetTexture() const
-	{
-		return mTextureName;
-	}
+		~FMaterial() {
+			MaterialAttributes = nullptr;
+		}
+		void SetMaterialAttributes(const FMaterialAttributes& Attributes) {
+			MaterialAttributes->BaseColor = Attributes.BaseColor;
+			MaterialAttributes->Normal = Attributes.Normal;
+			MaterialAttributes->Roughness = Attributes.Roughness;
+		}
 
-	inline void SetNormal(const std::string& NormalName)
-	{
-		mNormalName = NormalName;
-	}
+		inline void SetTexture(const std::string& TextureName)
+		{
+			mTextureName = TextureName;
+		}
 
-	std::string GetNormal() const 
-	{
-		return mNormalName;
-	}
-private:
-	std::string mTextureName;
-	std::string mNormalName;
-};
+		std::string GetTexture() const
+		{
+			return mTextureName;
+		}
+
+		inline void SetNormal(const std::string& NormalName)
+		{
+			mNormalName = NormalName;
+		}
+
+		std::string GetNormal() const
+		{
+			return mNormalName;
+		}
+	private:
+		std::string mTextureName;
+		std::string mNormalName;
+		std::unique_ptr<FMaterialAttributes> MaterialAttributes;
+	};
+}

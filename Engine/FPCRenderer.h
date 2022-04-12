@@ -43,10 +43,10 @@ namespace Charalotte
 		void Update() override;
 
 		virtual bool GetIsDevicedSucceed()override;
-
-	protected:
-		void GetRHI();
 		
+		// re construct function
+		void SceneRender();
+	protected:
 		void UpdateShadowPassCB();
 
 		void UpdateShadowCons(ObjectConstants& Obj, const FActorInfo& ActorPri);
@@ -55,11 +55,16 @@ namespace Charalotte
 
 		void BuildCommonInputLayout();
 
-
 		void BuildShadowInputLayout();
+
+		// re construct function
+		void RenderShadowDepth();
+
+		glm::mat4 BuildLightMatrix();
+		void BuildLightMatrix(glm::mat4& LightView, glm::mat4& LightProj);
 	private:
 
-		RHI* RHIPtr;
+		std::unique_ptr<RHI> RHIIns;
 
 		std::shared_ptr<RenderUsefulData> DrawData;
 
@@ -74,5 +79,8 @@ namespace Charalotte
 
 		std::shared_ptr<FShaderInfo> CommonShaderInput;
 		std::shared_ptr<FShaderInfo> ShadowShaderInput;
+
+		// re construct 
+
 	};
 }

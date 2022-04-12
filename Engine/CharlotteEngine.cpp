@@ -4,7 +4,7 @@
 #include "thread"
 #include "DDefines.h"
 #if PLATFORM_WINDOWS
-#include "FPCRender.h"
+#include "FPCRenderer.h"
 #endif
 #ifdef RENDER_PLATFORM_DX12
 #include "FWinRenderScene.h"
@@ -15,7 +15,7 @@ namespace Charalotte
 	CharalotteEngine::CharalotteEngine() {
 		WindowIns = this->CreateMainWindow();
 #if PLATFORM_WINDOWS
-		RenderIns = std::make_unique<FPCRender>();
+		RenderIns = std::make_unique<FPCRenderer>();
 #endif
 		Timer = std::make_unique<FGameTimer>();
 		//test code
@@ -23,6 +23,7 @@ namespace Charalotte
 #ifdef RENDER_PLATFORM_DX12
 		RenderScene = std::make_unique<FWinRenderScene>();
 #endif
+		RealRenderScene = std::make_unique<FRenderScene>();
 	}
 
 	bool CharalotteEngine::Init() {
@@ -97,7 +98,7 @@ namespace Charalotte
 		return WindowIns.get();
 	}
 
-	FRender* CharalotteEngine::GetRenderPtr()
+	FRenderer* CharalotteEngine::GetRenderPtr()
 	{
 		return RenderIns.get();
 	}
@@ -107,7 +108,7 @@ namespace Charalotte
 		return TextureArray;
 	}
 
-	FRenderScene* CharalotteEngine::GetRenderScenePtr()
+	FTempRenderScene* CharalotteEngine::GetRenderScenePtr()
 	{
 		if (RenderScene != nullptr)
 		{

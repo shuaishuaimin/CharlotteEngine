@@ -10,6 +10,7 @@ using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 using namespace DirectX::PackedVector;
 using std::string;
+using Charalotte::FMaterial;
 
 DX12RHI::DX12RHI() {
 	Charalotte::CameraData TempCameraData;
@@ -32,7 +33,7 @@ DX12RHI::~DX12RHI()
 	IsDeviceSucceed = false;
 }
 
-void DX12RHI::LoadTextureResource(const std::string& FileName, const std::string& FilePath, FRenderScene* RenderScenePtr)
+void DX12RHI::LoadTextureResource(const std::string& FileName, const std::string& FilePath, FTempRenderScene* RenderScenePtr)
 {
 	FWinRenderScene* DXRenderScene = dynamic_cast<FWinRenderScene*>(RenderScenePtr);
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
@@ -235,14 +236,14 @@ bool DX12RHI::GetIsDeviceSucceed()
 }
 
 void DX12RHI::BuildMeshAndActorPrimitives(const Charalotte::FActorPrimitive& Actors,
-	const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FRenderScene* RenderScenePtr)
+	const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FTempRenderScene* RenderScenePtr)
 {
 	FWinRenderScene* DXRenderScene = dynamic_cast<FWinRenderScene*>(RenderScenePtr);
 	BuildDXMeshPrimitives(Actors, Meshs, DXRenderScene);
 	BuildDXActorPrimitives(Actors, DXRenderScene);
 }
 
-void DX12RHI::BuildSceneResourcesForRenderPlatform(FRenderScene* RenderScenePtr)
+void DX12RHI::BuildSceneResourcesForRenderPlatform(FTempRenderScene* RenderScenePtr)
 {
 	FWinRenderScene* DXRenderScene = dynamic_cast<FWinRenderScene*>(RenderScenePtr);
 	CompleteDXMeshPrimitives(DXRenderScene);
@@ -254,7 +255,7 @@ void DX12RHI::BuildSceneResourcesForRenderPlatform(FRenderScene* RenderScenePtr)
 	}
 }
 
-void DX12RHI::CompileMaterial(FRenderScene* RenderScenePtr)
+void DX12RHI::CompileMaterial(FTempRenderScene* RenderScenePtr)
 {	
 	FWinRenderScene* DXRenderScene = dynamic_cast<FWinRenderScene*>(RenderScenePtr);
 	for (auto& DXActorResource : DXRenderScene->GetDXActorResources())
@@ -272,7 +273,7 @@ void DX12RHI::DrawPrepare(Charalotte::E_PSOTYPE psoType)
 	}
 
 }
-void DX12RHI::DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, const Charalotte::ObjectConstants& Obj, FRenderScene* RenderScenePtr)
+void DX12RHI::DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, const Charalotte::ObjectConstants& Obj, FTempRenderScene* RenderScenePtr)
 {
 	auto ActorInsPtr = dynamic_cast<FWinRenderScene*>(RenderScenePtr)->GetDXActorResourcesByName(Actor.ActorPrimitiveName);
 	if (ActorInsPtr == nullptr)
@@ -347,7 +348,7 @@ void DX12RHI::BuildShadowPSO()
 }
 
 void DX12RHI::SetPipelineParamter(Charalotte::E_PSOTYPE PSOType, 
-	const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FRenderScene* RenderScenePtr)
+	const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr)
 {
 	const auto& Iter = PsoSetParamterFunctions.find(PSOType);
 	if (Iter != PsoSetParamterFunctions.end())
@@ -941,7 +942,7 @@ void DX12RHI::RegisterPSOFunc()
 	}});
 
 	PsoSetParamterFunctions.insert({ Charalotte::Default, [this](const Charalotte::FActorInfo& Actor, 
-					Charalotte::RenderUsefulData* DrawData, FRenderScene* RenderScenePtr){
+					Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr){
 		auto ActorInsPtr = dynamic_cast<FWinRenderScene*>(RenderScenePtr)->GetDXActorResourcesByName(Actor.ActorPrimitiveName);
 		if (ActorInsPtr == nullptr)
 		{
@@ -960,7 +961,7 @@ void DX12RHI::RegisterPSOFunc()
 	}});
 
 	PsoSetParamterFunctions.insert({ Charalotte::Shadow, [this](const Charalotte::FActorInfo& Actor,
-					Charalotte::RenderUsefulData* DrawData, FRenderScene* RenderScenePtr) {
+					Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr) {
 		auto ActorInsPtr = dynamic_cast<FWinRenderScene*>(RenderScenePtr)->GetDXActorResourcesByName(Actor.ActorPrimitiveName);
 		if (ActorInsPtr == nullptr)
 		{
@@ -990,4 +991,10 @@ void DX12RHI::SwapChain()
 {
 	ThrowIfFailed(mSwapChain->Present(0, 0));
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
+}
+
+// re construct function
+void DX12RHI::BeginFrame()
+{
+	
 }

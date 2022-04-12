@@ -125,9 +125,10 @@ namespace Charalotte
 		float SpotPower = 64.0f;                            // spot light only
 	};
 
-	enum MapLoadType
+	enum class MapLoadType
 	{
-		BaseMapLoad
+		BaseMapLoad,
+		RenderSceneLoad
 	};
 
 	enum ResizeType

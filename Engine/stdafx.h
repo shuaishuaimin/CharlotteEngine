@@ -11,7 +11,7 @@
 #include <sstream>
 #include <cassert>
 
-#include "FRender.h"
+#include "FRenderer.h"
 #include "Math.h"
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
@@ -22,7 +22,7 @@
 #include "FGameTimer.h"
 #include "FMaterial.h"
 #include "RHI.h"
-#include "FRender.h"
+#include "FRenderer.h"
 #include "DDefines.h"
 
 #ifdef RENDER_PLATFORM_DX12

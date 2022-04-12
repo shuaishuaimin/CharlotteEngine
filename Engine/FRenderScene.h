@@ -1,11 +1,15 @@
 #pragma once
+#include "STransformDef.h"
+#include "FScene.h"
 
 class FRenderScene
 {
 public:
-	FRenderScene()
-	{}
-	virtual ~FRenderScene()
+	FRenderScene(){}
+	~FRenderScene(){}
+
+	void BuildResource()
 	{
+		
 	}
 };
