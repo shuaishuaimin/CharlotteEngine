@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include "FVerticesAndIndicesBuffer.h"
+#include "FMaterial.h"
 
 namespace Charalotte
 {
@@ -11,9 +12,13 @@ namespace Charalotte
 		{
 
 		}
+		void SetMaterial(FMaterial* Material)
+		{
 
+		}
 
 	private:
 		std::unique_ptr<FVerticesAndIndicesBuffer> VBIB;
+		FMaterial* Material; 
 	};
 }

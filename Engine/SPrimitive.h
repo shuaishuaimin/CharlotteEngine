@@ -7,8 +7,10 @@ class SPrimitive
 {
 
 };
+
 namespace Charalotte
 {
+	class FMaterial;
 	struct FLODInfo
 	{
 

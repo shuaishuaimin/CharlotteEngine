@@ -32,6 +32,8 @@ namespace Charalotte
 
 		FTempRenderScene* GetRenderScenePtr();
 
+		FRenderScene* GetRenderScene();
+
 		std::vector<std::string>& GetTextureArray();
 
 	private:

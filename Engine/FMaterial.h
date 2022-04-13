@@ -2,7 +2,10 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <unordered_map>
 #include "SMaterialAttributes.h"
+#include "SEShaderElements.h"
+#include "FRenderPSO.h"
 
 namespace Charalotte
 {
@@ -12,6 +15,7 @@ namespace Charalotte
 		FMaterial() : mTextureName("bricks"), mNormalName("bricks")
 		{
 			MaterialAttributes = std::make_unique<FMaterialAttributes>();
+			EmptyPsos = {};
 		}
 
 		~FMaterial() {
@@ -42,9 +46,24 @@ namespace Charalotte
 		{
 			return mNormalName;
 		}
+
+		std::vector<std::shared_ptr<FRenderPSO>>& GetPSOs(E_PSOTYPE psotype)
+		{
+			const auto& Iter = Psos.find(psotype);
+			if (Iter != Psos.end())
+			{
+				return Iter->second;
+			}
+			else
+			{
+				return EmptyPsos;
+			}
+		}
 	private:
 		std::string mTextureName;
 		std::string mNormalName;
 		std::unique_ptr<FMaterialAttributes> MaterialAttributes;
+		std::unordered_map<E_PSOTYPE, std::vector<std::shared_ptr<FRenderPSO>>> Psos;
+		std::vector<std::shared_ptr<FRenderPSO>> EmptyPsos;
 	};
 }

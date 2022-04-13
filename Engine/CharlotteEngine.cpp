@@ -119,5 +119,17 @@ namespace Charalotte
 			return nullptr;
 		}
 	}
+
+	FRenderScene* CharalotteEngine::GetRenderScene()
+	{
+		if (RealRenderScene != nullptr)
+		{
+			return RealRenderScene.get();
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
 }
 

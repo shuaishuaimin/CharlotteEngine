@@ -1,5 +1,5 @@
 #pragma once
-#include "SEShaderElements.h"
+//#include "SEShaderElements.h"
 #include "FVerticesAndIndicesBuffer.h"
 #include "FShader.h"
 
