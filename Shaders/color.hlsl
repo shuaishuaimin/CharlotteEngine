@@ -85,6 +85,7 @@ struct VertexOut
 	float4 Normal		: NORMAL;
 	float2 TexCoord		: TEXCOORD;
 	float4 ShadowPos	: SHADOWPOS;
+	float4 WorldPos     : POS;
 };
 
 
@@ -157,6 +158,7 @@ VertexOut VS(VertexIn vin)
 	vout.TexCoord = vin.TexCoord;
 
 	vout.ShadowPos = mul(mul(float4(vin.PosL, 1.0f), gWorld), gTrans);
+	vout.WorldPos = mul(float4(vin.PosL, 1.0f), gWorld);
     return vout;
 }
 
@@ -167,7 +169,7 @@ float4 PS(VertexOut pin) : SV_Target
 	float Shadow = CalcShadowFactor(pin.ShadowPos);
 
 	ShadingParams Params;
-	Params.VecPos = float3(pin.ShadowPos.x, pin.ShadowPos.y, pin.ShadowPos.z);
+	Params.VecPos = float3(pin.WorldPos.x, pin.WorldPos.y, pin.WorldPos.z);
 	Params.Normal = pin.Normal;
 	Params.LightStrength = gLightInfo.LightStrength;
 	Params.LightVec = gLightInfo.LightVec;
