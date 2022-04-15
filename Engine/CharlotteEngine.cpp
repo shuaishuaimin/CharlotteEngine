@@ -120,7 +120,7 @@ namespace Charalotte
 		}
 	}
 
-	FRenderScene* CharalotteEngine::GetRenderScene()
+	FRenderScene* CharalotteEngine::GetRenderSceneFinalButNotNow()
 	{
 		if (RealRenderScene != nullptr)
 		{

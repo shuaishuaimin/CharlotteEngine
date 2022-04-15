@@ -306,6 +306,12 @@
     <ClInclude Include="Engine\SMaterialAttributes.h">
       <Filter>Header Files\Engine\Public\Material</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\FRenderTarget.h">
+      <Filter>Header Files\Engine\Platform\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FPSOBase.h">
+      <Filter>Header Files\Engine\Public\Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\DDSTextureLoader.cpp">
@@ -375,6 +381,12 @@
       <Filter>Source Files\Engine\Render</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FHeapManager.cpp">
+      <Filter>Source Files\Engine\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FRenderScene.cpp">
+      <Filter>Source Files\Engine\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FVerticesAndIndicesBuffer.cpp">
       <Filter>Source Files\Engine\Render</Filter>
     </ClCompile>
   </ItemGroup>

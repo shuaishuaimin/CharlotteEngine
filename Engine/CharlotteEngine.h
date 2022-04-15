@@ -32,7 +32,7 @@ namespace Charalotte
 
 		FTempRenderScene* GetRenderScenePtr();
 
-		FRenderScene* GetRenderScene();
+		FRenderScene* GetRenderSceneFinalButNotNow();
 
 		std::vector<std::string>& GetTextureArray();
 

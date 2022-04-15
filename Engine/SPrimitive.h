@@ -51,6 +51,8 @@ namespace Charalotte
 		std::string ActorPrimitiveName;
 
 		std::shared_ptr<FMaterial> Material ; 
+
+		std::string MaterialPath;
 	};
 
 	struct FActorPrimitive

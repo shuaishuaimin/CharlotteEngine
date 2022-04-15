@@ -9,6 +9,13 @@
 #include "SPrimitive.h"
 #include "SEShaderElements.h"
 #include "FTempRenderScene.h"
+namespace Charalotte
+{
+	class FRenderPSO;
+	class FRenderTarget;
+	class FRenderMesh;
+	class FRenderScene;
+}
 
 class RHI
 {
@@ -34,9 +41,12 @@ public:
 	virtual void DrawPrepare(Charalotte::E_PSOTYPE PSOType) = 0;
 	virtual void DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, 
 						const Charalotte::ObjectConstants& Obj, FTempRenderScene* RenderScenePtr) = 0;
+	virtual void DrawMeshFinal(Charalotte::RenderUsefulData Data, Charalotte::FRenderMesh* Mesh) = 0;
 	virtual void DrawEnd(Charalotte::E_PSOTYPE PSOType) = 0;
 
 	virtual void ExecuteAndCloseCommandList() = 0;
+	virtual void EndFrame() = 0;
+
 	virtual void FlushCommandQueue() = 0;
 
 	virtual bool GetIsDeviceSucceed() = 0;
@@ -48,4 +58,6 @@ public:
 	virtual void SetShader(std::shared_ptr<Charalotte::FShaderInfo> ShaderInput) = 0;
 	virtual void SetPipelineParamter(Charalotte::E_PSOTYPE PSOType, 
 				const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr) = 0;
+	virtual void SetRenderTarget(Charalotte::FRenderTarget* RT) = 0;
+	virtual void SetPSOFinal(Charalotte::FRenderPSO* Pso) = 0;
 }; 

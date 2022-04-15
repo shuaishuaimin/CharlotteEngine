@@ -52,8 +52,11 @@ public:
 	virtual void DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData,
 		const Charalotte::ObjectConstants& Obj, FTempRenderScene* RenderScenePtr) override;
 	virtual void DrawEnd(Charalotte::E_PSOTYPE PSOType) override;
+	virtual void DrawMeshFinal(Charalotte::RenderUsefulData Data, Charalotte::FRenderMesh* Mesh) override;
 
 	virtual void ExecuteAndCloseCommandList() override;
+	virtual void EndFrame() override;
+
 	virtual void FlushCommandQueue() override;
 
 	virtual bool GetIsDeviceSucceed() override;
@@ -65,11 +68,11 @@ public:
 	virtual void SetShader(std::shared_ptr<Charalotte::FShaderInfo> ShaderInput) override;
 	virtual void SetPipelineParamter(Charalotte::E_PSOTYPE PSOType,
 		const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr) override;
+	virtual void SetRenderTarget(Charalotte::FRenderTarget* RT) override;
+	virtual void SetPSOFinal(Charalotte::FRenderPSO* Pso) override;
 
 protected:
 	// flush fence
-	
-
 	// function for render init
 	void CreateCommandObjects();
 

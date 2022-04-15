@@ -5,6 +5,9 @@
 #include "SRHIConstants.h"
 #include "FDXRHIFunctionLibrary.h"
 #include "FWinRenderScene.h"
+#include "FMaterial.h"
+#include "FRenderPSO.h"
+#include "FRenderTarget.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -426,7 +429,7 @@ void DX12RHI::CalcVerticesAndIndices(const std::string& GeometryName, const Char
 		DXMeshPri->indices.push_back(static_cast<int16_t>(VertexIndex));
 	}
 
-	Charalotte::FDXSubmeshPrimitive submesh;
+	Charalotte::FDXBoundingBox submesh;
 	submesh.IndexCount = (UINT)(MeshPri.LodInfos[0].Indices.size());
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
@@ -688,6 +691,27 @@ void DX12RHI::BuildPSO()
 	psoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
 	psoDesc.DSVFormat = mDepthStencilFormat;
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&Pso.mPSO)));
+}
+
+void DX12RHI::SetRenderTarget(Charalotte::FRenderTarget* RT)
+{
+
+}
+
+void DX12RHI::SetPSOFinal(Charalotte::FRenderPSO* Pso)
+{
+
+}
+
+void DX12RHI::DrawMeshFinal(Charalotte::RenderUsefulData Data, Charalotte::FRenderMesh* Mesh)
+{
+
+}
+
+void DX12RHI::EndFrame()
+{
+	ExecuteAndCloseCommandList();
+	FlushCommandQueue();
 }
 
 // Build heaps

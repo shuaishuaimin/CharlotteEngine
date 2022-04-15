@@ -19,7 +19,7 @@ namespace Charalotte
 		}
 
 		~FMaterial() {
-			MaterialAttributes = nullptr;
+			ClearMaterial();
 		}
 		void SetMaterialAttributes(const FMaterialAttributes& Attributes) {
 			MaterialAttributes->BaseColor = Attributes.BaseColor;
@@ -57,6 +57,23 @@ namespace Charalotte
 			else
 			{
 				return EmptyPsos;
+			}
+		}
+
+		void ClearMaterial()
+		{
+			MaterialAttributes = nullptr;
+			for (auto& Pso : Psos)
+			{
+				for (auto& RenderPSO : Pso.second)
+				{
+					RenderPSO = nullptr;
+				}
+			}
+			Psos.clear();
+			for (auto& EmptyPso : EmptyPsos)
+			{
+				EmptyPso = nullptr;
 			}
 		}
 	private:

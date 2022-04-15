@@ -7,7 +7,6 @@
 
 namespace Charalotte
 {
-
 	enum WindowsAction
 	{
 		Move,
@@ -26,7 +25,7 @@ namespace Charalotte
 	// geometries are stored in one vertex and index buffer.  It provides the offsets
 	// and data needed to draw a subset of geometry stores in the vertex and index 
 	// buffers so that we can implement the technique described by Figure 6.3.
-	struct FDXSubmeshPrimitive
+	struct FDXBoundingBox
 	{
 		UINT IndexCount = 0;
 		UINT StartIndexLocation = 0;
@@ -39,10 +38,9 @@ namespace Charalotte
 
 	struct FDXMeshPrimitive
 	{
-	
+		std::string Name;
 		using index_type_t = int16_t;
 		// Give it a name so we can look it up by name.
-		std::string Name;
 		std::vector<Charalotte::Vertex> vertices;
 		std::vector<index_type_t> indices;
 
@@ -66,7 +64,7 @@ namespace Charalotte
 		// A MeshGeometry may store multiple geometries in one vertex/index buffer.
 		// Use this container to define the Submesh geometries so we can draw
 		// the Submeshes individually.
-		std::unordered_map<std::string, FDXSubmeshPrimitive> DrawArgs;
+		std::unordered_map<std::string, FDXBoundingBox> DrawArgs;
 
 		D3D12_VERTEX_BUFFER_VIEW VertexBufferView()const
 		{

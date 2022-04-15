@@ -17,6 +17,7 @@
 #include "FScene.h"
 #include "WinMaterialData.h"
 #include "RHI.h"
+#include "FRenderTarget.h"
 // link necessary lib
 //#pragma comment(lib,"d3dcompiler.lib")
 //#pragma comment(lib, "D3D12.lib")
@@ -59,6 +60,7 @@ namespace Charalotte
 
 		// re construct function
 		void RenderShadowDepth();
+		void RenderBasePass();
 
 		glm::mat4 BuildLightMatrix();
 		void BuildLightMatrix(glm::mat4& LightView, glm::mat4& LightProj);
@@ -81,6 +83,7 @@ namespace Charalotte
 		std::shared_ptr<FShaderInfo> ShadowShaderInput;
 
 		// re construct 
-
+		std::shared_ptr<FRenderTarget> ShadowMapRT;
+		std::shared_ptr<FRenderTarget> BasePassRT;
 	};
 }

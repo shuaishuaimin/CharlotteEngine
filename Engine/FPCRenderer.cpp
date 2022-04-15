@@ -38,6 +38,8 @@ namespace Charalotte
 		TestLightData = std::make_shared<RenderUsefulData>();
 		CommonShaderInput = std::make_shared<FShaderInfo>();
 		ShadowShaderInput = std::make_shared<FShaderInfo>();
+		ShadowMapRT = std::make_shared<FRenderTarget>();
+		BasePassRT = std::make_shared<FRenderTarget>();
 	}
 
 
@@ -260,7 +262,33 @@ namespace Charalotte
 		glm::mat4 LightView;
 		glm::mat4 LightProj;
 		BuildLightMatrix(LightView, LightProj);
+		RHIIns->SetRenderTarget(ShadowMapRT.get());
+		for (auto& RenderMesh : CharalotteEngine::GetInstance().GetRenderSceneFinalButNotNow()->GetRenderMeshs())
+		{
+			auto& Psos = RenderMesh.second->GetMaterialPtr()->GetPSOs(E_PSOTYPE::Shadow);
+			for (const auto& Pso : Psos)
+			{
+				RHIIns->SetPSOFinal(Pso.get());
+				Pso->GetShader()->SetRarameter(RHIIns.get());
+				
+				RHIIns->DrawMeshFinal(*TestLightData, RenderMesh.second.get());
+			}
+		}
+	}
 
+	void FPCRenderer::RenderBasePass()
+	{
+		RHIIns->SetRenderTarget(BasePassRT.get());
+		for (auto& RenderMesh : CharalotteEngine::GetInstance().GetRenderSceneFinalButNotNow()->GetRenderMeshs())
+		{
+			auto& Psos = RenderMesh.second->GetMaterialPtr()->GetPSOs(E_PSOTYPE::Default);
+			for (const auto& Pso : Psos)
+			{
+				RHIIns->SetPSOFinal(Pso.get());
+				Pso->GetShader()->SetRarameter(RHIIns.get());
+				RHIIns->DrawMeshFinal(*DrawData, RenderMesh.second.get());
+			}
+		}
 	}
 
 	glm::mat4 FPCRenderer::BuildLightMatrix()
