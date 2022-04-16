@@ -84,14 +84,15 @@ void FWinEventRegisterSystem::RegisterMapLoadEventForDender(Charalotte::MapLoadT
 
 void FWinEventRegisterSystem::ExecuteMapLoadEvent(const std::string& MapName)
 {
-	/*auto UpLoadEvent = LoadMapEvents.find(NowLoadType);
+	auto UpLoadEvent = LoadMapEvents.find(Charalotte::MapLoadType::BaseMapLoad);
 	if (UpLoadEvent != LoadMapEvents.end())
 	{
 		UpLoadEvent->second(MapName);
-	}*/
-	for (const auto Event : LoadMapEvents)
+	}
+	UpLoadEvent = LoadMapEvents.find(Charalotte::MapLoadType::RenderSceneLoad);
+	if (UpLoadEvent != LoadMapEvents.end())
 	{
-		Event.second(MapName);
+		UpLoadEvent->second(MapName);
 	}
 }
 void FWinEventRegisterSystem::UnRegisterMapLoadEventForDender(Charalotte::MapLoadType Type)

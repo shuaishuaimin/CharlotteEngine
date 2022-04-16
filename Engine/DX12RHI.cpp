@@ -693,26 +693,6 @@ void DX12RHI::BuildPSO()
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&Pso.mPSO)));
 }
 
-void DX12RHI::SetRenderTarget(Charalotte::FRenderTarget* RT)
-{
-
-}
-
-void DX12RHI::SetPSOFinal(Charalotte::FRenderPSO* Pso)
-{
-
-}
-
-void DX12RHI::DrawMeshFinal(Charalotte::RenderUsefulData Data, Charalotte::FRenderMesh* Mesh)
-{
-
-}
-
-void DX12RHI::EndFrame()
-{
-	ExecuteAndCloseCommandList();
-	FlushCommandQueue();
-}
 
 // Build heaps
 void DX12RHI::BuildDescriptorHeapsAndTables(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& Heap)
@@ -1021,4 +1001,64 @@ void DX12RHI::SwapChain()
 void DX12RHI::BeginFrame()
 {
 	
+}
+
+void DX12RHI::SetRenderTarget(Charalotte::FRenderTarget* RT)
+{
+
+}
+
+void DX12RHI::SetPSOFinal(Charalotte::FRenderPSO* Pso)
+{
+
+}
+
+void DX12RHI::DrawMeshFinal(Charalotte::RenderUsefulData Data, Charalotte::FRenderMesh* Mesh)
+{
+
+}
+
+void DX12RHI::CreateTextureResource(Charalotte::FTexture* Texture)
+{
+	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
+	auto Filename = FDXRHIFunctionLibrary::String2wString(Texture->GetTexturePath());
+	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
+		mCommandList.Get(), Filename.c_str(),
+		Texture->GetResource(), Texture->GetUploadHeap()));
+	ThrowIfFailed(mCommandList->Close());
+	ID3D12CommandList* cmdLists[] = { mCommandList.Get() };
+	mCommandQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
+	FlushCommandQueue();
+}
+
+void DX12RHI::CreateVBIBBuffer(Charalotte::FVerticesAndIndicesBuffer* VBIB)
+{
+	const UINT vbByteSize = VBIB->GetVerticesSize();
+	const UINT ibByteSize = VBIB->GetIndicesSize();
+	ThrowIfFailed(D3DCreateBlob(vbByteSize, &VBIB->VBCPU()));
+	CopyMemory(VBIB->VBCPU()->GetBufferPointer(), VBIB->GetVertices().data(), vbByteSize);
+
+	ThrowIfFailed(D3DCreateBlob(ibByteSize, &VBIB->IBCPU()));
+	CopyMemory(VBIB->IBCPU()->GetBufferPointer(), VBIB->GetIndices().data(), ibByteSize);
+
+	auto Device = md3dDevice.Get();
+	auto VerticeData = VBIB->GetVertices().data();
+	auto Commandlist = mCommandList.Get();
+
+	VBIB->VBGPU() = FUtil::CreateDefaultBuffer(Device,
+		Commandlist, VerticeData, vbByteSize, VBIB->VBUploader());
+
+	VBIB->IBGPU() = FUtil::CreateDefaultBuffer(Device,
+		Commandlist,VBIB->GetIndices().data(), ibByteSize, VBIB->IBUploader());
+
+	VBIB->VBStride() = sizeof(Charalotte::Vertex);
+	VBIB->VBByteSize() = vbByteSize;
+	VBIB->IFormat() = DXGI_FORMAT_R16_UINT;
+	VBIB->IBByteSize() = ibByteSize;
+}
+
+void DX12RHI::EndFrame()
+{
+	ExecuteAndCloseCommandList();
+	FlushCommandQueue();
 }

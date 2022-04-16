@@ -2,9 +2,41 @@
 #include "FRenderScene.h"
 #include "FScene.h"
 #include "FMeshAsset.h"
+#include "FRHIManager.h"
+#ifdef RENDER_PLATFORM_DX12
+#include "FWinEventRegisterSystem.h"
+#endif
+#include "FTexture.h"
 
 namespace Charalotte
 {
+	FRenderScene::FRenderScene()
+	{
+		FWinEventRegisterSystem::GetInstance().RegisterMapLoadEventForDender(MapLoadType::RenderSceneLoad, [this](std::string Mapname){
+			this->BuildResource(Mapname);
+		});
+		std::string PathFront = "Content/Textures/";
+		FileNames = { PathFront + "bricks" + ".dds", PathFront + "ice" + ".dds" , PathFront + "tile" + ".dds" , PathFront + "stone" + ".dds" 
+						, PathFront + "StoneTexture" + ".dds", PathFront + "StoneNormal" + ".dds"};
+	}
+
+	void FRenderScene::AddNewTexture(std::string TexturePath)
+	{
+		std::shared_ptr<FTexture> Tex = std::make_shared<FTexture>(TexturePath);
+		FRHIManager::GetInstance().GetRHIPtr()->CreateTextureResource(Tex.get());
+		Textures.insert({TexturePath, std::move(Tex)});
+	}
+
+	void FRenderScene::EraseTexture(std::string TexturePath)
+	{
+		const auto& TexIter = Textures.find(TexturePath);
+		if (TexIter != Textures.end())
+		{
+			TexIter->second = nullptr;
+			Textures.erase(TexturePath);
+		}
+	}
+
 	void FRenderScene::BuildResource(const std::string& MapName)
 	{
 		const auto& ActorInfos = FScene::GetInstance().GetActorInfos();
@@ -20,9 +52,14 @@ namespace Charalotte
 				}
 				BufferName.erase(BufferName.size() - 1, 1);
 				CreateBufferResources(BufferName);
-				
 			}
 			CreateRenderMeshs(ActorPrimitiveIter->second);
+		}
+		for (const auto& FileName : FileNames)
+		{
+			std::shared_ptr<FTexture> Tex = std::make_shared<FTexture>(FileName);
+			FRHIManager::GetInstance().GetRHIPtr()->CreateTextureResource(Tex.get());
+			Textures.insert({FileName, std::move(Tex)});
 		}
 	}
 
@@ -60,6 +97,7 @@ namespace Charalotte
 					RenderMesh->SetMaterial(nullptr);
 				}
 				RenderMesh->SetTransformData(Actors.Transform);
+				RenderMeshs.insert({ ActorMeshPrimitiveName , std::move(RenderMesh)});
 			}
 			else
 			{
@@ -87,6 +125,13 @@ namespace Charalotte
 			mat.second = nullptr;
 		}
 		Materials.clear();
+
+		/*for (auto& Tex : Textures)
+		{
+			Tex.second->ClearTexture();
+
+		}*/
+		Textures.clear();
 	}
 
 	void FRenderScene::CreateBufferResources(const std::string& BufferName)
@@ -96,7 +141,12 @@ namespace Charalotte
 		{
 			return;
 		}
-		const Charalotte::FMeshPrimitive& MeshPri = FMeshAsset::GetInstance().GetMeshInfors().find(BufferName)->second;
+		const auto& Iter = FMeshAsset::GetInstance().GetMeshInfors().find(BufferName);
+		if (Iter == FMeshAsset::GetInstance().GetMeshInfors().end())
+		{
+			return;
+		}
+		const Charalotte::FMeshPrimitive& MeshPri = Iter->second;
 		std::string Name = BufferName;
 		if (MeshPri.LodInfos.size() <= 0)
 		{
@@ -154,7 +204,25 @@ namespace Charalotte
 		submesh.StartIndexLocation = 0;
 		submesh.BaseVertexLocation = 0;
 		VBIBBuffer->SetVBIBName(BufferName);
-		BufferResources.insert({BufferName, VBIBBuffer});
+		BufferResources.insert({BufferName, std::move(VBIBBuffer)});
+	}
+
+	void FRenderScene::CreateDefaultMaterials()
+	{	
+		std::string DefaultNormalPath = "Content/Textures/StoneNormal.dds";
+		const auto& Iter = Textures.find(DefaultNormalPath);
+		FTexture* DefaultNormal = nullptr;
+		if (Iter != Textures.end())
+		{
+			DefaultNormal = Iter->second.get();
+		}
+		for (auto& Texture : Textures)
+		{
+			std::shared_ptr<FMaterial> Mat = std::make_shared<FMaterial>();
+			Mat->SetTexture(Texture.second.get());
+			Mat->SetNormal(DefaultNormal);
+			Materials.insert({Texture.first, std::move(Mat)});
+		}
 	}
 }
 

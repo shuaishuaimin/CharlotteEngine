@@ -2,6 +2,7 @@
 #include "CharlotteEngine.h"
 #include "FScene.h"
 #include "thread"
+#include "RHI.h"
 #include "DDefines.h"
 #if PLATFORM_WINDOWS
 #include "FPCRenderer.h"
@@ -16,10 +17,11 @@ namespace Charalotte
 		WindowIns = this->CreateMainWindow();
 #if PLATFORM_WINDOWS
 		RenderIns = std::make_unique<FPCRenderer>();
+		RenderIns->StoreRHIPtr();
 #endif
 		Timer = std::make_unique<FGameTimer>();
 		//test code
-		TextureArray = { "bricks", "bricks2", "bricks3", "grass", "ice", "stone", "tile", "WireFence", "WoodCrate01", "Stone_Texture"};
+		TextureArray = { "bricks", "bricks2", "bricks3", "grass", "ice", "stone", "tile", "WireFence", "WoodCrate01", "StoneTexture"};
 #ifdef RENDER_PLATFORM_DX12
 		RenderScene = std::make_unique<FWinRenderScene>();
 #endif

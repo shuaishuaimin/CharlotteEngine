@@ -18,7 +18,7 @@ Charalotte::FMeshPrimitive FMeshAsset::GetMeshInfoByName(const std::string& Mesh
 	}
 	return Charalotte::FMeshPrimitive();
 }
-std::unordered_map<std::string, Charalotte::FMeshPrimitive> FMeshAsset::GetMeshInfors()
+std::unordered_map<std::string, Charalotte::FMeshPrimitive>& FMeshAsset::GetMeshInfors()
 {
 	return MeshsInfors;
 }

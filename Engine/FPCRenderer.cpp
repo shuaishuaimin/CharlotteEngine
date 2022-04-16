@@ -15,6 +15,7 @@
 #ifdef RENDER_PLATFORM_DX12
 #include "DX12RHI.h"
 #endif
+#include "FRHIManager.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -25,21 +26,7 @@ namespace Charalotte
 {
 	FPCRenderer::FPCRenderer()
 	{
-#ifdef RENDER_PLATFORM_DX12
-		RHIIns = std::make_unique<DX12RHI>();
-#endif
-		FWinEventRegisterSystem::GetInstance().RegisterMapLoadEventForDender(MapLoadType::BaseMapLoad, [this](const std::string& MapName) {
-			this->LoadingMapDataFromAssetSystem(MapName);
-			});
-		FWinEventRegisterSystem::GetInstance().RegisterOnResize(DXRenderResize, [this]() {
-			this->RHIIns->OnResize();
-			});
-		DrawData = std::make_shared<RenderUsefulData>();
-		TestLightData = std::make_shared<RenderUsefulData>();
-		CommonShaderInput = std::make_shared<FShaderInfo>();
-		ShadowShaderInput = std::make_shared<FShaderInfo>();
-		ShadowMapRT = std::make_shared<FRenderTarget>();
-		BasePassRT = std::make_shared<FRenderTarget>();
+		
 	}
 
 
@@ -48,21 +35,39 @@ namespace Charalotte
 
 	}
 
+	void FPCRenderer::StoreRHIPtr()
+	{
+		RHIPtr = FRHIManager::GetInstance().GetRHIPtr();
+		FWinEventRegisterSystem::GetInstance().RegisterOnResize(DXRenderResize, [this]() {
+			this->RHIPtr->OnResize();
+			});
+		FWinEventRegisterSystem::GetInstance().RegisterMapLoadEventForDender(MapLoadType::BaseMapLoad, [this](const std::string& MapName) {
+			this->LoadingMapDataFromAssetSystem(MapName);
+			});
+
+		DrawData = std::make_shared<RenderUsefulData>();
+		TestLightData = std::make_shared<RenderUsefulData>();
+		CommonShaderInput = std::make_shared<FShaderInfo>();
+		ShadowShaderInput = std::make_shared<FShaderInfo>();
+		ShadowMapRT = std::make_shared<FRenderTarget>();
+		BasePassRT = std::make_shared<FRenderTarget>();
+	}
+
 	bool FPCRenderer::Initialize()
 	{
-		if (!RHIIns->InitRenderPlatform(CharalotteEngine::GetInstance().GetWindowPtr()))
+		if (!RHIPtr->InitRenderPlatform(CharalotteEngine::GetInstance().GetWindowPtr()))
 		{
 			return false;
 		}
-		RHIIns->OnResize();
+		RHIPtr->OnResize();
 		BuildCommonInputLayout();
 		BuildShadowInputLayout();
-		RHIIns->BuildRootSignature(Default);
-		RHIIns->BuildPSO();
-		RHIIns->BuildRootSignature(Shadow);
-		RHIIns->BuildShadowPSO();
-		RHIIns->InitShadowMap();
-		RHIIns->FlushCommandQueue();
+		RHIPtr->BuildRootSignature(Default);
+		RHIPtr->BuildPSO();
+		RHIPtr->BuildRootSignature(Shadow);
+		RHIPtr->BuildShadowPSO();
+		RHIPtr->InitShadowMap();
+		RHIPtr->FlushCommandQueue();
 		return true;
 
 	}
@@ -76,7 +81,7 @@ namespace Charalotte
 	// draw by camera data
 	void FPCRenderer::Update()
 	{
-		RHIIns->OpenCommandList(true);
+		RHIPtr->OpenCommandList(true);
 		UpdateShadowPassCB();
 		InitLight();
 		FScene::GetInstance().GetCamera()->GetCameraData(DrawData->MainCameraData);
@@ -88,40 +93,40 @@ namespace Charalotte
 		if (ActorIter != Actors.end())
 		{
 			// draw shadow
-			RHIIns->DrawPrepare(Shadow);
+			RHIPtr->DrawPrepare(Shadow);
 			for (const auto& ActorPri : ActorIter->second.ActorsInfo)
 			{
 				ObjectConstants objConstants;
 				UpdateShadowCons(objConstants, ActorPri);
-				RHIIns->SetPipelineParamter(Shadow, ActorPri,
+				RHIPtr->SetPipelineParamter(Shadow, ActorPri,
 					TestLightData.get(), CharalotteEngine::GetInstance().GetRenderScenePtr());
-				RHIIns->DrawMesh(ActorPri, TestLightData.get(), objConstants, CharalotteEngine::GetInstance().GetRenderScenePtr());
+				RHIPtr->DrawMesh(ActorPri, TestLightData.get(), objConstants, CharalotteEngine::GetInstance().GetRenderScenePtr());
 			}
 			//RHIIns->DrawEnd(Shadow);
-			RHIIns->ExecuteAndCloseCommandList();
-			RHIIns->FlushCommandQueue();
+			RHIPtr->ExecuteAndCloseCommandList();
+			RHIPtr->FlushCommandQueue();
 
-			RHIIns->OpenCommandList(true);
+			RHIPtr->OpenCommandList(true);
 			// draw actor
-			RHIIns->DrawPrepare(Default);
+			RHIPtr->DrawPrepare(Default);
 			for (const auto& ActorPri : ActorIter->second.ActorsInfo)
 			{
 				ObjectConstants objConstants;
 				UpDateCommonCons(objConstants, ActorPri);
-				RHIIns->SetPipelineParamter(Default, ActorPri,
+				RHIPtr->SetPipelineParamter(Default, ActorPri,
 					DrawData.get(), CharalotteEngine::GetInstance().GetRenderScenePtr());
-				RHIIns->DrawMesh(ActorPri, DrawData.get(), objConstants, CharalotteEngine::GetInstance().GetRenderScenePtr());
+				RHIPtr->DrawMesh(ActorPri, DrawData.get(), objConstants, CharalotteEngine::GetInstance().GetRenderScenePtr());
 			}
-			RHIIns->DrawEnd(Default);
-			RHIIns->ExecuteAndCloseCommandList();
-			RHIIns->SwapChain();
-			RHIIns->FlushCommandQueue();
+			RHIPtr->DrawEnd(Default);
+			RHIPtr->ExecuteAndCloseCommandList();
+			RHIPtr->SwapChain();
+			RHIPtr->FlushCommandQueue();
 		}
 	}
 
 	bool FPCRenderer::GetIsDevicedSucceed()
 	{
-		return RHIIns->GetIsDeviceSucceed();
+		return RHIPtr->GetIsDeviceSucceed();
 	}
 
 	void FPCRenderer::LoadingMapDataFromAssetSystem(const std::string& MapName)
@@ -132,7 +137,7 @@ namespace Charalotte
 		if (ActorPrimitiveIter != FScene::GetInstance().GetActorInfos().end())
 		{
 
-			RHIIns->BuildMeshAndActorPrimitives(ActorPrimitiveIter->second, FMeshAsset::GetInstance().GetMeshInfors(), CharalotteEngine::GetInstance().GetRenderScenePtr());
+			RHIPtr->BuildMeshAndActorPrimitives(ActorPrimitiveIter->second, FMeshAsset::GetInstance().GetMeshInfors(), CharalotteEngine::GetInstance().GetRenderScenePtr());
 
 		}
 		else
@@ -143,12 +148,12 @@ namespace Charalotte
 		for (const auto& TextureName : CharalotteEngine::GetInstance().GetTextureArray())
 		{
 			std::string TexturePath = "Content/Textures/" + TextureName + ".dds";
-			RHIIns->LoadTextureResource(TextureName, TexturePath, CharalotteEngine::GetInstance().GetRenderScenePtr());
+			RHIPtr->LoadTextureResource(TextureName, TexturePath, CharalotteEngine::GetInstance().GetRenderScenePtr());
 		}
 
 		// Build scene and compile material
-		RHIIns->BuildSceneResourcesForRenderPlatform(CharalotteEngine::GetInstance().GetRenderScenePtr());
-		RHIIns->CompileMaterial(CharalotteEngine::GetInstance().GetRenderScenePtr());
+		RHIPtr->BuildSceneResourcesForRenderPlatform(CharalotteEngine::GetInstance().GetRenderScenePtr());
+		RHIPtr->CompileMaterial(CharalotteEngine::GetInstance().GetRenderScenePtr());
 	}
 
 	void FPCRenderer::UpdateShadowPassCB()
@@ -229,7 +234,7 @@ namespace Charalotte
 			{ "NORMAL", 0, E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT, 0, 28,  E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
 			{ "TEXCOORD", 0, E_GRAPHIC_FORMAT::FORMAT_R32G32_FLOAT, 0, 44,  E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
-		RHIIns->SetShader(CommonShaderInput);
+		RHIPtr->SetShader(CommonShaderInput);
 	}
 
 	void FPCRenderer::BuildShadowInputLayout()
@@ -247,13 +252,13 @@ namespace Charalotte
 			{ "NORMAL", 0, E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT, 0, 28,  E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
 			{ "TEXCOORD", 0, E_GRAPHIC_FORMAT::FORMAT_R32G32_FLOAT, 0, 44,  E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
-		RHIIns->SetShader(ShadowShaderInput);
+		RHIPtr->SetShader(ShadowShaderInput);
 	}
 
 	// re construct function
 	void FPCRenderer::SceneRender()
 	{	
-		RHIIns->BeginFrame();
+		RHIPtr->BeginFrame();
 		RenderShadowDepth();
 	}
 
@@ -262,31 +267,31 @@ namespace Charalotte
 		glm::mat4 LightView;
 		glm::mat4 LightProj;
 		BuildLightMatrix(LightView, LightProj);
-		RHIIns->SetRenderTarget(ShadowMapRT.get());
+		RHIPtr->SetRenderTarget(ShadowMapRT.get());
 		for (auto& RenderMesh : CharalotteEngine::GetInstance().GetRenderSceneFinalButNotNow()->GetRenderMeshs())
 		{
 			auto& Psos = RenderMesh.second->GetMaterialPtr()->GetPSOs(E_PSOTYPE::Shadow);
 			for (const auto& Pso : Psos)
 			{
-				RHIIns->SetPSOFinal(Pso.get());
-				Pso->GetShader()->SetRarameter(RHIIns.get());
+				RHIPtr->SetPSOFinal(Pso.get());
+				Pso->GetShader()->SetRarameter(RHIPtr);
 				
-				RHIIns->DrawMeshFinal(*TestLightData, RenderMesh.second.get());
+				RHIPtr->DrawMeshFinal(*TestLightData, RenderMesh.second.get());
 			}
 		}
 	}
 
 	void FPCRenderer::RenderBasePass()
 	{
-		RHIIns->SetRenderTarget(BasePassRT.get());
+		RHIPtr->SetRenderTarget(BasePassRT.get());
 		for (auto& RenderMesh : CharalotteEngine::GetInstance().GetRenderSceneFinalButNotNow()->GetRenderMeshs())
 		{
 			auto& Psos = RenderMesh.second->GetMaterialPtr()->GetPSOs(E_PSOTYPE::Default);
 			for (const auto& Pso : Psos)
 			{
-				RHIIns->SetPSOFinal(Pso.get());
-				Pso->GetShader()->SetRarameter(RHIIns.get());
-				RHIIns->DrawMeshFinal(*DrawData, RenderMesh.second.get());
+				RHIPtr->SetPSOFinal(Pso.get());
+				Pso->GetShader()->SetRarameter(RHIPtr);
+				RHIPtr->DrawMeshFinal(*DrawData, RenderMesh.second.get());
 			}
 		}
 	}

@@ -38,6 +38,7 @@ namespace Charalotte
 
 	private:
 		std::unique_ptr<FRenderer> RenderIns;
+		std::unique_ptr<RHI> RHIIns;
 		std::shared_ptr<FWindow> WindowIns;
 		std::unique_ptr<FGameTimer> Timer;
 		std::vector<std::string> TextureArray;

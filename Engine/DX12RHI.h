@@ -42,6 +42,8 @@ public:
 	virtual void BeginFrame() override;
 
 	virtual void CompileMaterial(FTempRenderScene* RenderScenePtr) override;
+	virtual void CreateTextureResource(Charalotte::FTexture* Texture) override;
+	virtual void CreateVBIBBuffer(Charalotte::FVerticesAndIndicesBuffer* VBIB) override;
 
 	virtual void InitShadowMap() override;
 	virtual bool InitRenderPlatform(FWindow* WindowPtr) override;

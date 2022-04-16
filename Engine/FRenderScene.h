@@ -6,10 +6,11 @@
 
 namespace Charalotte
 {
+	class FTexture;
 	class FRenderScene
 	{
 	public:
-		FRenderScene() {}
+		FRenderScene();
 		~FRenderScene() {
 			ClearRenderScene();
 		}
@@ -22,12 +23,19 @@ namespace Charalotte
 		{
 			return RenderMeshs;
 		}
+
+		void AddNewTexture(std::string TexturePath);
+
+		void EraseTexture(std::string TexturePath);
 	protected:
 		void CreateBufferResources(const std::string& BufferName);
 		void CreateRenderMeshs(const Charalotte::FActorPrimitive& ActorPrimitive);
+		void CreateDefaultMaterials();
 	private:
 		std::unordered_map<std::string, std::shared_ptr<FRenderMesh>> RenderMeshs;
 		std::unordered_map<std::string, std::shared_ptr<FVerticesAndIndicesBuffer>> BufferResources;
 		std::unordered_map<std::string, std::shared_ptr<FMaterial>> Materials;
+		std::unordered_map<std::string, std::shared_ptr<FTexture>> Textures;
+		std::vector<std::string> FileNames;
 	};
 }

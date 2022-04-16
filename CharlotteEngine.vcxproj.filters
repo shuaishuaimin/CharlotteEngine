@@ -309,8 +309,8 @@
     <ClInclude Include="Engine\FRenderTarget.h">
       <Filter>Header Files\Engine\Platform\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FPSOBase.h">
-      <Filter>Header Files\Engine\Public\Material</Filter>
+    <ClInclude Include="Engine\FRHIManager.h">
+      <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -388,6 +388,9 @@
     </ClCompile>
     <ClCompile Include="Engine\FVerticesAndIndicesBuffer.cpp">
       <Filter>Source Files\Engine\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FRHIManager.cpp">
+      <Filter>Source Files\Engine\RHI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

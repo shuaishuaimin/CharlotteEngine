@@ -12,7 +12,7 @@ public:
 	FMeshAsset() ;
 	~FMeshAsset() ;
 	Charalotte::FMeshPrimitive GetMeshInfoByName(const std::string& MeshName);
-	std::unordered_map<std::string, Charalotte::FMeshPrimitive> GetMeshInfors();
+	std::unordered_map<std::string, Charalotte::FMeshPrimitive>& GetMeshInfors();
 	void AddMeshInfors(const std::string& MeshName, Charalotte::FMeshPrimitive MeshInfo);
 
 private:

@@ -47,6 +47,8 @@ namespace Charalotte
 		
 		// re construct function
 		void SceneRender();
+
+		virtual void StoreRHIPtr() override;
 	protected:
 		void UpdateShadowPassCB();
 
@@ -64,9 +66,11 @@ namespace Charalotte
 
 		glm::mat4 BuildLightMatrix();
 		void BuildLightMatrix(glm::mat4& LightView, glm::mat4& LightProj);
+
+	
 	private:
 
-		std::unique_ptr<RHI> RHIIns;
+		RHI* RHIPtr;
 
 		std::shared_ptr<RenderUsefulData> DrawData;
 

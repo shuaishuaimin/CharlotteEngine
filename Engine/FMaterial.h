@@ -6,6 +6,7 @@
 #include "SMaterialAttributes.h"
 #include "SEShaderElements.h"
 #include "FRenderPSO.h"
+#include "FTexture.h"
 
 namespace Charalotte
 {
@@ -42,6 +43,15 @@ namespace Charalotte
 			mNormalName = NormalName;
 		}
 
+		inline void SetNormal(FTexture* NormalTex)
+		{
+			NormalTexture = NormalTex;
+		}
+
+		inline void SetTexture(FTexture* Tex)
+		{
+			Texture = Tex;
+		}
 		std::string GetNormal() const
 		{
 			return mNormalName;
@@ -79,6 +89,8 @@ namespace Charalotte
 	private:
 		std::string mTextureName;
 		std::string mNormalName;
+		FTexture* Texture;
+		FTexture* NormalTexture;
 		std::unique_ptr<FMaterialAttributes> MaterialAttributes;
 		std::unordered_map<E_PSOTYPE, std::vector<std::shared_ptr<FRenderPSO>>> Psos;
 		std::vector<std::shared_ptr<FRenderPSO>> EmptyPsos;

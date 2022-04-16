@@ -55,12 +55,65 @@ namespace Charalotte
 			return VBIBName;
 		}
 
+		inline std::vector<Charalotte::Vertex>& GetVertices()
+		{
+			return vertices;
+		}
+
+		inline std::vector<index_type_t>& GetIndices()
+		{
+			return indices;
+		}
+		UINT& VBStride()
+		{
+			return VertexByteStride;
+		}
+
+		UINT& VBByteSize()
+		{
+			return VertexBufferByteSize;
+		}
+
+		UINT& IBByteSize()
+		{
+			return IndexBufferByteSize;
+		}
 		void ClearBuffers();
 #ifdef RENDER_PLATFORM_DX12
 		D3D12_VERTEX_BUFFER_VIEW VertexBufferView()const;
 
 		D3D12_INDEX_BUFFER_VIEW IndexBufferView()const;
 
+		Microsoft::WRL::ComPtr<ID3DBlob>& VBCPU()
+		{
+			return VertexBufferCPU;
+		}
+		Microsoft::WRL::ComPtr<ID3DBlob>& IBCPU()
+		{
+			return IndexBufferCPU;
+		}
+
+		Microsoft::WRL::ComPtr<ID3D12Resource>& VBGPU()
+		{
+			return VertexBufferGPU;
+		}
+		Microsoft::WRL::ComPtr<ID3D12Resource>& IBGPU()
+		{
+			return IndexBufferGPU;
+		}
+
+		Microsoft::WRL::ComPtr<ID3D12Resource>& VBUploader()
+		{
+			return VertexBufferUploader;
+		}
+		Microsoft::WRL::ComPtr<ID3D12Resource>& IBUploader()
+		{
+			return IndexBufferUploader;
+		}
+		DXGI_FORMAT& IFormat()
+		{
+			return IndexFormat;
+		}
 #endif
 	private:
 		std::string VBIBName;

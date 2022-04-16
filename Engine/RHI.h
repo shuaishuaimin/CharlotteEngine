@@ -15,6 +15,8 @@ namespace Charalotte
 	class FRenderTarget;
 	class FRenderMesh;
 	class FRenderScene;
+	class FTexture;
+	class FVerticesAndIndicesBuffer;
 }
 
 class RHI
@@ -32,6 +34,8 @@ public:
 	virtual void BeginFrame() = 0;
 
 	virtual void CompileMaterial(FTempRenderScene* RenderScenePtr) = 0;
+	virtual void CreateTextureResource(Charalotte::FTexture* Texture) = 0;
+	virtual void CreateVBIBBuffer(Charalotte::FVerticesAndIndicesBuffer* VBIB) = 0;
 
 	virtual void InitShadowMap() = 0;
 	virtual bool InitRenderPlatform(FWindow* WindowPtr) = 0;
@@ -60,4 +64,5 @@ public:
 				const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr) = 0;
 	virtual void SetRenderTarget(Charalotte::FRenderTarget* RT) = 0;
 	virtual void SetPSOFinal(Charalotte::FRenderPSO* Pso) = 0;
+	
 }; 

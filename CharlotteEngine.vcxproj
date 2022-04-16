@@ -149,11 +149,11 @@
     <ClInclude Include="Engine\FCommandList.h" />
     <ClInclude Include="Engine\FDXRHIFunctionLibrary.h" />
     <ClInclude Include="Engine\FHeapManager.h" />
-    <ClInclude Include="Engine\FPSOBase.h" />
     <ClInclude Include="Engine\FRenderMesh.h" />
     <ClInclude Include="Engine\FRenderPSO.h" />
     <ClInclude Include="Engine\FRenderScene.h" />
     <ClInclude Include="Engine\FRenderTarget.h" />
+    <ClInclude Include="Engine\FRHIManager.h" />
     <ClInclude Include="Engine\FShadowMap.h" />
     <ClInclude Include="Engine\FTempRenderScene.h" />
     <ClInclude Include="Engine\FShader.h" />
@@ -210,6 +210,7 @@
     <ClCompile Include="Engine\FHeapManager.cpp" />
     <ClCompile Include="Engine\FMeshAsset.cpp" />
     <ClCompile Include="Engine\FRenderScene.cpp" />
+    <ClCompile Include="Engine\FRHIManager.cpp" />
     <ClCompile Include="Engine\FScene.cpp" />
     <ClCompile Include="Engine\FVerticesAndIndicesBuffer.cpp" />
     <ClCompile Include="Engine\FWinRenderScene.cpp" />

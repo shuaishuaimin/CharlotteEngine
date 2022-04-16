@@ -1,29 +1,56 @@
 #pragma once
 #include <string>
+#include "DDefines.h"
+#ifdef RENDER_PLATFORM_DX12
+#include "d3dx12.h"
+#include "wrl.h"
+#endif // 
 
-class FTexture
+namespace Charalotte
 {
-public:
-	FTexture(const std::string& Path) : TexturePath(Path)
+	class FTexture
 	{
+	public:
+		FTexture(const std::string& Path) : TexturePath(Path)
+		{
 
-	}
+		}
 
-	~FTexture(){}
-	std::string GetTexturePath()
-	{
-		return TexturePath;
-	}
+		~FTexture() {}
+		std::string GetTexturePath()
+		{
+			return TexturePath;
+		}
 
-	void SetTexturePath(const std::string& Path)
-	{
-		TexturePath = Path;
-	}
+		void SetTexturePath(const std::string& Path)
+		{
+			TexturePath = Path;
+		}
 
-	void BuildResource()
-	{
+#ifdef RENDER_PLATFORM_DX12
+		inline Microsoft::WRL::ComPtr<ID3D12Resource>& GetResource()
+		{
+			return Resource;
+		}
+		inline Microsoft::WRL::ComPtr<ID3D12Resource>& GetUploadHeap()
+		{
+			return UploadHeap;
+		}
+#endif
 
-	}
-private:
-	std::string TexturePath;
-};
+		void ClearTexture()
+		{
+#ifdef RENDER_PLATFORM_DX12
+			Resource = nullptr;
+			UploadHeap = nullptr;
+#endif
+		}
+
+	private:
+		std::string TexturePath;
+#ifdef RENDER_PLATFORM_DX12
+		Microsoft::WRL::ComPtr<ID3D12Resource> Resource = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap = nullptr;
+#endif
+	};
+}
