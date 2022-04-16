@@ -36,6 +36,8 @@ public:
 	virtual void CompileMaterial(FTempRenderScene* RenderScenePtr) = 0;
 	virtual void CreateTextureResource(Charalotte::FTexture* Texture) = 0;
 	virtual void CreateVBIBBuffer(Charalotte::FVerticesAndIndicesBuffer* VBIB) = 0;
+	virtual void CreateRenderMeshResource(Charalotte::FRenderMesh* RenderMesh) = 0;
+	virtual void CreateRenderMeshSrv(Charalotte::FMaterial* Mat, Charalotte::FRenderMesh* Mesh) = 0;
 
 	virtual void InitShadowMap() = 0;
 	virtual bool InitRenderPlatform(FWindow* WindowPtr) = 0;

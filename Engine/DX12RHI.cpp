@@ -8,6 +8,7 @@
 #include "FMaterial.h"
 #include "FRenderPSO.h"
 #include "FRenderTarget.h"
+#include "FRenderMesh.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -698,7 +699,7 @@ void DX12RHI::BuildPSO()
 void DX12RHI::BuildDescriptorHeapsAndTables(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& Heap)
 {
 	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
-	cbvHeapDesc.NumDescriptors = 10;
+	cbvHeapDesc.NumDescriptors = 2;
 	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	cbvHeapDesc.NodeMask = 0;
@@ -1018,6 +1019,32 @@ void DX12RHI::DrawMeshFinal(Charalotte::RenderUsefulData Data, Charalotte::FRend
 
 }
 
+void DX12RHI::CreateRenderMeshSrv(Charalotte::FMaterial* Mat, Charalotte::FRenderMesh* Mesh)
+{
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	auto& TexResource = Mat->GetTexturePtr()->GetResource();
+	auto& NorResource = Mat->GetNormalPtr()->GetResource();
+	srvDesc.Format = TexResource->GetDesc().Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = TexResource->GetDesc().MipLevels;
+	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE CPUHandle = Mesh->Srvh()->GetCPUDescriptorHandleForHeapStart();
+
+	md3dDevice->CreateShaderResourceView(
+		TexResource.Get(),
+		&srvDesc,
+		CPUHandle);
+	CPUHandle.ptr += mCbvSrvUavDescriptorSize;
+	md3dDevice->CreateShaderResourceView(
+		NorResource.Get(),
+		&srvDesc,
+		CPUHandle);
+}
+
 void DX12RHI::CreateTextureResource(Charalotte::FTexture* Texture)
 {
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
@@ -1057,6 +1084,12 @@ void DX12RHI::CreateVBIBBuffer(Charalotte::FVerticesAndIndicesBuffer* VBIB)
 	VBIB->IBByteSize() = ibByteSize;
 }
 
+void DX12RHI::CreateRenderMeshResource(Charalotte::FRenderMesh* RenderMesh)
+{
+	BuildDescriptorHeapsAndTables(RenderMesh->CbvH());
+	BuildDescriptorHeapsAndTables(RenderMesh->Srvh());
+	BulidConstantBuffers(RenderMesh->CbvH(), RenderMesh->OCB());
+}
 void DX12RHI::EndFrame()
 {
 	ExecuteAndCloseCommandList();

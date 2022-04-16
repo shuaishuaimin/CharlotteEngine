@@ -4,6 +4,7 @@
 #include "FRenderMesh.h"
 #include "FVerticesAndIndicesBuffer.h"
 
+class RHI;
 namespace Charalotte
 {
 	class FTexture;
@@ -37,5 +38,6 @@ namespace Charalotte
 		std::unordered_map<std::string, std::shared_ptr<FMaterial>> Materials;
 		std::unordered_map<std::string, std::shared_ptr<FTexture>> Textures;
 		std::vector<std::string> FileNames;
+		RHI* RHIPtr;
 	};
 }

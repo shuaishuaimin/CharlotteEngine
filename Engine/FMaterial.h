@@ -52,6 +52,16 @@ namespace Charalotte
 		{
 			Texture = Tex;
 		}
+
+		inline FTexture* GetTexturePtr()
+		{
+			return Texture;
+		}
+
+		inline FTexture* GetNormalPtr()
+		{
+			return NormalTexture;
+		}
 		std::string GetNormal() const
 		{
 			return mNormalName;

@@ -89,6 +89,7 @@ void FScene::LoadMap(const std::string& MapName) {
 			ActorInfor.Material->SetTexture("bricks");
 			cool = true;
 		}
+		ActorInfor.MaterialPath = "Content/Textures/StoneTexture.dds";
 		
 		/*if (TempTextureIndex < TextureNum)
 		{

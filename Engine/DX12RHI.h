@@ -44,6 +44,8 @@ public:
 	virtual void CompileMaterial(FTempRenderScene* RenderScenePtr) override;
 	virtual void CreateTextureResource(Charalotte::FTexture* Texture) override;
 	virtual void CreateVBIBBuffer(Charalotte::FVerticesAndIndicesBuffer* VBIB) override;
+	virtual void CreateRenderMeshResource(Charalotte::FRenderMesh* RenderMesh) override;
+	virtual void CreateRenderMeshSrv(Charalotte::FMaterial* Mat, Charalotte::FRenderMesh* Mesh) override;
 
 	virtual void InitShadowMap() override;
 	virtual bool InitRenderPlatform(FWindow* WindowPtr) override;
