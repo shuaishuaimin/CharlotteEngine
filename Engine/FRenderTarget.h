@@ -1,10 +1,5 @@
 #pragma once
-#include "DDefines.h"
 #include "EHeapType.h"
-#ifdef RENDER_PLATFORM_DX12
-
-
-#endif
 
 namespace Charalotte
 {
@@ -17,7 +12,8 @@ namespace Charalotte
 		}
 		FRenderTarget(int Off, HeapType TP) : Offest(Off), Type(TP)
 		{}
-		~FRenderTarget() {}
+
+		virtual ~FRenderTarget() {}
 		
 	private:
 		int Offest;

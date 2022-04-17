@@ -139,6 +139,9 @@
     <Filter Include="Header Files\Engine\Platform\Render\RenderMesh">
       <UniqueIdentifier>{03712378-6a82-4baf-8c5b-5ad1bbae64cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Engine\Platform\Render\ForBloom">
+      <UniqueIdentifier>{6a83e698-53b7-4df5-80b5-062b219f8a50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\d3dx12.h">
@@ -312,6 +315,21 @@
     <ClInclude Include="Engine\FRHIManager.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\FDXRenderTarget.h">
+      <Filter>Header Files\Engine\Platform\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\SViewportAndRect.h">
+      <Filter>Header Files\Engine\EngineDataDef</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FResource.h">
+      <Filter>Header Files\Engine\Platform\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FDXResource.h">
+      <Filter>Header Files\Engine\Platform\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\SResourceElement.h">
+      <Filter>Header Files\Engine\Platform\Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\DDSTextureLoader.cpp">
@@ -391,6 +409,9 @@
     </ClCompile>
     <ClCompile Include="Engine\FRHIManager.cpp">
       <Filter>Source Files\Engine\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FDXRenderTarget.cpp">
+      <Filter>Source Files\Engine\Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -39,7 +39,8 @@ namespace Charalotte
 	}
 
 	void FRenderScene::BuildResource(const std::string& MapName)
-	{
+	{	
+		ClearRenderScene();
 		RHIPtr = FRHIManager::GetInstance().GetRHIPtr();
 		for (const auto& FileName : FileNames)
 		{

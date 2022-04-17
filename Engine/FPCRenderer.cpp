@@ -67,6 +67,7 @@ namespace Charalotte
 		RHIPtr->BuildRootSignature(Shadow);
 		RHIPtr->BuildShadowPSO();
 		RHIPtr->InitShadowMap();
+		TestCreateAndUseRT();
 		RHIPtr->FlushCommandQueue();
 		return true;
 
@@ -349,6 +350,30 @@ namespace Charalotte
 		glm::mat4 lightProj = glm::orthoLH_ZO(l, r, b, t, n, f);
 		LightView = lightView;
 		LightProj = lightProj;
+	}
+
+	void FPCRenderer::TestCreateAndUseRT()
+	{
+		/*std::shared_ptr<FRenderTarget> HDR = RHIPtr->CreateRenderTarget(0, 0);
+		std::shared_ptr<FRenderTarget> SetUp = RHIPtr->CreateRenderTarget(1, 1);
+		std::shared_ptr<FRenderTarget> DownFirst = RHIPtr->CreateRenderTarget(2, 2);
+		std::shared_ptr<FRenderTarget> DownSecond = RHIPtr->CreateRenderTarget(3, 3);
+		std::shared_ptr<FRenderTarget> DownThird = RHIPtr->CreateRenderTarget(4, 4);
+		std::shared_ptr<FRenderTarget> UpFirst = RHIPtr->CreateRenderTarget(5, 5);
+		std::shared_ptr<FRenderTarget> UpSecond = RHIPtr->CreateRenderTarget(6, 6);
+		std::shared_ptr<FRenderTarget> UpThird = RHIPtr->CreateRenderTarget(7, 7);
+		std::shared_ptr<FRenderTarget> Sumber = RHIPtr->CreateRenderTarget(8, 8);
+		std::shared_ptr<FRenderTarget> ToneMap = RHIPtr->CreateRenderTarget(9, 9);
+		Rts = {{"HDR", HDR}, 
+				{"Setup", SetUp},
+				{"DownFirst", DownFirst},
+				{"DownSecond", DownSecond},
+				{"DownThird", DownThird},
+				{"UpFirst", UpFirst},
+				{"UpSecond", UpSecond},
+				{"UpThird", UpThird},
+				{"Sumber", Sumber},
+				{"ToneMap", ToneMap}};*/
 	}
 }
 

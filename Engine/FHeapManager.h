@@ -31,8 +31,6 @@ namespace Charalotte
 			NullHeap = nullptr;
 		}
 		
-		
-
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& Heap(HeapType type)
 		{
 			switch (type)
@@ -51,18 +49,12 @@ namespace Charalotte
 			}
 		}
 
-		void CreateHeap(ID3D12Device* Device, int ViewNum, HeapType Type)
-		{
-			D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
-			dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-			dsvHeapDesc.NodeMask = 0;
-			dsvHeapDesc.NumDescriptors = ViewNum;
-			dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE(Type);
-			ThrowIfFailed(Device->CreateDescriptorHeap(
-				&dsvHeapDesc, IID_PPV_ARGS(Heap(Type).GetAddressOf())));
-		}
 		CD3DX12_CPU_DESCRIPTOR_HANDLE GetCPUHandleByTypeAndOffest(HeapType type, int Offset)
 		{
+			if (Offset <= 0)
+			{
+				return GetCPUHandle(type);
+			}
 			CD3DX12_CPU_DESCRIPTOR_HANDLE THandle = GetCPUHandle(type);
 			THandle.Offset(Offset, GetSize(type));
 			return THandle;
@@ -70,6 +62,10 @@ namespace Charalotte
 
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GetGPUHandleByTypeAndOffest(HeapType type, int Offset)
 		{
+			if (Offset <= 0)
+			{
+				return GetGPUHandle(type);
+			}
 			CD3DX12_GPU_DESCRIPTOR_HANDLE  THandle = GetGPUHandle(type);
 			THandle.Offset(Offset, GetSize(type));
 			return THandle;
@@ -100,7 +96,7 @@ namespace Charalotte
 			}
 		}
 	protected:
-		CD3DX12_CPU_DESCRIPTOR_HANDLE& GetCPUHandle(HeapType type)
+		CD3DX12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(HeapType type)
 		{
 			switch (type)
 			{
@@ -118,7 +114,7 @@ namespace Charalotte
 			}
 		}
 
-		CD3DX12_GPU_DESCRIPTOR_HANDLE& GetGPUHandle(HeapType type)
+		CD3DX12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(HeapType type)
 		{
 			switch (type)
 			{
@@ -134,6 +130,17 @@ namespace Charalotte
 			default:
 				return GPUDsvHandle;
 			}
+		}
+
+		void CreateHeap(ID3D12Device* Device, int ViewNum, HeapType Type)
+		{
+			D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
+			dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+			dsvHeapDesc.NodeMask = 0;
+			dsvHeapDesc.NumDescriptors = ViewNum;
+			dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE(Type);
+			ThrowIfFailed(Device->CreateDescriptorHeap(
+				&dsvHeapDesc, IID_PPV_ARGS(Heap(Type).GetAddressOf())));
 		}
 	private:
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> RtvHeap;

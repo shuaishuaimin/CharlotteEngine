@@ -10,6 +10,7 @@
 #include "SEShaderElements.h"
 #include "FTempRenderScene.h"
 #include "EHeapType.h"
+#include "SResourceElement.h"
 namespace Charalotte
 {
 	class FRenderPSO;
@@ -18,6 +19,7 @@ namespace Charalotte
 	class FRenderScene;
 	class FTexture;
 	class FVerticesAndIndicesBuffer;
+	class FRenderTarget;
 }
 
 class RHI
@@ -39,6 +41,8 @@ public:
 	virtual void CreateVBIBBuffer(Charalotte::FVerticesAndIndicesBuffer* VBIB) = 0;
 	virtual void CreateRenderMeshResource(Charalotte::FRenderMesh* RenderMesh) = 0;
 	virtual void CreateRenderMeshSrv(Charalotte::FMaterial* Mat, Charalotte::FRenderMesh* Mesh) = 0;
+	virtual std::shared_ptr<Charalotte::FRenderTarget> CreateRenderTarget(Charalotte::FResourceElement Element) = 0;
+	virtual void UpdateRenderTarget(Charalotte::FRenderTarget* RT, Charalotte::E_GRAPHIC_FORMAT ) = 0;
 
 	virtual void InitShadowMap() = 0;
 	virtual bool InitRenderPlatform(FWindow* WindowPtr) = 0;

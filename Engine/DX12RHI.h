@@ -47,6 +47,7 @@ public:
 	virtual void CreateVBIBBuffer(Charalotte::FVerticesAndIndicesBuffer* VBIB) override;
 	virtual void CreateRenderMeshResource(Charalotte::FRenderMesh* RenderMesh) override;
 	virtual void CreateRenderMeshSrv(Charalotte::FMaterial* Mat, Charalotte::FRenderMesh* Mesh) override;
+	virtual std::shared_ptr<Charalotte::FRenderTarget> CreateRenderTarget(Charalotte::FResourceElement) override;
 
 	virtual void InitShadowMap() override;
 	virtual bool InitRenderPlatform(FWindow* WindowPtr) override;
@@ -76,6 +77,8 @@ public:
 	virtual void SetRenderTarget(Charalotte::FRenderTarget* RT) override;
 	virtual void SetPSOFinal(Charalotte::FRenderPSO* Pso) override;
 	virtual void SetHeap(Charalotte::HeapType HT) override;
+
+	virtual void UpdateRenderTarget(Charalotte::FRenderTarget* RT, Charalotte::E_GRAPHIC_FORMAT) override;
 
 protected:
 	// flush fence
@@ -192,5 +195,6 @@ private:
 	std::unique_ptr<FDXShadowMap> ShadowMap;
 	std::shared_ptr<FDevice> DevicePtr;
 	std::unique_ptr<Charalotte::FHeapManager> HeapMgr;
+	std::vector<std::shared_ptr<Charalotte::FRenderTarget>> RTs;
 };
 

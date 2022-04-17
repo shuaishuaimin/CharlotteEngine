@@ -50,6 +50,8 @@ namespace Charalotte
 
 		virtual void StoreRHIPtr() override;
 	protected:
+		void TestCreateAndUseRT();
+
 		void UpdateShadowPassCB();
 
 		void UpdateShadowCons(ObjectConstants& Obj, const FActorInfo& ActorPri);
@@ -89,5 +91,7 @@ namespace Charalotte
 		// re construct 
 		std::shared_ptr<FRenderTarget> ShadowMapRT;
 		std::shared_ptr<FRenderTarget> BasePassRT;
+
+		std::unordered_map<std::string, std::shared_ptr<FRenderTarget>> Rts;
 	};
 }
