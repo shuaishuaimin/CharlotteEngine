@@ -7,9 +7,9 @@
 #include "FWinRenderScene.h"
 #include "FMaterial.h"
 #include "FRenderPSO.h"
-#include "FRenderTarget.h"
 #include "FRenderMesh.h"
-#include "FDXRenderTarget.h"
+#include "FPCRenderTarget.h"
+#include "FDXResource.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -1006,9 +1006,9 @@ void DX12RHI::BeginFrame()
 	
 }
 
-void DX12RHI::SetRenderTarget(Charalotte::FRenderTarget* RT)
+void DX12RHI::SetRenderTarget(Charalotte::FPCRenderTarget* RT)
 {
-
+	
 }
 
 void DX12RHI::SetPSOFinal(Charalotte::FRenderPSO* Pso)
@@ -1093,69 +1093,22 @@ void DX12RHI::CreateRenderMeshResource(Charalotte::FRenderMesh* RenderMesh)
 	BulidConstantBuffers(RenderMesh->CbvH(), RenderMesh->OCB());
 }
 
-std::shared_ptr<Charalotte::FRenderTarget> DX12RHI::CreateRenderTarget(Charalotte::FResourceElement Element)
+std::shared_ptr<Charalotte::FPCRenderTarget> DX12RHI::CreateRenderTarget()
 {
-	std::shared_ptr<Charalotte::FRenderTarget> RT = std::make_shared<Charalotte::FDXRenderTarget>(mClientWidth,
-	mClientHeight, DevicePtr.get(), Element);
+	std::shared_ptr<Charalotte::FPCRenderTarget> RT = std::make_shared<Charalotte::FPCRenderTarget>();
 	return RT;
 }
 
-void DX12RHI::UpdateRenderTarget(Charalotte::FRenderTarget* RT, Charalotte::E_GRAPHIC_FORMAT Format)
+std::shared_ptr<Charalotte::FResource> DX12RHI::CreateResource(Charalotte::FResourceAttributes ResourceA)
 {
-	//auto dxrt = dynamic_cast<Charalotte::FDXRenderTarget*>(RT);
-	//const FLOAT Color[4] = { 0.0f,0.0f,0.0f,0.0f };
-	//CD3DX12_CLEAR_VALUE optClear(DXGI_FORMAT(Format), Color);
+	std::shared_ptr<Charalotte::FResource> Resource = std::make_shared<Charalotte::FDXResource>(md3dDevice.Get());
+	dynamic_cast<Charalotte::FDXResource*>(Resource.get())->BuildResource(ResourceA, HeapMgr.get());
+	return Resource;
+}
 
-	//	D3D12_RESOURCE_DESC RTdesc;
-	//	RTdesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	//	RTdesc.Alignment = 0;
-	//	RTdesc.Width = dxrt->getWight();
-	//	RTdesc.Height = dxrt->GetHeight();
-	//	RTdesc.DepthOrArraySize = 1;
-	//	RTdesc.MipLevels = 1;
-	//	RTdesc.Format = DXGI_FORMAT(Format);
-	//	RTdesc.SampleDesc.Count = false ? 4 : 1;
-	//	RTdesc.SampleDesc.Quality = false ? (0 - 1) : 0;
-	//	RTdesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	//	RTdesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-
-	//	optClear.Format = DXGI_FORMAT(Format);
-	//	optClear.DepthStencil.Depth = 1.0f;
-	//	optClear.DepthStencil.Stencil = 0;
-	//	optClear.Color[0] = Color[0];
-	//	optClear.Color[1] = Color[1];
-	//	optClear.Color[2] = Color[2];
-	//	optClear.Color[3] = Color[3];
-
-	//	ThrowIfFailed(md3dDevice->CreateCommittedResource(
-	//		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-	//		D3D12_HEAP_FLAG_NONE,
-	//		&RTdesc,
-	//		D3D12_RESOURCE_STATE_RENDER_TARGET,
-	//		&optClear,
-	//		IID_PPV_ARGS(dxrt->GetRTBuffer().GetAddressOf())));
-
-	//	//create rtv view
-	//	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc;
-	//	rtvDesc.Format = DXGI_FORMAT(Format);
-	//	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-	//	rtvDesc.Texture2D.MipSlice = 0;
-	//	rtvDesc.Texture2D.PlaneSlice = 0;
-
-	//	auto rtvHeandle = HeapMgr->GetCPUHandleByTypeAndOffest(Charalotte::HeapType::RTVHeap, dxrt->GetRtvOffest());
-	//	md3dDevice->CreateRenderTargetView(dxrt->GetRTBuffer().Get(), &rtvDesc, rtvHeandle);
-
-	//	//create srv view
-	//	D3D12_SHADER_RESOURCE_VIEW_DESC rtsrvDesc = {};
-	//	rtsrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	//	rtsrvDesc.Format = DXGI_FORMAT(Format);
-	//	rtsrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	//	rtsrvDesc.Texture2D.MostDetailedMip = 0;
-	//	rtsrvDesc.Texture2D.MipLevels = 1;
-	//	rtsrvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-	//	rtsrvDesc.Texture2D.PlaneSlice = 0;
-	//	auto SrvHandle = HeapMgr->GetCPUHandleByTypeAndOffest(Charalotte::HeapType::CBVSRVUAVHeap, dxrt->GetSrvOffest());
-	//	md3dDevice->CreateShaderResourceView(dxrt->GetRTBuffer().Get(), &rtsrvDesc, SrvHandle);
+void DX12RHI::UpdateRenderTarget(Charalotte::FPCRenderTarget* RT, Charalotte::FResourceAttributes RA)
+{
+	
 }
 
 void DX12RHI::EndFrame()

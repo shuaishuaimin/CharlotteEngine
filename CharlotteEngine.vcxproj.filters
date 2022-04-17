@@ -309,13 +309,10 @@
     <ClInclude Include="Engine\SMaterialAttributes.h">
       <Filter>Header Files\Engine\Public\Material</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FRenderTarget.h">
-      <Filter>Header Files\Engine\Platform\Render</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\FRHIManager.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FDXRenderTarget.h">
+    <ClInclude Include="Engine\FPCRenderTarget.h">
       <Filter>Header Files\Engine\Platform\Render</Filter>
     </ClInclude>
     <ClInclude Include="Engine\SViewportAndRect.h">
@@ -327,7 +324,7 @@
     <ClInclude Include="Engine\FDXResource.h">
       <Filter>Header Files\Engine\Platform\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\SResourceElement.h">
+    <ClInclude Include="Engine\SEResourceElement.h">
       <Filter>Header Files\Engine\Platform\Render</Filter>
     </ClInclude>
   </ItemGroup>
@@ -410,8 +407,11 @@
     <ClCompile Include="Engine\FRHIManager.cpp">
       <Filter>Source Files\Engine\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FDXRenderTarget.cpp">
+    <ClCompile Include="Engine\FPCRenderTarget.cpp">
       <Filter>Source Files\Engine\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FDXResource.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

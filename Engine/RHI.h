@@ -10,16 +10,17 @@
 #include "SEShaderElements.h"
 #include "FTempRenderScene.h"
 #include "EHeapType.h"
-#include "SResourceElement.h"
+#include "SEResourceElement.h"
 namespace Charalotte
 {
 	class FRenderPSO;
-	class FRenderTarget;
+	class FPCRenderTarget;
 	class FRenderMesh;
 	class FRenderScene;
 	class FTexture;
 	class FVerticesAndIndicesBuffer;
-	class FRenderTarget;
+	class FPCRenderTarget;
+	class FResource;
 }
 
 class RHI
@@ -41,8 +42,8 @@ public:
 	virtual void CreateVBIBBuffer(Charalotte::FVerticesAndIndicesBuffer* VBIB) = 0;
 	virtual void CreateRenderMeshResource(Charalotte::FRenderMesh* RenderMesh) = 0;
 	virtual void CreateRenderMeshSrv(Charalotte::FMaterial* Mat, Charalotte::FRenderMesh* Mesh) = 0;
-	virtual std::shared_ptr<Charalotte::FRenderTarget> CreateRenderTarget(Charalotte::FResourceElement Element) = 0;
-	virtual void UpdateRenderTarget(Charalotte::FRenderTarget* RT, Charalotte::E_GRAPHIC_FORMAT ) = 0;
+	virtual std::shared_ptr<Charalotte::FPCRenderTarget> CreateRenderTarget() = 0;
+	virtual std::shared_ptr<Charalotte::FResource> CreateResource(Charalotte::FResourceAttributes ResourceA) = 0;
 
 	virtual void InitShadowMap() = 0;
 	virtual bool InitRenderPlatform(FWindow* WindowPtr) = 0;
@@ -69,7 +70,9 @@ public:
 	virtual void SetShader(std::shared_ptr<Charalotte::FShaderInfo> ShaderInput) = 0;
 	virtual void SetPipelineParamter(Charalotte::E_PSOTYPE PSOType, 
 				const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr) = 0;
-	virtual void SetRenderTarget(Charalotte::FRenderTarget* RT) = 0;
+	virtual void SetRenderTarget(Charalotte::FPCRenderTarget* RT) = 0;
 	virtual void SetPSOFinal(Charalotte::FRenderPSO* Pso) = 0;
 	virtual void SetHeap(Charalotte::HeapType HT) = 0;
+
+	virtual void UpdateRenderTarget(Charalotte::FPCRenderTarget* RT, Charalotte::FResourceAttributes RA) = 0;
 }; 

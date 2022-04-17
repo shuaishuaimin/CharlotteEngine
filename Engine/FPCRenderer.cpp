@@ -49,8 +49,8 @@ namespace Charalotte
 		TestLightData = std::make_shared<RenderUsefulData>();
 		CommonShaderInput = std::make_shared<FShaderInfo>();
 		ShadowShaderInput = std::make_shared<FShaderInfo>();
-		ShadowMapRT = std::make_shared<FRenderTarget>();
-		BasePassRT = std::make_shared<FRenderTarget>();
+		ShadowMapRT = std::make_shared<FPCRenderTarget>();
+		BasePassRT = std::make_shared<FPCRenderTarget>();
 	}
 
 	bool FPCRenderer::Initialize()
@@ -354,26 +354,24 @@ namespace Charalotte
 
 	void FPCRenderer::TestCreateAndUseRT()
 	{
-		/*std::shared_ptr<FRenderTarget> HDR = RHIPtr->CreateRenderTarget(0, 0);
-		std::shared_ptr<FRenderTarget> SetUp = RHIPtr->CreateRenderTarget(1, 1);
-		std::shared_ptr<FRenderTarget> DownFirst = RHIPtr->CreateRenderTarget(2, 2);
-		std::shared_ptr<FRenderTarget> DownSecond = RHIPtr->CreateRenderTarget(3, 3);
-		std::shared_ptr<FRenderTarget> DownThird = RHIPtr->CreateRenderTarget(4, 4);
-		std::shared_ptr<FRenderTarget> UpFirst = RHIPtr->CreateRenderTarget(5, 5);
-		std::shared_ptr<FRenderTarget> UpSecond = RHIPtr->CreateRenderTarget(6, 6);
-		std::shared_ptr<FRenderTarget> UpThird = RHIPtr->CreateRenderTarget(7, 7);
-		std::shared_ptr<FRenderTarget> Sumber = RHIPtr->CreateRenderTarget(8, 8);
-		std::shared_ptr<FRenderTarget> ToneMap = RHIPtr->CreateRenderTarget(9, 9);
-		Rts = {{"HDR", HDR}, 
-				{"Setup", SetUp},
-				{"DownFirst", DownFirst},
-				{"DownSecond", DownSecond},
-				{"DownThird", DownThird},
-				{"UpFirst", UpFirst},
-				{"UpSecond", UpSecond},
-				{"UpThird", UpThird},
-				{"Sumber", Sumber},
-				{"ToneMap", ToneMap}};*/
+		FResourceElement El;
+		El.DsDsvOffest = 0;
+		El.DsRtvOffest = 0;
+		El.RtDsvOffest = 0;
+		El.RtRtvOffest = 0;
+		std::shared_ptr<FPCRenderTarget> Rt = RHIPtr->CreateRenderTarget();
+		FResourceAttributes Attribute;
+		Attribute.DsO = 0;
+		Attribute.RtO = 0;
+		Attribute.SrO = 0;
+		Attribute.Height = 1280;
+		Attribute.Width = 1980;
+		Attribute.Format = E_GRAPHIC_FORMAT::FORMAT_R16G16B16A16_FLOAT;
+		Attribute.ResourceType = E_RESOURCE_TYPE::RESOURCE_DEP;
+		Rt->SetDSResource(RHIPtr->CreateResource(Attribute));
+		Attribute.Format = E_GRAPHIC_FORMAT::FORMAT_R16G16B16A16_FLOAT;
+		Attribute.ResourceType = E_RESOURCE_TYPE::RESOURCE_RT;
+		Rt->SetRTResource(RHIPtr->CreateResource(Attribute));
 	}
 }
 

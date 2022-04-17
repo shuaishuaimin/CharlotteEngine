@@ -146,7 +146,7 @@
   <ItemGroup>
     <ClInclude Include="Engine\AActor.h" />
     <ClInclude Include="Engine\EHeapType.h" />
-    <ClInclude Include="Engine\FDXRenderTarget.h" />
+    <ClInclude Include="Engine\FPCRenderTarget.h" />
     <ClInclude Include="Engine\FCommandList.h" />
     <ClInclude Include="Engine\FDXResource.h" />
     <ClInclude Include="Engine\FDXRHIFunctionLibrary.h" />
@@ -154,7 +154,6 @@
     <ClInclude Include="Engine\FRenderMesh.h" />
     <ClInclude Include="Engine\FRenderPSO.h" />
     <ClInclude Include="Engine\FRenderScene.h" />
-    <ClInclude Include="Engine\FRenderTarget.h" />
     <ClInclude Include="Engine\FResource.h" />
     <ClInclude Include="Engine\FRHIManager.h" />
     <ClInclude Include="Engine\FShadowMap.h" />
@@ -163,7 +162,7 @@
     <ClInclude Include="Engine\FBaseLight.h" />
     <ClInclude Include="Engine\FTexture.h" />
     <ClInclude Include="Engine\FVerticesAndIndicesBuffer.h" />
-    <ClInclude Include="Engine\SResourceElement.h" />
+    <ClInclude Include="Engine\SEResourceElement.h" />
     <ClInclude Include="Engine\SEShaderElements.h" />
     <ClInclude Include="Engine\SMaterialAttributes.h" />
     <ClInclude Include="Engine\STransformDef.h" />
@@ -211,7 +210,8 @@
     <ClCompile Include="Engine\CharlotteEngine.cpp" />
     <ClCompile Include="Engine\DDSTextureLoader.cpp" />
     <ClCompile Include="Engine\DX12RHI.cpp" />
-    <ClCompile Include="Engine\FDXRenderTarget.cpp" />
+    <ClCompile Include="Engine\FPCRenderTarget.cpp" />
+    <ClCompile Include="Engine\FDXResource.cpp" />
     <ClCompile Include="Engine\FDXShadowMap.cpp" />
     <ClCompile Include="Engine\FHeapManager.cpp" />
     <ClCompile Include="Engine\FMeshAsset.cpp" />

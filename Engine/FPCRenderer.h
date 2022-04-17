@@ -17,7 +17,7 @@
 #include "FScene.h"
 #include "WinMaterialData.h"
 #include "RHI.h"
-#include "FRenderTarget.h"
+#include "FPCRenderTarget.h"
 // link necessary lib
 //#pragma comment(lib,"d3dcompiler.lib")
 //#pragma comment(lib, "D3D12.lib")
@@ -89,9 +89,9 @@ namespace Charalotte
 		std::shared_ptr<FShaderInfo> ShadowShaderInput;
 
 		// re construct 
-		std::shared_ptr<FRenderTarget> ShadowMapRT;
-		std::shared_ptr<FRenderTarget> BasePassRT;
+		std::shared_ptr<FPCRenderTarget> ShadowMapRT;
+		std::shared_ptr<FPCRenderTarget> BasePassRT;
 
-		std::unordered_map<std::string, std::shared_ptr<FRenderTarget>> Rts;
+		std::unordered_map<std::string, std::shared_ptr<FPCRenderTarget>> Rts;
 	};
 }

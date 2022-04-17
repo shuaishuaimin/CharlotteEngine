@@ -1,10 +1,13 @@
 #pragma once
 
-class FResource
+namespace Charalotte
 {
-public:
-	FResource(){}
-	virtual ~FResource(){}
+	class FResource
+	{
+	public:
+		FResource() {}
+		virtual ~FResource() {}
 
-private:
-};
+	private:
+	};
+}
