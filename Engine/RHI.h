@@ -9,6 +9,7 @@
 #include "SPrimitive.h"
 #include "SEShaderElements.h"
 #include "FTempRenderScene.h"
+#include "EHeapType.h"
 namespace Charalotte
 {
 	class FRenderPSO;
@@ -66,5 +67,5 @@ public:
 				const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr) = 0;
 	virtual void SetRenderTarget(Charalotte::FRenderTarget* RT) = 0;
 	virtual void SetPSOFinal(Charalotte::FRenderPSO* Pso) = 0;
-	
+	virtual void SetHeap(Charalotte::HeapType HT) = 0;
 }; 

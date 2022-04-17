@@ -21,6 +21,7 @@
 #include "DX12RHIData.h"
 #include "FDXPSOs.h"
 #include "FDXShadowMap.h"
+#include "FHeapManager.h"
 
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
@@ -74,6 +75,7 @@ public:
 		const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr) override;
 	virtual void SetRenderTarget(Charalotte::FRenderTarget* RT) override;
 	virtual void SetPSOFinal(Charalotte::FRenderPSO* Pso) override;
+	virtual void SetHeap(Charalotte::HeapType HT) override;
 
 protected:
 	// flush fence
@@ -189,5 +191,6 @@ private:
 		Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr)>> PsoSetParamterFunctions;
 	std::unique_ptr<FDXShadowMap> ShadowMap;
 	std::shared_ptr<FDevice> DevicePtr;
+	std::unique_ptr<Charalotte::FHeapManager> HeapMgr;
 };
 

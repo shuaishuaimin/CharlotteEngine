@@ -117,7 +117,6 @@ bool DX12RHI::InitRenderPlatform(FWindow* WindowPtr)
 	m4xMsaaQuality = msQualityLevels.NumQualityLevels;
 	assert(m4xMsaaQuality > 0 && "Unexpected MSAA quality level.");
 
-
 #ifdef _DEBUG
 	LogAdapters();
 #endif
@@ -127,6 +126,7 @@ bool DX12RHI::InitRenderPlatform(FWindow* WindowPtr)
 	CreateSwapChain(WindowPtr);
 	CreateRtvAndDsvDescriptorHeaps();
 	DevicePtr = std::make_shared<FDXDevice>(md3dDevice.Get());
+	HeapMgr = std::make_unique<Charalotte::FHeapManager>(md3dDevice.Get(), 1024, 1024, 2048);
 	return true;
 }
 
@@ -1094,4 +1094,11 @@ void DX12RHI::EndFrame()
 {
 	ExecuteAndCloseCommandList();
 	FlushCommandQueue();
+}
+
+void DX12RHI::SetHeap(Charalotte::HeapType HT)
+{
+	auto& Heap = HeapMgr->Heap(HT);
+	ID3D12DescriptorHeap* descriptorHeaps[] = { Heap.Get() };
+	mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 }
