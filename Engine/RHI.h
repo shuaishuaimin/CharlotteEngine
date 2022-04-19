@@ -21,6 +21,7 @@ namespace Charalotte
 	class FVerticesAndIndicesBuffer;
 	class FPCRenderTarget;
 	class FResource;
+	class FShader;
 }
 
 class RHI
@@ -73,6 +74,7 @@ public:
 	virtual void SetRenderTarget(Charalotte::FPCRenderTarget* RT) = 0;
 	virtual void SetPSOFinal(Charalotte::FRenderPSO* Pso) = 0;
 	virtual void SetHeap(Charalotte::HeapType HT) = 0;
+	virtual void SetShaderElement(Charalotte::FShader*) = 0;
 
 	virtual void UpdateRenderTarget(Charalotte::FPCRenderTarget* RT, Charalotte::FResourceAttributes RA) = 0;
 }; 

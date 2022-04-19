@@ -62,6 +62,7 @@ namespace Charalotte
 #endif 
 	private:
 		FVerticesAndIndicesBuffer* VBIB;
+
 		std::string RenderMeshName;
 #ifdef RENDER_PLATFORM_DX12
 		FDXBoundingBox DrawArg;

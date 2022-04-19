@@ -167,5 +167,15 @@ namespace Charalotte
 		std::string VSShaderVersion = "";
 		std::string PSShaderVersion = "";
 		std::vector<FInputElementDesc> InputLayout;
+
+	};
+
+	struct FVSPSAttributes
+	{
+		FShaderMacro* VSShaderMacroPtr = nullptr;
+		FShaderMacro* PSShaderMacroPtr = nullptr;
+		std::string VSShaderVersion = "";
+		std::string PSShaderVersion = "";
+		std::vector<FInputElementDesc> InputLayout;
 	};
 }

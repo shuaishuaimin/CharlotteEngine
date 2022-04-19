@@ -78,6 +78,7 @@ public:
 	virtual void SetRenderTarget(Charalotte::FPCRenderTarget* RT) override;
 	virtual void SetPSOFinal(Charalotte::FRenderPSO* Pso) override;
 	virtual void SetHeap(Charalotte::HeapType HT) override;
+	virtual void SetShaderElement(Charalotte::FShader*) override;
 
 	virtual void UpdateRenderTarget(Charalotte::FPCRenderTarget* RT, Charalotte::FResourceAttributes RA) override;
 

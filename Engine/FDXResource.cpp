@@ -62,7 +62,7 @@ namespace Charalotte
 
 		auto rtvHeandle = HeapMgr->GetCPUHandleByTypeAndOffest(Charalotte::HeapType::RTVHeap, ResourceA.RtO);
 		DevicePtr->CreateRenderTargetView(mResource.Get(), &rtvDesc, rtvHeandle);
-
+		
 		//create srv view
 		D3D12_SHADER_RESOURCE_VIEW_DESC rtsrvDesc = {};
 		rtsrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;

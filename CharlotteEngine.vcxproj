@@ -145,7 +145,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Engine\AActor.h" />
+    <ClInclude Include="Engine\SDX12ShaderElement.h" />
     <ClInclude Include="Engine\EHeapType.h" />
+    <ClInclude Include="Engine\FCoreShader.h" />
     <ClInclude Include="Engine\FPCRenderTarget.h" />
     <ClInclude Include="Engine\FCommandList.h" />
     <ClInclude Include="Engine\FDXResource.h" />
@@ -218,6 +220,7 @@
     <ClCompile Include="Engine\FRenderScene.cpp" />
     <ClCompile Include="Engine\FRHIManager.cpp" />
     <ClCompile Include="Engine\FScene.cpp" />
+    <ClCompile Include="Engine\FShader.cpp" />
     <ClCompile Include="Engine\FVerticesAndIndicesBuffer.cpp" />
     <ClCompile Include="Engine\FWinRenderScene.cpp" />
     <ClCompile Include="Engine\GameInstance.cpp" />

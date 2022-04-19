@@ -12,16 +12,20 @@ namespace Charalotte
 	class FRenderPSO
 	{
 	public:
-		FRenderPSO(FVerticesAndIndicesBuffer* VBIB, FShader* Shader) : VBIBBuffer(VBIB), ShaderPtr(Shader)
+		FRenderPSO(FVerticesAndIndicesBuffer* VBIB) : VBIBBuffer(VBIB)
 		{
-
+			
 		}
 
 		FShader* GetShader()
 		{
-			return ShaderPtr;
+			return ShaderPtr.get();
 		}
 
+		void CreateShader(std::shared_ptr<FShader>&& Shader)
+		{
+			ShaderPtr = Shader;
+		}
 #ifdef RENDER_PLATFORM_DX12
 		ID3D12PipelineState* GetPso()
 		{
@@ -30,7 +34,7 @@ namespace Charalotte
 #endif
 	private:
 		FVerticesAndIndicesBuffer* VBIBBuffer;
-		FShader* ShaderPtr;
+		std::shared_ptr<FShader> ShaderPtr;
 #ifdef RENDER_PLATFORM_DX12
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> Pso;
 #endif

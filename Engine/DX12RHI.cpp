@@ -1106,6 +1106,25 @@ std::shared_ptr<Charalotte::FResource> DX12RHI::CreateResource(Charalotte::FReso
 	return Resource;
 }
 
+void DX12RHI::SetShaderElement(Charalotte::FShader* Shader)
+{
+	if (Shader == nullptr)
+	{
+		return;
+	}
+	std::shared_ptr<Charalotte::FDXShaderElement> ShaderE = std::make_shared<Charalotte::FDXShaderElement>();
+	std::wstring WPath = FDXRHIFunctionLibrary::String2wString(Shader->ShaderPath());
+	auto& Att = Shader->GetAttributes();
+	auto VSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(Att->VSShaderMacroPtr);
+	auto PSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(Att->PSShaderMacroPtr);
+	auto mvsByteCode = FUtil::CompileShader(WPath,
+		VSShaderMacroSharedPtr.get(), "VS", Att->VSShaderVersion);
+	auto mpsByteCode = FUtil::CompileShader(WPath,
+		PSShaderMacroSharedPtr.get(), "PS", Att->PSShaderVersion);
+	ShaderE->InputLayout = FDXRHIFunctionLibrary::InputDescS2DX12(Att->InputLayout);
+	Shader->SetShaderElement(ShaderE);
+}
+
 void DX12RHI::UpdateRenderTarget(Charalotte::FPCRenderTarget* RT, Charalotte::FResourceAttributes RA)
 {
 	

@@ -270,9 +270,6 @@
     <ClInclude Include="Engine\FDXRHIFunctionLibrary.h">
       <Filter>Header Files\Engine\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FShader.h">
-      <Filter>Header Files\Engine\Platform\Render\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\FCommandList.h">
       <Filter>Header Files\Engine\Platform\Render</Filter>
     </ClInclude>
@@ -326,6 +323,15 @@
     </ClInclude>
     <ClInclude Include="Engine\SEResourceElement.h">
       <Filter>Header Files\Engine\Platform\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FShader.h">
+      <Filter>Header Files\Engine\Public\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FCoreShader.h">
+      <Filter>Header Files\Engine\Public\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\SDX12ShaderElement.h">
+      <Filter>Header Files\Engine\Public\Material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -412,6 +418,9 @@
     </ClCompile>
     <ClCompile Include="Engine\FDXResource.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FShader.cpp">
+      <Filter>Source Files\Engine\Public\Material</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
