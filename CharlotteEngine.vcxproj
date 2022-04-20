@@ -145,6 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Engine\AActor.h" />
+    <ClInclude Include="Engine\FRootForShader.h" />
     <ClInclude Include="Engine\SDX12ShaderElement.h" />
     <ClInclude Include="Engine\EHeapType.h" />
     <ClInclude Include="Engine\FCoreShader.h" />

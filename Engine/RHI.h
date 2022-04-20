@@ -11,6 +11,7 @@
 #include "FTempRenderScene.h"
 #include "EHeapType.h"
 #include "SEResourceElement.h"
+#include "FShadowMap.h"
 namespace Charalotte
 {
 	class FRenderPSO;
@@ -22,6 +23,8 @@ namespace Charalotte
 	class FPCRenderTarget;
 	class FResource;
 	class FShader;
+	class FRenderPSO;
+	class FRootForShader;
 }
 
 class RHI
@@ -45,6 +48,10 @@ public:
 	virtual void CreateRenderMeshSrv(Charalotte::FMaterial* Mat, Charalotte::FRenderMesh* Mesh) = 0;
 	virtual std::shared_ptr<Charalotte::FPCRenderTarget> CreateRenderTarget() = 0;
 	virtual std::shared_ptr<Charalotte::FResource> CreateResource(Charalotte::FResourceAttributes ResourceA) = 0;
+	virtual std::shared_ptr<Charalotte::FRenderPSO> CreatePSO(Charalotte::FPSOAttributes , Charalotte::FShader*) = 0;
+	virtual std::shared_ptr<Charalotte::FRootForShader> CreateRoot(Charalotte::FShader*) = 0;
+	virtual std::shared_ptr<Charalotte::FShadowMap> CreateShadowMap() = 0;
+	virtual void ChangeResourceBarrier(Charalotte::FResource*, Charalotte::E_RESOURCE_STATE Orgin, Charalotte::E_RESOURCE_STATE Final, unsigned int NumBarriers) = 0;
 
 	virtual void InitShadowMap() = 0;
 	virtual bool InitRenderPlatform(FWindow* WindowPtr) = 0;
@@ -74,7 +81,14 @@ public:
 	virtual void SetRenderTarget(Charalotte::FPCRenderTarget* RT) = 0;
 	virtual void SetPSOFinal(Charalotte::FRenderPSO* Pso) = 0;
 	virtual void SetHeap(Charalotte::HeapType HT) = 0;
+	virtual void SetRenderMeshHeap(Charalotte::FRenderMesh*) = 0;
+	virtual void SetCurrentBufferHeap() = 0;
+	virtual void SetShadowMapHeap(Charalotte::FShadowMap*) = 0;
 	virtual void SetShaderElement(Charalotte::FShader*) = 0;
+	virtual void SetGraphicsRoot32BitConstants(unsigned int ParamIndex, unsigned int NumOfByteValue, void* SrcData, unsigned int Offset32BitValue) = 0;
+	virtual void SetShadowMapForRT(Charalotte::FShadowMap*) = 0;
+	virtual void SetGraphicsRootDescriptorTable(unsigned int index, Charalotte::HeapType, int Offest, Charalotte::FRenderMesh*) = 0;
+	virtual void SetGraphicsRootConstantBufferView(unsigned int Index, Charalotte::FResource*, Charalotte::FRenderMesh*) = 0;
 
 	virtual void UpdateRenderTarget(Charalotte::FPCRenderTarget* RT, Charalotte::FResourceAttributes RA) = 0;
 }; 

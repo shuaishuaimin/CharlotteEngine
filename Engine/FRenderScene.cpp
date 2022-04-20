@@ -3,18 +3,24 @@
 #include "FScene.h"
 #include "FMeshAsset.h"
 #include "FRHIManager.h"
+#include "CharlotteEngine.h"
+#include "FRenderMesh.h"
+//#include "FCoreShader.h"
 #ifdef RENDER_PLATFORM_DX12
 #include "FWinEventRegisterSystem.h"
 #endif
 #include "FTexture.h"
+#include "FCoreShader.h"
 
 namespace Charalotte
 {
 	FRenderScene::FRenderScene()
 	{
+#ifdef RENDER_PLATFORM_DX12
 		FWinEventRegisterSystem::GetInstance().RegisterMapLoadEventForDender(MapLoadType::RenderSceneLoad, [this](std::string Mapname){
 			this->BuildResource(Mapname);
 		});
+#endif
 		std::string PathFront = "Content/Textures/";
 		FileNames = { PathFront + "bricks" + ".dds", PathFront + "ice" + ".dds" , PathFront + "tile" + ".dds" , PathFront + "stone" + ".dds" 
 						, PathFront + "StoneTexture" + ".dds", PathFront + "StoneNormal" + ".dds"};
@@ -48,6 +54,9 @@ namespace Charalotte
 			RHIPtr->CreateTextureResource(Tex.get());
 			Textures.insert({ FileName, std::move(Tex) });
 		}
+		CreateDefaultShaders("Shaders\\color.hlsl", E_PSOTYPE::Default);
+		CreateDefaultShaders("Shaders\\Shadows.hlsl", E_PSOTYPE::Shadow);
+		CreateDefaultPsos();
 		CreateDefaultMaterials();
 		const auto& ActorInfos = FScene::GetInstance().GetActorInfos();
 		const auto& ActorPrimitiveIter = ActorInfos.find(MapName);
@@ -133,6 +142,18 @@ namespace Charalotte
 		Materials.clear();
 
 		Textures.clear();
+
+		for (auto& Shader : Shaders)
+		{
+			Shader.second = nullptr;
+		}
+		Shaders.clear();
+		
+		for (auto& Pso : Psos)
+		{
+			Pso.second.clear();
+		}
+		Psos.clear();
 	}
 
 	void FRenderScene::CreateBufferResources(const std::string& BufferName)
@@ -219,10 +240,94 @@ namespace Charalotte
 		}
 		for (auto& Texture : Textures)
 		{
+			FMaterialAttributes DefAttribute;
+			DefAttribute.BaseColor = Texture.second.get();
+			DefAttribute.Normal = DefaultNormal;
+			DefAttribute.Roughness = 1.0f;
 			std::shared_ptr<FMaterial> Mat = std::make_shared<FMaterial>();
-			Mat->SetTexture(Texture.second.get());
-			Mat->SetNormal(DefaultNormal);
+			Mat->SetMaterialAttributes(DefAttribute);
+			Mat->AddPSO(GetPsoPtr(Default, "DefaultPso"), "DefaultPso", E_PSOTYPE::Default);
+			Mat->AddPSO(GetPsoPtr(Shadow, "ShadowPso"), "ShadowPso", E_PSOTYPE::Shadow);
 			Materials.insert({Texture.first, std::move(Mat)});
+		}
+	}
+
+	void FRenderScene::CreateDefaultShaders(const std::string& Path, E_PSOTYPE PsoType)
+	{
+		std::shared_ptr<FShader> Shader;
+		switch(PsoType)
+		{
+			case Default:
+				Shader = std::make_shared<FBassPassShader>(Path);
+				break;
+			case Shadow:
+				Shader = std::make_shared<FShadowShader>(Path);
+				break;
+		}
+			
+		std::shared_ptr<FVSPSAttributes> Att = std::make_shared<FVSPSAttributes>();
+		Att->PSShaderMacroPtr = nullptr;
+		Att->VSShaderMacroPtr = nullptr;
+		Att->VSShaderVersion = "vs_5_0";
+		Att->PSShaderVersion = "ps_5_0";
+		Att->InputLayout =
+		{
+			{ "POSITION", 0, E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT , 0, 0, E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{ "COLOR", 0, E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT, 0, 12,  E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
+			{ "NORMAL", 0, E_GRAPHIC_FORMAT::FORMAT_R32G32B32_FLOAT, 0, 28,  E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} ,
+			{ "TEXCOORD", 0, E_GRAPHIC_FORMAT::FORMAT_R32G32_FLOAT, 0, 44,  E_INPUT_CLASSIFICATION::INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+		};
+		Shader->SetAttributes(Att);
+		RHIPtr->SetShaderElement(Shader.get());
+		Shaders.insert({Path, std::move(Shader)});
+	}
+	void FRenderScene::CreatePso(E_PSOTYPE PsoType, const std::string& ShaderPath, const std::string& Name, FPSOAttributes PsoAtt)
+	{
+		auto ShaderIter = Shaders.find(ShaderPath);
+		if (ShaderIter != Shaders.end())
+		{
+			std::shared_ptr<FRenderPSO> RenderPso = RHIPtr->CreatePSO(PsoAtt, ShaderIter->second.get());
+			Psos[PsoType].insert({ Name , std::move(RenderPso)});
+		}
+	}
+
+	void FRenderScene::CreateDefaultPsos()
+	{
+		FPSOAttributes DefaultPsoAtt;
+		DefaultPsoAtt.IsUseBias = false;
+		DefaultPsoAtt.NumRenderTargets = 1;
+		DefaultPsoAtt.RTVFormat = E_GRAPHIC_FORMAT::FORMAT_R8G8B8A8_UNORM;
+		CreatePso(E_PSOTYPE::Default, "Shaders\\color.hlsl", "DefaultPso", DefaultPsoAtt);
+
+		FPSOAttributes ShadowPsoAtt;
+		ShadowPsoAtt.IsUseBias = true;
+		ShadowPsoAtt.DepthBias = 15000;
+		ShadowPsoAtt.DepthBiasClamp = 0.0f;
+		ShadowPsoAtt.SlopeScaledDepthBias = 1.0f;
+		ShadowPsoAtt.NumRenderTargets = 0;
+		ShadowPsoAtt.RTVFormat = E_GRAPHIC_FORMAT::FORMAT_UNKNOWN;
+		CreatePso(E_PSOTYPE::Shadow, "Shaders\\Shadows.hlsl", "ShadowPso", ShadowPsoAtt);
+
+	}
+
+	FRenderPSO* FRenderScene::GetPsoPtr(E_PSOTYPE PsoType, const std::string& PsoName)
+	{
+		const auto& TypeIter = Psos.find(PsoType);
+		if (TypeIter != Psos.end())
+		{
+			const auto& PsoIter = TypeIter->second.find(PsoName);
+			if (PsoIter != TypeIter->second.end())
+			{
+				return PsoIter->second.get();
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
+		else
+		{
+			return nullptr;
 		}
 	}
 }

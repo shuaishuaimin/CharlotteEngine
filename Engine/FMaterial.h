@@ -16,7 +16,6 @@ namespace Charalotte
 		FMaterial() : mTextureName("bricks"), mNormalName("bricks")
 		{
 			MaterialAttributes = std::make_unique<FMaterialAttributes>();
-			EmptyPsos = {};
 		}
 
 		~FMaterial() {
@@ -26,6 +25,10 @@ namespace Charalotte
 			MaterialAttributes->BaseColor = Attributes.BaseColor;
 			MaterialAttributes->Normal = Attributes.Normal;
 			MaterialAttributes->Roughness = Attributes.Roughness;
+		}
+		FMaterialAttributes* GetAttributes()
+		{
+			return MaterialAttributes.get();
 		}
 
 		inline void SetTexture(const std::string& TextureName)
@@ -43,40 +46,41 @@ namespace Charalotte
 			mNormalName = NormalName;
 		}
 
-		inline void SetNormal(FTexture* NormalTex)
-		{
-			NormalTexture = NormalTex;
-		}
-
-		inline void SetTexture(FTexture* Tex)
-		{
-			Texture = Tex;
-		}
-
-		inline FTexture* GetTexturePtr()
-		{
-			return Texture;
-		}
-
-		inline FTexture* GetNormalPtr()
-		{
-			return NormalTexture;
-		}
 		std::string GetNormal() const
 		{
 			return mNormalName;
 		}
 
-		std::vector<std::shared_ptr<FRenderPSO>>& GetPSOs(E_PSOTYPE psotype)
+		void AddPSO(FRenderPSO* PsoPtr, const std::string& PsoName, E_PSOTYPE type)
 		{
-			const auto& Iter = Psos.find(psotype);
+			const auto& Iter = Psos.find(type);
 			if (Iter != Psos.end())
 			{
-				return Iter->second;
+				Iter->second.insert({PsoName, PsoPtr});
 			}
 			else
 			{
-				return EmptyPsos;
+				Psos.insert({type, {{PsoName, PsoPtr}}});
+			}
+		}
+		FRenderPSO* GetPso(const std::string& PsoName, E_PSOTYPE type)
+		{
+			const auto& TypeIter = Psos.find(type);
+			if (TypeIter != Psos.end())
+			{
+				const auto& PsoIter = TypeIter->second.find(PsoName);
+				if (PsoIter != TypeIter->second.end())
+				{
+					return PsoIter->second;
+				}
+				else
+				{
+					return nullptr;
+				}
+			}
+			else
+			{
+				return nullptr;
 			}
 		}
 
@@ -85,24 +89,14 @@ namespace Charalotte
 			MaterialAttributes = nullptr;
 			for (auto& Pso : Psos)
 			{
-				for (auto& RenderPSO : Pso.second)
-				{
-					RenderPSO = nullptr;
-				}
+				Pso.second.clear();
 			}
 			Psos.clear();
-			for (auto& EmptyPso : EmptyPsos)
-			{
-				EmptyPso = nullptr;
-			}
 		}
 	private:
 		std::string mTextureName;
 		std::string mNormalName;
-		FTexture* Texture;
-		FTexture* NormalTexture;
 		std::unique_ptr<FMaterialAttributes> MaterialAttributes;
-		std::unordered_map<E_PSOTYPE, std::vector<std::shared_ptr<FRenderPSO>>> Psos;
-		std::vector<std::shared_ptr<FRenderPSO>> EmptyPsos;
+		std::unordered_map<E_PSOTYPE, std::unordered_map<std::string, FRenderPSO*>> Psos;
 	};
 }

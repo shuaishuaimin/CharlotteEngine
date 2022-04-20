@@ -6,7 +6,8 @@ namespace Charalotte
 	class FShadowShader : public FShader
 	{
 	public:
-		FShadowShader() {
+		FShadowShader(const std::string& Path) : FShader(Path)
+		{
 
 		}
 		virtual ~FShadowShader(){}
@@ -19,12 +20,13 @@ namespace Charalotte
 	class FBassPassShader : public FShader
 	{
 	public:
-		FBassPassShader() {
+		FBassPassShader(const std::string& Path) : FShader(Path)
+		{
 
 		}
 		virtual void SetRarameter(RHI* R) override
 		{
 
 		}
-
+	};
 }

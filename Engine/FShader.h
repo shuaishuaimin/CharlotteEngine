@@ -5,7 +5,7 @@
 #include "DDefines.h"
 #ifdef RENDER_PLATFORM_DX12
 #include "SDX12ShaderElement.h" 
-#endif
+#endif#
 namespace Charalotte
 {
 	class FShader
@@ -25,22 +25,22 @@ namespace Charalotte
 		{
 			Attributes = nullptr;
 		}
-		std::shared_ptr<FVSPSAttributes>& GetAttributes()
+		void SetAttributes(std::shared_ptr<FVSPSAttributes> Att)
 		{
-			return Attributes;
+			Attributes = Att;
 		}
-		void SetAttributes(std::shared_ptr<Charalotte::FVSPSAttributes> SI)
+		FVSPSAttributes* GetAttributes()
 		{
-			Attributes = SI;
+			return Attributes.get();
 		}
-		std::string& ShaderPath()
+		const std::string& ShaderPath() 
 		{
 			return shaderPath;
 		}
 
 		virtual void SetRarameter(RHI* R) = 0;
 #ifdef RENDER_PLATFORM_DX12
-		void SetShaderElement(std::shared_ptr<FDXShaderElement>& Ele)
+		void SetShaderElement(std::shared_ptr<FDXShaderElement> Ele)
 		{
 			ShaderEle = Ele;
 		}

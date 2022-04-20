@@ -49,6 +49,10 @@ public:
 	virtual void CreateRenderMeshSrv(Charalotte::FMaterial* Mat, Charalotte::FRenderMesh* Mesh) override;
 	virtual std::shared_ptr<Charalotte::FPCRenderTarget> CreateRenderTarget() override;
 	virtual std::shared_ptr<Charalotte::FResource> CreateResource(Charalotte::FResourceAttributes ResourceA) override;
+	virtual std::shared_ptr<Charalotte::FRenderPSO> CreatePSO(Charalotte::FPSOAttributes, Charalotte::FShader*) override;
+	virtual std::shared_ptr<Charalotte::FRootForShader> CreateRoot(Charalotte::FShader*) override;
+	virtual std::shared_ptr<Charalotte::FShadowMap> CreateShadowMap() override;
+	virtual void ChangeResourceBarrier(Charalotte::FResource*, Charalotte::E_RESOURCE_STATE Orgin, Charalotte::E_RESOURCE_STATE Final, unsigned int NumBarriers) override;
 
 	virtual void InitShadowMap() override;
 	virtual bool InitRenderPlatform(FWindow* WindowPtr) override;
@@ -78,7 +82,16 @@ public:
 	virtual void SetRenderTarget(Charalotte::FPCRenderTarget* RT) override;
 	virtual void SetPSOFinal(Charalotte::FRenderPSO* Pso) override;
 	virtual void SetHeap(Charalotte::HeapType HT) override;
+	virtual void SetRenderMeshHeap(Charalotte::FRenderMesh*) override;
+	virtual void SetCurrentBufferHeap() override;
+	virtual void SetShadowMapHeap(Charalotte::FShadowMap*) override;
 	virtual void SetShaderElement(Charalotte::FShader*) override;
+	virtual void SetGraphicsRoot32BitConstants(unsigned int ParamIndex, 
+					unsigned int NumOfByteValue, void* SrcData, unsigned int Offset32BitValue)override;
+	virtual void SetShadowMapForRT(Charalotte::FShadowMap*)override;
+	virtual void SetGraphicsRootDescriptorTable(unsigned int index, Charalotte::HeapType, int Offest, Charalotte::FRenderMesh*)override;
+	virtual void SetGraphicsRootConstantBufferView(unsigned int Index, Charalotte::FResource*, Charalotte::FRenderMesh*)override;
+
 
 	virtual void UpdateRenderTarget(Charalotte::FPCRenderTarget* RT, Charalotte::FResourceAttributes RA) override;
 
@@ -194,7 +207,7 @@ private:
 	std::unordered_map<Charalotte::E_PSOTYPE, std::function<void()>> PsoEndFunctions;
 	std::unordered_map<Charalotte::E_PSOTYPE, std::function<void(const Charalotte::FActorInfo& Actor,
 		Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr)>> PsoSetParamterFunctions;
-	std::unique_ptr<FDXShadowMap> ShadowMap;
+	std::unique_ptr<Charalotte::FDXShadowMap> ShadowMap;
 	std::shared_ptr<FDevice> DevicePtr;
 	std::unique_ptr<Charalotte::FHeapManager> HeapMgr;
 	std::vector<std::shared_ptr<Charalotte::FPCRenderTarget>> RTs;

@@ -69,6 +69,7 @@ namespace Charalotte
 		RHIPtr->InitShadowMap();
 		TestCreateAndUseRT();
 		RHIPtr->FlushCommandQueue();
+		ShadowMap = RHIPtr->CreateShadowMap();
 		return true;
 
 	}
@@ -272,14 +273,11 @@ namespace Charalotte
 		RHIPtr->SetRenderTarget(ShadowMapRT.get());
 		for (auto& RenderMesh : CharalotteEngine::GetInstance().GetRenderSceneFinalButNotNow()->GetRenderMeshs())
 		{
-			auto& Psos = RenderMesh.second->GetMaterialPtr()->GetPSOs(E_PSOTYPE::Shadow);
-			for (const auto& Pso : Psos)
-			{
-				RHIPtr->SetPSOFinal(Pso.get());
-				Pso->GetShader()->SetRarameter(RHIPtr);
-				
-				RHIPtr->DrawMeshFinal(*TestLightData, RenderMesh.second.get());
-			}
+			auto Pso = RenderMesh.second->GetMaterialPtr()->GetPso("ShadowPso", E_PSOTYPE::Shadow);
+			RHIPtr->SetPSOFinal(Pso);
+			Pso->GetShader()->SetRarameter(RHIPtr);
+			RHIPtr->DrawMeshFinal(*TestLightData, RenderMesh.second.get());
+			
 		}
 	}
 
@@ -288,13 +286,11 @@ namespace Charalotte
 		RHIPtr->SetRenderTarget(BasePassRT.get());
 		for (auto& RenderMesh : CharalotteEngine::GetInstance().GetRenderSceneFinalButNotNow()->GetRenderMeshs())
 		{
-			auto& Psos = RenderMesh.second->GetMaterialPtr()->GetPSOs(E_PSOTYPE::Default);
-			for (const auto& Pso : Psos)
-			{
-				RHIPtr->SetPSOFinal(Pso.get());
-				Pso->GetShader()->SetRarameter(RHIPtr);
-				RHIPtr->DrawMeshFinal(*DrawData, RenderMesh.second.get());
-			}
+			auto Pso = RenderMesh.second->GetMaterialPtr()->GetPso("DefaultPso", E_PSOTYPE::Default);
+		
+			RHIPtr->SetPSOFinal(Pso);
+			Pso->GetShader()->SetRarameter(RHIPtr);
+			RHIPtr->DrawMeshFinal(*DrawData, RenderMesh.second.get());
 		}
 	}
 

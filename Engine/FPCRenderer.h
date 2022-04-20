@@ -18,6 +18,7 @@
 #include "WinMaterialData.h"
 #include "RHI.h"
 #include "FPCRenderTarget.h"
+#include "FShadowMap.h"
 // link necessary lib
 //#pragma comment(lib,"d3dcompiler.lib")
 //#pragma comment(lib, "D3D12.lib")
@@ -93,5 +94,6 @@ namespace Charalotte
 		std::shared_ptr<FPCRenderTarget> BasePassRT;
 
 		std::unordered_map<std::string, std::shared_ptr<FPCRenderTarget>> Rts;
+		std::shared_ptr<FShadowMap> ShadowMap;
 	};
 }

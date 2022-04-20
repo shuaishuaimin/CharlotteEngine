@@ -10,6 +10,7 @@
 #include "FRenderMesh.h"
 #include "FPCRenderTarget.h"
 #include "FDXResource.h"
+#include "FRootForShader.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -365,7 +366,7 @@ void DX12RHI::SetPipelineParamter(Charalotte::E_PSOTYPE PSOType,
 
 void DX12RHI::InitShadowMap()
 {
-	ShadowMap = std::make_unique<FDXShadowMap>(mClientWidth, mClientHeight, DevicePtr.get());
+	ShadowMap = std::make_unique<Charalotte::FDXShadowMap>(mClientWidth, mClientHeight, DevicePtr.get());
 	ShadowMap->Init();
 }
 // when input heap, we should two heap, that is rtvHeap and dsvHeap
@@ -937,15 +938,14 @@ void DX12RHI::RegisterPSOFunc()
 	}});
 
 	PsoEndFunctions.insert({Charalotte::Shadow, [this](){
-		//mCommandList->SetGraphicsRootDescriptorTable(4, ShadowMap->GetSrvHeap()->GetGPUDescriptorHandleForHeapStart());
 // Indicate a state transition on the resource usage.
 			auto BarrierTransRTToPresent = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
-				D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ);
+				D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 			mCommandList->ResourceBarrier(1, &BarrierTransRTToPresent);
 
-			auto BarrierTransReadToResource = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
+			/*auto BarrierTransReadToResource = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
 				D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-			mCommandList->ResourceBarrier(1, &BarrierTransReadToResource);
+			mCommandList->ResourceBarrier(1, &BarrierTransReadToResource);*/
 	}});
 
 	PsoSetParamterFunctions.insert({ Charalotte::Default, [this](const Charalotte::FActorInfo& Actor, 
@@ -1013,7 +1013,7 @@ void DX12RHI::SetRenderTarget(Charalotte::FPCRenderTarget* RT)
 
 void DX12RHI::SetPSOFinal(Charalotte::FRenderPSO* Pso)
 {
-	mCommandList->SetPipelineState(Pso->GetPso());
+	mCommandList->SetPipelineState(Pso->GetPsoRef().Get());
 }
 
 void DX12RHI::DrawMeshFinal(Charalotte::RenderUsefulData Data, Charalotte::FRenderMesh* Mesh)
@@ -1026,8 +1026,8 @@ void DX12RHI::CreateRenderMeshSrv(Charalotte::FMaterial* Mat, Charalotte::FRende
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	srvDesc = {};
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	auto& TexResource = Mat->GetTexturePtr()->GetResource();
-	auto& NorResource = Mat->GetNormalPtr()->GetResource();
+	auto& TexResource = Mat->GetAttributes()->BaseColor->GetResource();
+	auto& NorResource = Mat->GetAttributes()->Normal->GetResource();
 	srvDesc.Format = TexResource->GetDesc().Format;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
@@ -1093,6 +1093,60 @@ void DX12RHI::CreateRenderMeshResource(Charalotte::FRenderMesh* RenderMesh)
 	BulidConstantBuffers(RenderMesh->CbvH(), RenderMesh->OCB());
 }
 
+std::shared_ptr<Charalotte::FRenderPSO> DX12RHI::CreatePSO(Charalotte::FPSOAttributes PsoAtt, Charalotte::FShader* ShaderPtr)
+{
+	std::shared_ptr<Charalotte::FRenderPSO> PsoIns = std::make_shared<Charalotte::FRenderPSO>();
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
+	SecureZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+	auto ShaderEle = ShaderPtr->GetShaderElement();
+	if (PsoAtt.IsUseBias)
+	{
+		psoDesc.RasterizerState.DepthBias = static_cast<INT>(PsoAtt.DepthBias);
+		psoDesc.RasterizerState.DepthBiasClamp = PsoAtt.DepthBiasClamp;
+		psoDesc.RasterizerState.SlopeScaledDepthBias = PsoAtt.SlopeScaledDepthBias;
+	}
+	psoDesc.InputLayout = { ShaderEle->InputLayout.data(), (UINT)ShaderEle->InputLayout.size() };
+	psoDesc.pRootSignature = ShaderEle->RootSig->GetRootSignatureRef().Get();
+	psoDesc.VS =
+	{
+		reinterpret_cast<BYTE*>(ShaderEle->mvsByteCode->GetBufferPointer()),
+			ShaderEle->mvsByteCode->GetBufferSize()
+	};
+
+	psoDesc.PS =
+	{
+		reinterpret_cast<BYTE*>(ShaderEle->mpsByteCode->GetBufferPointer()),
+			ShaderEle->mpsByteCode->GetBufferSize()
+	};
+	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	psoDesc.RasterizerState.FrontCounterClockwise = TRUE;
+	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	psoDesc.SampleMask = UINT_MAX;
+	// D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE
+	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	psoDesc.NumRenderTargets = PsoAtt.NumRenderTargets;
+	psoDesc.RTVFormats[0] = DXGI_FORMAT(PsoAtt.RTVFormat);
+	psoDesc.SampleDesc.Count = m4xMsaaState ? 4 : 1;
+	psoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
+	psoDesc.DSVFormat = DXGI_FORMAT(PsoAtt.DSFormat);
+	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&PsoIns->GetPsoRef())));
+	return PsoIns;
+}
+std::shared_ptr<Charalotte::FRootForShader> DX12RHI::CreateRoot(Charalotte::FShader* ShaderPtr)
+{
+	std::shared_ptr<Charalotte::FRootForShader> Root = std::make_shared<Charalotte::FRootForShader>();
+	if (ShaderPtr != nullptr)
+	{
+		ThrowIfFailed(md3dDevice->CreateRootSignature(
+			0,
+			ShaderPtr->GetShaderElement()->mvsByteCode->GetBufferPointer(),
+			ShaderPtr->GetShaderElement()->mvsByteCode->GetBufferSize(),
+			IID_PPV_ARGS(&Root->GetRootSignatureRef())));
+	}
+	return Root;
+}
+
 std::shared_ptr<Charalotte::FPCRenderTarget> DX12RHI::CreateRenderTarget()
 {
 	std::shared_ptr<Charalotte::FPCRenderTarget> RT = std::make_shared<Charalotte::FPCRenderTarget>();
@@ -1106,6 +1160,19 @@ std::shared_ptr<Charalotte::FResource> DX12RHI::CreateResource(Charalotte::FReso
 	return Resource;
 }
 
+void DX12RHI::ChangeResourceBarrier(Charalotte::FResource* Resource, Charalotte::E_RESOURCE_STATE Orgin, Charalotte::E_RESOURCE_STATE Final, unsigned int NumBarriers)
+{
+	if (Resource == nullptr)
+	{
+		return;
+	}
+	Charalotte::FDXResource* DXR = dynamic_cast<Charalotte::FDXResource*>(Resource);
+	auto BarrierTransResourceToRead = CD3DX12_RESOURCE_BARRIER::Transition(DXR->GetResource().Get(),
+		D3D12_RESOURCE_STATES(Orgin), D3D12_RESOURCE_STATES(Final));
+	mCommandList->ResourceBarrier(NumBarriers, &BarrierTransResourceToRead);
+}
+
+// if you want to create shader ,you must come true ShaderAttribute
 void DX12RHI::SetShaderElement(Charalotte::FShader* Shader)
 {
 	if (Shader == nullptr)
@@ -1114,20 +1181,60 @@ void DX12RHI::SetShaderElement(Charalotte::FShader* Shader)
 	}
 	std::shared_ptr<Charalotte::FDXShaderElement> ShaderE = std::make_shared<Charalotte::FDXShaderElement>();
 	std::wstring WPath = FDXRHIFunctionLibrary::String2wString(Shader->ShaderPath());
-	auto& Att = Shader->GetAttributes();
-	auto VSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(Att->VSShaderMacroPtr);
-	auto PSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(Att->PSShaderMacroPtr);
-	auto mvsByteCode = FUtil::CompileShader(WPath,
-		VSShaderMacroSharedPtr.get(), "VS", Att->VSShaderVersion);
-	auto mpsByteCode = FUtil::CompileShader(WPath,
-		PSShaderMacroSharedPtr.get(), "PS", Att->PSShaderVersion);
-	ShaderE->InputLayout = FDXRHIFunctionLibrary::InputDescS2DX12(Att->InputLayout);
-	Shader->SetShaderElement(ShaderE);
+	auto Att = Shader->GetAttributes();
+	if(Att != nullptr)
+	{
+		ShaderE->VSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(Att->VSShaderMacroPtr);
+		ShaderE->PSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(Att->PSShaderMacroPtr);
+		ShaderE->mvsByteCode = FUtil::CompileShader(WPath,
+			ShaderE->VSShaderMacroSharedPtr.get(), "VS", Att->VSShaderVersion);
+		ShaderE->mpsByteCode = FUtil::CompileShader(WPath,
+			ShaderE->PSShaderMacroSharedPtr.get(), "PS", Att->PSShaderVersion);
+		ShaderE->InputLayout = FDXRHIFunctionLibrary::InputDescS2DX12(Att->InputLayout);
+		Shader->SetShaderElement(ShaderE);
+		ShaderE->RootSig = CreateRoot(Shader);
+	}
 }
 
 void DX12RHI::UpdateRenderTarget(Charalotte::FPCRenderTarget* RT, Charalotte::FResourceAttributes RA)
 {
 	
+}
+
+void DX12RHI::SetGraphicsRoot32BitConstants(unsigned int ParamIndex, 
+				unsigned int NumOfByteValue, void* SrcData, unsigned int Offset32BitValue)
+{
+	mCommandList->SetGraphicsRoot32BitConstants(ParamIndex, NumOfByteValue, SrcData, Offset32BitValue);
+}
+void DX12RHI::SetShadowMapForRT(Charalotte::FShadowMap* ShadowMap)
+{
+	if (ShadowMap == nullptr)
+	{
+		return;
+	}
+	Charalotte::FDXShadowMap* DXShadowMap = dynamic_cast<Charalotte::FDXShadowMap*>(ShadowMap);
+	mCommandList->ClearDepthStencilView(DXShadowMap->GetDsvHeap()->GetCPUDescriptorHandleForHeapStart(),
+		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
+	auto DsvHeapStart = DXShadowMap->GetDsvHeap()->GetCPUDescriptorHandleForHeapStart();
+	mCommandList->OMSetRenderTargets(0, nullptr, false, &DsvHeapStart);
+}
+void DX12RHI::SetGraphicsRootDescriptorTable(unsigned int index, Charalotte::HeapType, int Offest, Charalotte::FRenderMesh* Mesh)
+{
+	// Temp function ,we will use offset and heap type
+	mCommandList->SetGraphicsRootDescriptorTable(index, Mesh->Srvh()->GetGPUDescriptorHandleForHeapStart());
+}
+void DX12RHI::SetGraphicsRootConstantBufferView(unsigned int Index, Charalotte::FResource*, Charalotte::FRenderMesh* Mesh)
+{
+	// Temp function ,we will use offset and heap type
+	mCommandList->SetGraphicsRootConstantBufferView(Index, Mesh->OCB()->Resource()->GetGPUVirtualAddress());
+}
+
+std::shared_ptr<Charalotte::FShadowMap> DX12RHI::CreateShadowMap()
+{
+	std::shared_ptr<Charalotte::FShadowMap> ShadowMap = std::make_shared<Charalotte::FDXShadowMap>(mClientWidth, mClientHeight, DevicePtr.get());
+	dynamic_cast<Charalotte::FDXShadowMap*>(ShadowMap.get())->Init();
+	return ShadowMap;
 }
 
 void DX12RHI::EndFrame()
@@ -1142,3 +1249,20 @@ void DX12RHI::SetHeap(Charalotte::HeapType HT)
 	ID3D12DescriptorHeap* descriptorHeaps[] = { Heap.Get() };
 	mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 }
+
+void DX12RHI::SetRenderMeshHeap(Charalotte::FRenderMesh* Mesh)
+{
+	ID3D12DescriptorHeap* descriptorHeaps[] = { Mesh->Srvh().Get() };
+	mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+}
+void DX12RHI::SetCurrentBufferHeap()
+{
+	
+}
+void DX12RHI::SetShadowMapHeap(Charalotte::FShadowMap* ShadowMap)
+{
+	Charalotte::FDXShadowMap* ShadowMapPtr = dynamic_cast<Charalotte::FDXShadowMap*>(ShadowMap);
+	ID3D12DescriptorHeap* ShadowdescriptorHeaps[] = { ShadowMapPtr->GetSrvHeap().Get() };
+	mCommandList->SetDescriptorHeaps(_countof(ShadowdescriptorHeaps), ShadowdescriptorHeaps);
+}
+
