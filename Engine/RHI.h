@@ -89,6 +89,8 @@ public:
 	virtual void SetShadowMapForRT(Charalotte::FShadowMap*) = 0;
 	virtual void SetGraphicsRootDescriptorTable(unsigned int index, Charalotte::HeapType, int Offest, Charalotte::FRenderMesh*) = 0;
 	virtual void SetGraphicsRootConstantBufferView(unsigned int Index, Charalotte::FResource*, Charalotte::FRenderMesh*) = 0;
+	virtual void SetCurrentBufferRenderTarget() = 0;
+	virtual void SerRenderTargetOfShadowMap(Charalotte::FShadowMap*) = 0;
 
 	virtual void UpdateRenderTarget(Charalotte::FPCRenderTarget* RT, Charalotte::FResourceAttributes RA) = 0;
 }; 

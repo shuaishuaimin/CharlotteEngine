@@ -91,7 +91,8 @@ public:
 	virtual void SetShadowMapForRT(Charalotte::FShadowMap*)override;
 	virtual void SetGraphicsRootDescriptorTable(unsigned int index, Charalotte::HeapType, int Offest, Charalotte::FRenderMesh*)override;
 	virtual void SetGraphicsRootConstantBufferView(unsigned int Index, Charalotte::FResource*, Charalotte::FRenderMesh*)override;
-
+	virtual void SetCurrentBufferRenderTarget()override;
+	virtual void SerRenderTargetOfShadowMap(Charalotte::FShadowMap*)override;
 
 	virtual void UpdateRenderTarget(Charalotte::FPCRenderTarget* RT, Charalotte::FResourceAttributes RA) override;
 

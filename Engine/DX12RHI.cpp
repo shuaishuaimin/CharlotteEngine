@@ -889,9 +889,10 @@ void DX12RHI::RegisterPSOFunc()
 
 		// Clear the back buffer and depth buffer.
 		mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-		mCommandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::LightPink, 0, nullptr);
+		mCommandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::White, 0, nullptr);
 		// Specify the buffers we are going to render to
 		auto CBV = CurrentBackBufferView();
+
 		auto DSV = DepthStencilView();
 		mCommandList->OMSetRenderTargets(1, &CBV, true, &DSV);
 
@@ -1266,3 +1267,12 @@ void DX12RHI::SetShadowMapHeap(Charalotte::FShadowMap* ShadowMap)
 	mCommandList->SetDescriptorHeaps(_countof(ShadowdescriptorHeaps), ShadowdescriptorHeaps);
 }
 
+void DX12RHI::SetCurrentBufferRenderTarget()
+{
+	
+}
+void DX12RHI::SerRenderTargetOfShadowMap(Charalotte::FShadowMap* ShadowMap)
+{
+	Charalotte::FDXShadowMap* RPtr = dynamic_cast<Charalotte::FDXShadowMap*>(ShadowMap);
+	
+}

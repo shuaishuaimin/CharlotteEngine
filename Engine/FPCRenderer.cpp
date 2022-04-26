@@ -12,6 +12,7 @@
 #include "SRHIConstants.h "
 #include "SEShaderElements.h"
 #include "CharlotteEngine.h"
+#include "FRenderMesh.h"
 #ifdef RENDER_PLATFORM_DX12
 #include "DX12RHI.h"
 #endif

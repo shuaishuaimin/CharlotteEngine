@@ -18,6 +18,19 @@ namespace Charalotte
 
 		~FDXShadowMap() = default;
 
+		virtual FResource* GetResourcePtr()override
+		{
+			if (ResourcePtr != nullptr)
+			{
+				return ResourcePtr.get();
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
+
+#ifdef RENDER_PLATFORM_DX12
 		void Init();
 
 		void OnResize(UINT newWidth, UINT newHeight);
@@ -54,5 +67,8 @@ namespace Charalotte
 
 		UINT mWidth;
 		UINT mHeight;
+#endif
+	private:
+		std::shared_ptr<FResource> ResourcePtr;
 	};
 }

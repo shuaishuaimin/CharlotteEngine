@@ -11,10 +11,21 @@
 #endif
 namespace Charalotte
 {
+#ifdef RENDER_PLATFORM_DX12
+	struct HeapSet
+	{
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> Heap = nullptr;
+		CD3DX12_CPU_DESCRIPTOR_HANDLE CPUHandle;
+		CD3DX12_GPU_DESCRIPTOR_HANDLE GPUHandle;
+		UINT DescriptorSize = 0;
+	};
+#endif
+
 	class FHeapManager
 	{
-	public:
 #ifdef RENDER_PLATFORM_DX12
+	public:
+
 		FHeapManager(ID3D12Device* Device, int RtvNum, int DsvNum, int USCVNum)
 		{			
 			CreateHeap(Device, USCVNum,HeapType::CBVSRVUAVHeap);
@@ -33,6 +44,7 @@ namespace Charalotte
 		
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& Heap(HeapType type)
 		{
+			
 			switch (type)
 			{
 			case HeapType::DSVHeap:
@@ -134,6 +146,7 @@ namespace Charalotte
 
 		void CreateHeap(ID3D12Device* Device, int ViewNum, HeapType Type)
 		{
+			HeapSet RealHeap;
 			D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
 			dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 			dsvHeapDesc.NodeMask = 0;
@@ -159,6 +172,8 @@ namespace Charalotte
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GPURtvHandle;
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GPUDsvHandle;
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GPUCbvSrvUavHandle;
+
+		std::unordered_map<HeapType, std::shared_ptr<HeapSet>> Heaps; 
 #endif
 	};
 }

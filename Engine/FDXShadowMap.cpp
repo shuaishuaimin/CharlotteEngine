@@ -1,5 +1,7 @@
 #include "stdafx.h"
+#ifdef RENDER_PLATFORM_DX12
 #include "FDXShadowMap.h"
+#include "FDXResource.h"
 namespace Charalotte
 {
 	FDXShadowMap::FDXShadowMap(
@@ -60,6 +62,8 @@ namespace Charalotte
 			&optClear,
 			IID_PPV_ARGS(&mShadowMap)));
 		mShadowMap->SetName(L"shadowmap");
+		ResourcePtr = std::make_shared<FDXResource>(DevicePtr);
+		dynamic_cast<FDXResource*>(ResourcePtr.get())->GetResource() = mShadowMap;
 	}
 
 	void FDXShadowMap::CreateHeap(ID3D12Device* device)
@@ -117,3 +121,5 @@ namespace Charalotte
 		return mDsvHeap;
 	}
 }
+
+#endif
