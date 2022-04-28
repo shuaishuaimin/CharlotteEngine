@@ -3,11 +3,11 @@
 
 void GameLogic::Init()
 {
-	FScene::GetInstance().LoadMap("ThirdPersonExampleMap.dat");
+	Charalotte::FScene::GetInstance().LoadMap("ThirdPersonExampleMap.dat");
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('P', [](){
-		FScene::GetInstance().LoadMap("Cool.dat");
+		Charalotte::FScene::GetInstance().LoadMap("Cool.dat");
 		});
 	FWinEventRegisterSystem::GetInstance().RegisterKeyInput('L', []() {
-		FScene::GetInstance().LoadMap("ThirdPersonExampleMap.dat");
+		Charalotte::FScene::GetInstance().LoadMap("ThirdPersonExampleMap.dat");
 		});
 }

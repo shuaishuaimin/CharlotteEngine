@@ -5,19 +5,22 @@
 #include "DX12RHI.h"
 #endif
 
-FRHIManager::FRHIManager()
+namespace Charalotte
 {
+	FRHIManager::FRHIManager()
+	{
 #ifdef RENDER_PLATFORM_DX12
-	RHIIns = std::make_unique<DX12RHI>();
+		RHIIns = std::make_unique<DX12RHI>();
 #endif
-}
+	}
 
-FRHIManager::~FRHIManager()
-{
+	FRHIManager::~FRHIManager()
+	{
 
-}
+	}
 
-RHI* FRHIManager::GetRHIPtr()
-{
-	return RHIIns.get();
+	RHI* FRHIManager::GetRHIPtr()
+	{
+		return RHIIns.get();
+	}
 }

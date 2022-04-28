@@ -8,43 +8,46 @@
 #include "FGameTimer.h"
 #include "FWinEventRegisterSystem.h"
 
-class FScene : public Singleton<FScene>
+namespace Charalotte
 {
-public:
-	FScene();
-	~FScene();
+	class FScene : public Singleton<FScene>
+	{
+	public:
+		FScene();
+		~FScene();
 
-	FCamera* GetCamera();
-	
-	Charalotte::CameraTransform& GetCameraTrans();
-	
-	void InitCameraTrans();
+		FCamera* GetCamera();
 
-	void Update();
+		Charalotte::CameraTransform& GetCameraTrans();
 
-	std::unordered_map<std::string, Charalotte::FActorPrimitive>& GetActorInfos();
+		void InitCameraTrans();
 
-	void LoadMap(const std::string& MapName);
+		void Update();
 
-	std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>>& GetActorDictionary();
+		std::unordered_map<std::string, Charalotte::FActorPrimitive>& GetActorInfos();
 
-	std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>& GetSceneActorByName(const std::string& MapName);
+		void LoadMap(const std::string& MapName);
 
-private:
-	std::vector<std::shared_ptr<FCamera>> Cameras;
-	std::shared_ptr<FCamera> MainCamera;
-	Charalotte::CameraTransform CameraTrans;
-	Charalotte::CameraTransform DefaultCameraTrans;
+		std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>>& GetActorDictionary();
 
-	// save the actor information without render
-	std::unordered_map<std::string, Charalotte::FActorPrimitive> ActorInfors;
+		std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>& GetSceneActorByName(const std::string& MapName);
 
-	// save the actor information have been rendered;
-	std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>> ActorDir;
+	private:
+		std::vector<std::shared_ptr<FCamera>> Cameras;
+		std::shared_ptr<FCamera> MainCamera;
+		Charalotte::CameraTransform CameraTrans;
+		Charalotte::CameraTransform DefaultCameraTrans;
 
-	std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>> EmptyActorVec;
+		// save the actor information without render
+		std::unordered_map<std::string, Charalotte::FActorPrimitive> ActorInfors;
 
-	std::string NowMapName;
+		// save the actor information have been rendered;
+		std::unordered_map<std::string, std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>>> ActorDir;
 
-	std::unordered_map<std::string, int32_t> MeshPrimitiveTimes;
-};
+		std::vector<std::shared_ptr<Charalotte::FDXActorPrimitive>> EmptyActorVec;
+
+		std::string NowMapName;
+
+		std::unordered_map<std::string, int32_t> MeshPrimitiveTimes;
+	};
+}

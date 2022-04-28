@@ -2,13 +2,16 @@
 #include "RHI.h"
 #include "Singleton.h"
 
-class FRHIManager : public Singleton<FRHIManager>
+namespace Charalotte
 {
-public:
-	FRHIManager();
-	~FRHIManager();
+	class FRHIManager : public Singleton<FRHIManager>
+	{
+	public:
+		FRHIManager();
+		~FRHIManager();
 
-	RHI* GetRHIPtr();
-private:
-	std::unique_ptr<RHI> RHIIns;
-};
+		RHI* GetRHIPtr();
+	private:
+		std::unique_ptr<RHI> RHIIns;
+	};
+}
