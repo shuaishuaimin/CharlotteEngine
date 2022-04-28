@@ -11,10 +11,11 @@
 
 namespace Charalotte
 {
+	class FHeapManager;
 	class FDXShadowMap : public FShadowMap
 	{
 	public:
-		FDXShadowMap(UINT width, UINT height, FDevice* Device);
+		FDXShadowMap(UINT width, UINT height, FDevice* Device, FHeapManager* HeapPtr);
 
 		~FDXShadowMap() = default;
 
@@ -67,8 +68,12 @@ namespace Charalotte
 
 		UINT mWidth;
 		UINT mHeight;
+
+		int SrvHeapOffset = -1;
+		int DsvHeapOffset = -1;
 #endif
 	private:
 		std::shared_ptr<FResource> ResourcePtr;
+		FHeapManager* HeapMgrPtr;
 	};
 }

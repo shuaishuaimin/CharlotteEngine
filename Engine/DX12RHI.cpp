@@ -369,7 +369,7 @@ namespace Charalotte
 
 	void DX12RHI::InitShadowMap()
 	{
-		ShadowMap = std::make_unique<FDXShadowMap>(mClientWidth, mClientHeight, DevicePtr.get());
+		ShadowMap = std::make_unique<FDXShadowMap>(mClientWidth, mClientHeight, DevicePtr.get(), HeapMgr.get());
 		ShadowMap->Init();
 	}
 	// when input heap, we should two heap, that is rtvHeap and dsvHeap
@@ -1246,7 +1246,7 @@ namespace Charalotte
 
 	std::shared_ptr<FShadowMap> DX12RHI::CreateShadowMap()
 	{
-		std::shared_ptr<FShadowMap> ShadowMap = std::make_shared<FDXShadowMap>(mClientWidth, mClientHeight, DevicePtr.get());
+		std::shared_ptr<FShadowMap> ShadowMap = std::make_shared<FDXShadowMap>(mClientWidth, mClientHeight, DevicePtr.get(), HeapMgr.get());
 		dynamic_cast<FDXShadowMap*>(ShadowMap.get())->Init();
 		return ShadowMap;
 	}

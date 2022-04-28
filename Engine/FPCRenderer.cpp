@@ -264,6 +264,7 @@ namespace Charalotte
 		RHIPtr->BeginFrame();
 		RenderShadowDepth();
 		RenderBasePass();
+		RHIPtr->EndFrame();
 	}
 
 	void FPCRenderer::RenderShadowDepth()

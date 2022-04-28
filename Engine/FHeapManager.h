@@ -199,7 +199,7 @@ namespace Charalotte
 			TempHeap->CPUHandleStart = TempHeap->Heap->GetCPUDescriptorHandleForHeapStart();
 			TempHeap->GPUHandleStart = TempHeap->Heap->GetGPUDescriptorHandleForHeapStart();
 			TempHeap->DescriptorSize = GetSize(Type);
-			Heaps.insert({Type, TempHeap});
+			Heaps.insert({Type, std::move(TempHeap)});
 		}
 
 		

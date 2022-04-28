@@ -5,9 +5,10 @@
 #include "FShader.h"
 #include "FRenderPSO.h"
 
-class RHI;
+
 namespace Charalotte
 {
+	class RHI;
 	class FTexture;
 	class FDXRenderMesh;
 	class FRenderScene

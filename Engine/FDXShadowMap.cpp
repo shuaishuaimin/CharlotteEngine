@@ -2,10 +2,11 @@
 #ifdef RENDER_PLATFORM_DX12
 #include "FDXShadowMap.h"
 #include "FDXResource.h"
+#include "FHeapManager.h"
 namespace Charalotte
 {
 	FDXShadowMap::FDXShadowMap(
-		UINT width, UINT height, FDevice* Device) : mWidth(width), mHeight(height), Device(Device)
+		UINT width, UINT height, FDevice* Device, FHeapManager* HeapPtr) : mWidth(width), mHeight(height), Device(Device), HeapMgrPtr(HeapPtr)
 	{
 		mSrvHeap = nullptr;
 	}
@@ -14,6 +15,10 @@ namespace Charalotte
 		BuildShadowMapResource(this->Device);
 		FDXDevice* DxDevice = dynamic_cast<FDXDevice*>(Device);
 		auto DevicePtr = DxDevice->GetDevice();
+		if (HeapMgrPtr == nullptr)
+		{
+			return;
+		}
 		CreateHeap(DevicePtr);
 		CreateSRVAndDSV(DevicePtr);
 	}
