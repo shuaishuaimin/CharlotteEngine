@@ -94,7 +94,7 @@ namespace Charalotte
 				auto Rs = BufferResourceIter->second;
 				
 #ifdef RENDER_PLATFORM_DX12
-				std::shared_ptr<FRenderMesh> RenderMeshIns = std::make_shared<FDXRenderMesh>();
+				std::shared_ptr<FRenderMesh> RenderMeshIns = RHIPtr->CreateRenderMesh();
 				FDXRenderMesh* RenderMesh = dynamic_cast<FDXRenderMesh*>(RenderMeshIns.get());
 				Charalotte::FDXBoundingBox submesh;
 				submesh.IndexCount = Rs->GetIndicesLength() ;

@@ -18,18 +18,17 @@ using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 using namespace DirectX::PackedVector;
 using std::string;
-using Charalotte::FMaterial;
 
 
 namespace Charalotte
 {
 	DX12RHI::DX12RHI() {
-		Charalotte::CameraData TempCameraData;
+		CameraData TempCameraData;
 		//FScene::GetInstance().GetCamera()->GetCameraData(TempCameraData);
 		mClientWidth = 1980;
 		mClientHeight = 1280;
 		IsDeviceSucceed = false;
-		PSOs = std::make_unique<Charalotte::FDXPSOs>();
+		PSOs = std::make_unique<FDXPSOs>();
 		RegisterPSOFunc();
 	}
 
@@ -48,7 +47,7 @@ namespace Charalotte
 	{
 		FWinRenderScene* DXRenderScene = dynamic_cast<FWinRenderScene*>(RenderScenePtr);
 		ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
-		auto Texture = std::make_shared<Charalotte::DXTextureResource>();
+		auto Texture = std::make_shared<DXTextureResource>();
 		Texture->Name = FileName;
 		Texture->Filename = FDXRHIFunctionLibrary::String2wString(FilePath);
 		ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
@@ -133,7 +132,7 @@ namespace Charalotte
 		CreateSwapChain(WindowPtr);
 		CreateRtvAndDsvDescriptorHeaps();
 		DevicePtr = std::make_shared<FDXDevice>(md3dDevice.Get());
-		HeapMgr = std::make_unique<Charalotte::FHeapManager>(md3dDevice.Get(), 1024, 1024, 2048);
+		HeapMgr = std::make_unique<FHeapManager>(md3dDevice.Get(), 1024, 1024, 2048);
 		return true;
 	}
 
@@ -246,8 +245,8 @@ namespace Charalotte
 		return IsDeviceSucceed;
 	}
 
-	void DX12RHI::BuildMeshAndActorPrimitives(const Charalotte::FActorPrimitive& Actors,
-		const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FTempRenderScene* RenderScenePtr)
+	void DX12RHI::BuildMeshAndActorPrimitives(const FActorPrimitive& Actors,
+		const std::unordered_map<std::string, FMeshPrimitive>& Meshs, FTempRenderScene* RenderScenePtr)
 	{
 		FWinRenderScene* DXRenderScene = dynamic_cast<FWinRenderScene*>(RenderScenePtr);
 		BuildDXMeshPrimitives(Actors, Meshs, DXRenderScene);
@@ -275,7 +274,7 @@ namespace Charalotte
 		}
 	}
 
-	void DX12RHI::DrawPrepare(Charalotte::E_PSOTYPE psoType)
+	void DX12RHI::DrawPrepare(E_PSOTYPE psoType)
 	{
 		const auto& Iter = PsoPrepareFunction.find(psoType);
 		if (Iter != PsoPrepareFunction.end())
@@ -284,7 +283,7 @@ namespace Charalotte
 		}
 
 	}
-	void DX12RHI::DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, const Charalotte::ObjectConstants& Obj, FTempRenderScene* RenderScenePtr)
+	void DX12RHI::DrawMesh(const FActorInfo& Actor, RenderUsefulData* DrawData, const ObjectConstants& Obj, FTempRenderScene* RenderScenePtr)
 	{
 		auto ActorInsPtr = dynamic_cast<FWinRenderScene*>(RenderScenePtr)->GetDXActorResourcesByName(Actor.ActorPrimitiveName);
 		if (ActorInsPtr == nullptr)
@@ -308,7 +307,7 @@ namespace Charalotte
 			1, 0, 0, 0);
 	}
 
-	void DX12RHI::DrawEnd(Charalotte::E_PSOTYPE PSOType)
+	void DX12RHI::DrawEnd(E_PSOTYPE PSOType)
 	{
 		const auto& Iter = PsoEndFunctions.find(PSOType);
 		if (Iter != PsoEndFunctions.end())
@@ -320,7 +319,7 @@ namespace Charalotte
 	void DX12RHI::BuildShadowPSO()
 	{
 		bool GetPSOSuccess = false;
-		auto& ShadowPso = PSOs->GetPSOReference(Charalotte::Shadow, GetPSOSuccess);
+		auto& ShadowPso = PSOs->GetPSOReference(Shadow, GetPSOSuccess);
 		if (!GetPSOSuccess)
 		{
 			return;
@@ -358,8 +357,8 @@ namespace Charalotte
 		ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&ShadowPso.mPSO)));
 	}
 
-	void DX12RHI::SetPipelineParamter(Charalotte::E_PSOTYPE PSOType,
-		const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr)
+	void DX12RHI::SetPipelineParamter(E_PSOTYPE PSOType,
+		const FActorInfo& Actor, RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr)
 	{
 		const auto& Iter = PsoSetParamterFunctions.find(PSOType);
 		if (Iter != PsoSetParamterFunctions.end())
@@ -370,21 +369,21 @@ namespace Charalotte
 
 	void DX12RHI::InitShadowMap()
 	{
-		ShadowMap = std::make_unique<Charalotte::FDXShadowMap>(mClientWidth, mClientHeight, DevicePtr.get());
+		ShadowMap = std::make_unique<FDXShadowMap>(mClientWidth, mClientHeight, DevicePtr.get());
 		ShadowMap->Init();
 	}
 	// when input heap, we should two heap, that is rtvHeap and dsvHeap
 	// their type is D3D12_DESCRIPTOR_HEAP_DESC
 	// we should create description and its own information, that is way to explain heap 
 	//	data in heap can not be explained by computer without explain
-	void DX12RHI::CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform,
-		const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FWinRenderScene* DXRenderScene)
+	void DX12RHI::CalcVerticesAndIndices(const std::string& GeometryName, const FTransform& Transform,
+		const std::unordered_map<std::string, FMeshPrimitive>& Meshs, FWinRenderScene* DXRenderScene)
 	{
 		if (Meshs.find(GeometryName) == Meshs.end())
 		{
 			return;
 		}
-		const Charalotte::FMeshPrimitive& MeshPri = Meshs.find(GeometryName)->second;
+		const FMeshPrimitive& MeshPri = Meshs.find(GeometryName)->second;
 
 		std::string Name = GeometryName;
 		if (MeshPri.LodInfos.size() <= 0)
@@ -394,7 +393,7 @@ namespace Charalotte
 			OutputDebugStringA(ss.str().c_str());
 			return;
 		}
-		std::shared_ptr<Charalotte::FDXMeshPrimitive> DXMeshPri = std::make_shared<Charalotte::FDXMeshPrimitive>();
+		std::shared_ptr<FDXMeshPrimitive> DXMeshPri = std::make_shared<FDXMeshPrimitive>();
 		int VertexIndex = 0;
 		// use normal to vertex color
 		bool IsUseNormalToColor = false;
@@ -407,7 +406,7 @@ namespace Charalotte
 		{
 			glm::vec4 VertexColor = glm::vec4(1.0f);
 
-			Charalotte::Vertex vertex;
+			Vertex vertex;
 			glm::vec3 Float3 = glm::vec3(1.0f);
 			// execute scale transport
 			Float3.x = VertexLocation.x;
@@ -437,7 +436,7 @@ namespace Charalotte
 			DXMeshPri->indices.push_back(static_cast<int16_t>(VertexIndex));
 		}
 
-		Charalotte::FDXBoundingBox submesh;
+		FDXBoundingBox submesh;
 		submesh.IndexCount = (UINT)(MeshPri.LodInfos[0].Indices.size());
 		submesh.StartIndexLocation = 0;
 		submesh.BaseVertexLocation = 0;
@@ -448,8 +447,8 @@ namespace Charalotte
 		DXRenderScene->AddDXMeshPrimitive(GeometryName, DXMeshPri);
 	}
 
-	void DX12RHI::BuildDXMeshPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive,
-		const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FWinRenderScene* DXRenderScene)
+	void DX12RHI::BuildDXMeshPrimitives(const FActorPrimitive& ActorPrimitive,
+		const std::unordered_map<std::string, FMeshPrimitive>& Meshs, FWinRenderScene* DXRenderScene)
 	{
 		for (const auto& Actor : ActorPrimitive.ActorsInfo)
 		{
@@ -469,7 +468,7 @@ namespace Charalotte
 		ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 		for (auto& MeshGeoIter : DXRenderScene->GetDXMeshResources())
 		{
-			Charalotte::FDXMeshPrimitive* MeshGeo = MeshGeoIter.second.get();
+			FDXMeshPrimitive* MeshGeo = MeshGeoIter.second.get();
 			if (MeshGeo == nullptr)
 			{
 				continue;
@@ -492,7 +491,7 @@ namespace Charalotte
 			MeshGeo->IndexBufferGPU = FUtil::CreateDefaultBuffer(md3dDevice.Get(),
 				mCommandList.Get(), MeshGeo->indices.data(), ibByteSize, MeshGeo->IndexBufferUploader);
 
-			MeshGeo->VertexByteStride = sizeof(Charalotte::Vertex);
+			MeshGeo->VertexByteStride = sizeof(Vertex);
 			MeshGeo->VertexBufferByteSize = vbByteSize;
 			MeshGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
 			MeshGeo->IndexBufferByteSize = ibByteSize;
@@ -504,7 +503,7 @@ namespace Charalotte
 	}
 
 	// build dx actor primitives and push it into dx resource
-	void DX12RHI::BuildDXActorPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive, FWinRenderScene* DXRenderScene)
+	void DX12RHI::BuildDXActorPrimitives(const FActorPrimitive& ActorPrimitive, FWinRenderScene* DXRenderScene)
 	{
 		DXRenderScene->ClearDXActorPrimitives();
 
@@ -520,7 +519,7 @@ namespace Charalotte
 			auto MeshResourcePtr = DXRenderScene->GetDXMeshResourceByName(ActorMeshPrimitiveName);
 			if (MeshResourcePtr != nullptr)
 			{
-				std::shared_ptr<Charalotte::FDXActorPrimitive> DXActorPrimitive = std::make_shared<Charalotte::FDXActorPrimitive>();
+				std::shared_ptr<FDXActorPrimitive> DXActorPrimitive = std::make_shared<FDXActorPrimitive>();
 				DXActorPrimitive->DXMeshPrimitive = MeshResourcePtr;
 				DXActorPrimitive->DXActorPrimitiveName = Actors.ActorPrimitiveName;
 				DXActorPrimitive->Transform = Actors.Transform;
@@ -593,7 +592,7 @@ namespace Charalotte
 		sd.SampleDesc.Quality = m4xMsaaQuality ? (m4xMsaaQuality - 1) : 0;
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		sd.BufferCount = SwapChainBufferCount;
-		sd.OutputWindow = dynamic_cast<Charalotte::FWin32Window*>(WindowPtr)->MainWnd();
+		sd.OutputWindow = dynamic_cast<FWin32Window*>(WindowPtr)->MainWnd();
 		sd.Windowed = true;
 		sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -627,12 +626,12 @@ namespace Charalotte
 		}
 	}
 
-	void DX12RHI::SetShader(std::shared_ptr<Charalotte::FShaderInfo> ShaderInput)
+	void DX12RHI::SetShader(std::shared_ptr<FShaderInfo> ShaderInput)
 	{
 		HRESULT hr = S_OK;
 		bool IsGetSucceed = false;
 		auto& Pso = PSOs->GetPSOReference(ShaderInput->PsoType, IsGetSucceed);
-		Charalotte::PSO TempPso;
+		PSO TempPso;
 		std::wstring ShaderFilePath = FDXRHIFunctionLibrary::String2wString(ShaderInput->ShaderFilePath);
 		auto VSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(ShaderInput->VSShaderMacroPtr);
 		auto PSShaderMacroSharedPtr = FDXRHIFunctionLibrary::ShaderMacro2DX12(ShaderInput->PSShaderMacroPtr);
@@ -647,7 +646,7 @@ namespace Charalotte
 			PSOs->InsertNewPSO(ShaderInput->PsoType, TempPso);
 		}
 	}
-	void DX12RHI::BuildRootSignature(Charalotte::E_PSOTYPE psoType)
+	void DX12RHI::BuildRootSignature(E_PSOTYPE psoType)
 	{
 		bool GetPSOSuccess = false;
 		auto& Pso = PSOs->GetPSOReference(psoType, GetPSOSuccess);
@@ -667,7 +666,7 @@ namespace Charalotte
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 		bool GetPSOSuccess = false;
-		auto& Pso = PSOs->GetPSOReference(Charalotte::Default, GetPSOSuccess);
+		auto& Pso = PSOs->GetPSOReference(Default, GetPSOSuccess);
 		if (!GetPSOSuccess)
 		{
 			return;
@@ -715,11 +714,11 @@ namespace Charalotte
 	}
 
 	void DX12RHI::BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap,
-		std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>>& ObjectCb)
+		std::shared_ptr<UploadBuffer<ObjectConstants>>& ObjectCb)
 	{
-		ObjectCb = std::make_shared<UploadBuffer<Charalotte::ObjectConstants>>(md3dDevice.Get(), 1, true);
+		ObjectCb = std::make_shared<UploadBuffer<ObjectConstants>>(md3dDevice.Get(), 1, true);
 
-		UINT objCBByteSize = FUtil::CalcConstantBufferByteSize(sizeof(Charalotte::ObjectConstants));
+		UINT objCBByteSize = FUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
 
 		D3D12_GPU_VIRTUAL_ADDRESS cbAddress = ObjectCb->Resource()->GetGPUVirtualAddress();
 		// Offset to the ith object constant buffer in the buffer.
@@ -731,7 +730,7 @@ namespace Charalotte
 
 		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 		cbvDesc.BufferLocation = cbAddress;
-		cbvDesc.SizeInBytes = FUtil::CalcConstantBufferByteSize(sizeof(Charalotte::ObjectConstants));
+		cbvDesc.SizeInBytes = FUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
 
 		md3dDevice->CreateConstantBufferView(
 			&cbvDesc,
@@ -871,9 +870,9 @@ namespace Charalotte
 
 	void DX12RHI::RegisterPSOFunc()
 	{
-		PsoPrepareFunction.insert({ Charalotte::Default, [this]() {
+		PsoPrepareFunction.insert({ Default, [this]() {
 			bool IsPSOGetSucceed = false;
-			Charalotte::PSO& Pso = PSOs->GetPSOReference(Charalotte::Default, IsPSOGetSucceed);
+			PSO& Pso = PSOs->GetPSOReference(Default, IsPSOGetSucceed);
 			if (!IsPSOGetSucceed)
 			{
 				return;
@@ -905,10 +904,10 @@ namespace Charalotte
 			mCommandList->SetPipelineState(Pso.mPSO.Get());
 		} });
 
-		PsoPrepareFunction.insert({ Charalotte::Shadow,[this]() {
+		PsoPrepareFunction.insert({ Shadow,[this]() {
 
-			Charalotte::PSO& ShadowPso = PSOs->GetPSOReference(Charalotte::Shadow);
-			Charalotte::PSO& DefaultPso = PSOs->GetPSOReference(Charalotte::Default);
+			PSO& ShadowPso = PSOs->GetPSOReference(Shadow);
+			PSO& DefaultPso = PSOs->GetPSOReference(Default);
 
 			if (ShadowMap == nullptr)
 			{
@@ -931,7 +930,7 @@ namespace Charalotte
 
 		} });
 
-		PsoEndFunctions.insert({ Charalotte::Default, [this]() {
+		PsoEndFunctions.insert({ Default, [this]() {
 			// Indicate a state transition on the resource usage.
 			auto BarrierTransRTToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 				D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
@@ -942,7 +941,7 @@ namespace Charalotte
 			mCommandList->ResourceBarrier(1, &BarrierTransResourceToRead);
 		} });
 
-		PsoEndFunctions.insert({ Charalotte::Shadow, [this]() {
+		PsoEndFunctions.insert({ Shadow, [this]() {
 			// Indicate a state transition on the resource usage.
 						auto BarrierTransRTToPresent = CD3DX12_RESOURCE_BARRIER::Transition(ShadowMap->GetResource(),
 							D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
@@ -953,8 +952,8 @@ namespace Charalotte
 						mCommandList->ResourceBarrier(1, &BarrierTransReadToResource);*/
 				} });
 
-		PsoSetParamterFunctions.insert({ Charalotte::Default, [this](const Charalotte::FActorInfo& Actor,
-						Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr) {
+		PsoSetParamterFunctions.insert({ Default, [this](const FActorInfo& Actor,
+						RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr) {
 			auto ActorInsPtr = dynamic_cast<FWinRenderScene*>(RenderScenePtr)->GetDXActorResourcesByName(Actor.ActorPrimitiveName);
 			if (ActorInsPtr == nullptr)
 			{
@@ -972,8 +971,8 @@ namespace Charalotte
 			mCommandList->SetGraphicsRootDescriptorTable(4, ShadowMap->GetSrvHeap()->GetGPUDescriptorHandleForHeapStart());
 		} });
 
-		PsoSetParamterFunctions.insert({ Charalotte::Shadow, [this](const Charalotte::FActorInfo& Actor,
-						Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr) {
+		PsoSetParamterFunctions.insert({ Shadow, [this](const FActorInfo& Actor,
+						RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr) {
 			auto ActorInsPtr = dynamic_cast<FWinRenderScene*>(RenderScenePtr)->GetDXActorResourcesByName(Actor.ActorPrimitiveName);
 			if (ActorInsPtr == nullptr)
 			{
@@ -987,7 +986,7 @@ namespace Charalotte
 	void DX12RHI::OpenCommandList(bool IsOpenPso)
 	{
 		ThrowIfFailed(mDirectCmdListAlloc->Reset());
-		auto& Pso = PSOs->GetPSOReference(Charalotte::Default);
+		auto& Pso = PSOs->GetPSOReference(Default);
 		ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), Pso.mPSO.Get()));
 	}
 	void DX12RHI::ExecuteAndCloseCommandList()
@@ -1011,24 +1010,24 @@ namespace Charalotte
 
 	}
 
-	void DX12RHI::SetRenderTarget(Charalotte::FPCRenderTarget* RT)
+	void DX12RHI::SetRenderTarget(FPCRenderTarget* RT)
 	{
 
 	}
 
-	void DX12RHI::SetPSOFinal(Charalotte::FRenderPSO* Pso)
+	void DX12RHI::SetPSOFinal(FRenderPSO* Pso)
 	{
 		mCommandList->SetPipelineState(Pso->GetPsoRef().Get());
 	}
 
-	void DX12RHI::DrawMeshFinal(Charalotte::RenderUsefulData Data, Charalotte::FRenderMesh* Mesh)
+	void DX12RHI::DrawMeshFinal(RenderUsefulData Data, FRenderMesh* Mesh)
 	{
 
 	}
 
-	void DX12RHI::CreateRenderMeshSrv(Charalotte::FMaterial* Mat, Charalotte::FRenderMesh* MeshPtr)
+	void DX12RHI::CreateRenderMeshSrv(FMaterial* Mat, FRenderMesh* MeshPtr)
 	{
-		Charalotte::FDXRenderMesh* Mesh = dynamic_cast<Charalotte::FDXRenderMesh*>(MeshPtr);
+		FDXRenderMesh* Mesh = dynamic_cast<FDXRenderMesh*>(MeshPtr);
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 		srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -1053,7 +1052,7 @@ namespace Charalotte
 			CPUHandle);
 	}
 
-	void DX12RHI::CreateTextureResource(Charalotte::FTexture* Texture)
+	void DX12RHI::CreateTextureResource(FTexture* Texture)
 	{
 		ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 		auto Filename = FDXRHIFunctionLibrary::String2wString(Texture->GetTexturePath());
@@ -1066,9 +1065,9 @@ namespace Charalotte
 		FlushCommandQueue();
 	}
 
-	void DX12RHI::CreateVBIBBuffer(Charalotte::FVBIBBuffer* VBIBBuffer)
+	void DX12RHI::CreateVBIBBuffer(FVBIBBuffer* VBIBBuffer)
 	{
-		Charalotte::FDXVerticesAndIndicesBuffer* VBIB = dynamic_cast<Charalotte::FDXVerticesAndIndicesBuffer*>(VBIBBuffer);
+		FDXVerticesAndIndicesBuffer* VBIB = dynamic_cast<FDXVerticesAndIndicesBuffer*>(VBIBBuffer);
 		const UINT vbByteSize = VBIB->GetVerticesSize();
 		const UINT ibByteSize = VBIB->GetIndicesSize();
 		ThrowIfFailed(D3DCreateBlob(vbByteSize, &VBIB->VBCPU()));
@@ -1087,23 +1086,23 @@ namespace Charalotte
 		VBIB->IBGPU() = FUtil::CreateDefaultBuffer(Device,
 			Commandlist, VBIB->GetIndices().data(), ibByteSize, VBIB->IBUploader());
 
-		VBIB->VBStride() = sizeof(Charalotte::Vertex);
+		VBIB->VBStride() = sizeof(Vertex);
 		VBIB->VBByteSize() = vbByteSize;
 		VBIB->IFormat() = DXGI_FORMAT_R16_UINT;
 		VBIB->IBByteSize() = ibByteSize;
 	}
 
-	void DX12RHI::CreateRenderMeshResource(Charalotte::FRenderMesh* RenderMeshPtr)
+	void DX12RHI::CreateRenderMeshResource(FRenderMesh* RenderMeshPtr)
 	{
-		Charalotte::FDXRenderMesh* RenderMesh = dynamic_cast<Charalotte::FDXRenderMesh*>(RenderMeshPtr);
+		FDXRenderMesh* RenderMesh = dynamic_cast<FDXRenderMesh*>(RenderMeshPtr);
 		BuildDescriptorHeapsAndTables(RenderMesh->CbvH());
 		BuildDescriptorHeapsAndTables(RenderMesh->Srvh());
 		BulidConstantBuffers(RenderMesh->CbvH(), RenderMesh->OCB());
 	}
 
-	std::shared_ptr<Charalotte::FRenderPSO> DX12RHI::CreatePSO(Charalotte::FPSOAttributes PsoAtt, Charalotte::FShader* ShaderPtr)
+	std::shared_ptr<FRenderPSO> DX12RHI::CreatePSO(FPSOAttributes PsoAtt, FShader* ShaderPtr)
 	{
-		std::shared_ptr<Charalotte::FRenderPSO> PsoIns = std::make_shared<Charalotte::FRenderPSO>();
+		std::shared_ptr<FRenderPSO> PsoIns = std::make_shared<FRenderPSO>();
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 		SecureZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 		auto ShaderEle = ShaderPtr->GetShaderElement();
@@ -1141,9 +1140,9 @@ namespace Charalotte
 		ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&PsoIns->GetPsoRef())));
 		return PsoIns;
 	}
-	std::shared_ptr<Charalotte::FRootForShader> DX12RHI::CreateRoot(Charalotte::FShader* ShaderPtr)
+	std::shared_ptr<FRootForShader> DX12RHI::CreateRoot(FShader* ShaderPtr)
 	{
-		std::shared_ptr<Charalotte::FRootForShader> Root = std::make_shared<Charalotte::FRootForShader>();
+		std::shared_ptr<FRootForShader> Root = std::make_shared<FRootForShader>();
 		if (ShaderPtr != nullptr)
 		{
 			ThrowIfFailed(md3dDevice->CreateRootSignature(
@@ -1155,39 +1154,44 @@ namespace Charalotte
 		return Root;
 	}
 
-	std::shared_ptr<Charalotte::FPCRenderTarget> DX12RHI::CreateRenderTarget()
+	std::shared_ptr<FPCRenderTarget> DX12RHI::CreateRenderTarget()
 	{
-		std::shared_ptr<Charalotte::FPCRenderTarget> RT = std::make_shared<Charalotte::FPCRenderTarget>();
+		std::shared_ptr<FPCRenderTarget> RT = std::make_shared<FPCRenderTarget>();
 		return RT;
 	}
 
-	std::shared_ptr<Charalotte::FResource> DX12RHI::CreateResource(Charalotte::FResourceAttributes ResourceA)
+	std::shared_ptr<FResource> DX12RHI::CreateResource(FResourceAttributes ResourceA)
 	{
-		std::shared_ptr<Charalotte::FResource> Resource = std::make_shared<Charalotte::FDXResource>(md3dDevice.Get());
-		dynamic_cast<Charalotte::FDXResource*>(Resource.get())->BuildResource(ResourceA, HeapMgr.get());
+		std::shared_ptr<FResource> Resource = std::make_shared<FDXResource>(md3dDevice.Get());
+		dynamic_cast<FDXResource*>(Resource.get())->BuildResource(ResourceA, HeapMgr.get());
 		return Resource;
 	}
 
-	void DX12RHI::ChangeResourceBarrier(Charalotte::FResource* Resource, Charalotte::E_RESOURCE_STATE Orgin, Charalotte::E_RESOURCE_STATE Final, unsigned int NumBarriers)
+	std::shared_ptr<FRenderMesh> DX12RHI::CreateRenderMesh()
+	{
+		std::shared_ptr<FRenderMesh> TempRenderMesh = std::make_shared<FDXRenderMesh>(HeapMgr.get());
+		return TempRenderMesh;
+	}
+	void DX12RHI::ChangeResourceBarrier(FResource* Resource, E_RESOURCE_STATE Orgin, E_RESOURCE_STATE Final, unsigned int NumBarriers)
 	{
 		if (Resource == nullptr)
 		{
 			return;
 		}
-		Charalotte::FDXResource* DXR = dynamic_cast<Charalotte::FDXResource*>(Resource);
+		FDXResource* DXR = dynamic_cast<FDXResource*>(Resource);
 		auto BarrierTransResourceToRead = CD3DX12_RESOURCE_BARRIER::Transition(DXR->GetResource().Get(),
 			D3D12_RESOURCE_STATES(Orgin), D3D12_RESOURCE_STATES(Final));
 		mCommandList->ResourceBarrier(NumBarriers, &BarrierTransResourceToRead);
 	}
 
 	// if you want to create shader ,you must come true ShaderAttribute
-	void DX12RHI::SetShaderElement(Charalotte::FShader* Shader)
+	void DX12RHI::SetShaderElement(FShader* Shader)
 	{
 		if (Shader == nullptr)
 		{
 			return;
 		}
-		std::shared_ptr<Charalotte::FDXShaderElement> ShaderE = std::make_shared<Charalotte::FDXShaderElement>();
+		std::shared_ptr<FDXShaderElement> ShaderE = std::make_shared<FDXShaderElement>();
 		std::wstring WPath = FDXRHIFunctionLibrary::String2wString(Shader->ShaderPath());
 		auto Att = Shader->GetAttributes();
 		if (Att != nullptr)
@@ -1204,9 +1208,9 @@ namespace Charalotte
 		}
 	}
 
-	void DX12RHI::UpdateRenderTarget(Charalotte::FPCRenderTarget* RT, Charalotte::FResourceAttributes RA)
+	void DX12RHI::UpdateRenderTarget(FPCRenderTarget* RT, FResourceAttributes RA)
 	{
-
+		
 	}
 
 	void DX12RHI::SetGraphicsRoot32BitConstants(unsigned int ParamIndex,
@@ -1214,36 +1218,36 @@ namespace Charalotte
 	{
 		mCommandList->SetGraphicsRoot32BitConstants(ParamIndex, NumOfByteValue, SrcData, Offset32BitValue);
 	}
-	void DX12RHI::SetShadowMapForRT(Charalotte::FShadowMap* ShadowMap)
+	void DX12RHI::SetShadowMapForRT(FShadowMap* ShadowMap)
 	{
 		if (ShadowMap == nullptr)
 		{
 			return;
 		}
-		Charalotte::FDXShadowMap* DXShadowMap = dynamic_cast<Charalotte::FDXShadowMap*>(ShadowMap);
+		FDXShadowMap* DXShadowMap = dynamic_cast<FDXShadowMap*>(ShadowMap);
 		mCommandList->ClearDepthStencilView(DXShadowMap->GetDsvHeap()->GetCPUDescriptorHandleForHeapStart(),
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
 		auto DsvHeapStart = DXShadowMap->GetDsvHeap()->GetCPUDescriptorHandleForHeapStart();
 		mCommandList->OMSetRenderTargets(0, nullptr, false, &DsvHeapStart);
 	}
-	void DX12RHI::SetGraphicsRootDescriptorTable(unsigned int index, Charalotte::HeapType, int Offest, Charalotte::FRenderMesh* MeshPtr)
+	void DX12RHI::SetGraphicsRootDescriptorTable(unsigned int index, HeapType, int Offest, FRenderMesh* MeshPtr)
 	{
-		Charalotte::FDXRenderMesh* Mesh = dynamic_cast<Charalotte::FDXRenderMesh*>(MeshPtr);
+		FDXRenderMesh* Mesh = dynamic_cast<FDXRenderMesh*>(MeshPtr);
 		// Temp function ,we will use offset and heap type
 		mCommandList->SetGraphicsRootDescriptorTable(index, Mesh->Srvh()->GetGPUDescriptorHandleForHeapStart());
 	}
-	void DX12RHI::SetGraphicsRootConstantBufferView(unsigned int Index, Charalotte::FResource*, Charalotte::FRenderMesh* MeshPtr)
+	void DX12RHI::SetGraphicsRootConstantBufferView(unsigned int Index, FResource*, FRenderMesh* MeshPtr)
 	{
-		Charalotte::FDXRenderMesh* Mesh = dynamic_cast<Charalotte::FDXRenderMesh*>(MeshPtr);
+		FDXRenderMesh* Mesh = dynamic_cast<FDXRenderMesh*>(MeshPtr);
 		// Temp function ,we will use offset and heap type
 		mCommandList->SetGraphicsRootConstantBufferView(Index, Mesh->OCB()->Resource()->GetGPUVirtualAddress());
 	}
 
-	std::shared_ptr<Charalotte::FShadowMap> DX12RHI::CreateShadowMap()
+	std::shared_ptr<FShadowMap> DX12RHI::CreateShadowMap()
 	{
-		std::shared_ptr<Charalotte::FShadowMap> ShadowMap = std::make_shared<Charalotte::FDXShadowMap>(mClientWidth, mClientHeight, DevicePtr.get());
-		dynamic_cast<Charalotte::FDXShadowMap*>(ShadowMap.get())->Init();
+		std::shared_ptr<FShadowMap> ShadowMap = std::make_shared<FDXShadowMap>(mClientWidth, mClientHeight, DevicePtr.get());
+		dynamic_cast<FDXShadowMap*>(ShadowMap.get())->Init();
 		return ShadowMap;
 	}
 
@@ -1253,16 +1257,16 @@ namespace Charalotte
 		FlushCommandQueue();
 	}
 
-	void DX12RHI::SetHeap(Charalotte::HeapType HT)
+	void DX12RHI::SetHeap(HeapType HT)
 	{
 		auto& Heap = HeapMgr->Heap(HT);
 		ID3D12DescriptorHeap* descriptorHeaps[] = { Heap.Get() };
 		mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 	}
 
-	void DX12RHI::SetRenderMeshHeap(Charalotte::FRenderMesh* MeshPtr)
+	void DX12RHI::SetRenderMeshHeap(FRenderMesh* MeshPtr)
 	{
-		Charalotte::FDXRenderMesh* Mesh = dynamic_cast<Charalotte::FDXRenderMesh*>(MeshPtr);
+		FDXRenderMesh* Mesh = dynamic_cast<FDXRenderMesh*>(MeshPtr);
 		ID3D12DescriptorHeap* descriptorHeaps[] = { Mesh->Srvh().Get() };
 		mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 	}
@@ -1270,9 +1274,9 @@ namespace Charalotte
 	{
 
 	}
-	void DX12RHI::SetShadowMapHeap(Charalotte::FShadowMap* ShadowMap)
+	void DX12RHI::SetShadowMapHeap(FShadowMap* ShadowMap)
 	{
-		Charalotte::FDXShadowMap* ShadowMapPtr = dynamic_cast<Charalotte::FDXShadowMap*>(ShadowMap);
+		FDXShadowMap* ShadowMapPtr = dynamic_cast<FDXShadowMap*>(ShadowMap);
 		ID3D12DescriptorHeap* ShadowdescriptorHeaps[] = { ShadowMapPtr->GetSrvHeap().Get() };
 		mCommandList->SetDescriptorHeaps(_countof(ShadowdescriptorHeaps), ShadowdescriptorHeaps);
 	}
@@ -1281,9 +1285,9 @@ namespace Charalotte
 	{
 
 	}
-	void DX12RHI::SerRenderTargetOfShadowMap(Charalotte::FShadowMap* ShadowMap)
+	void DX12RHI::SerRenderTargetOfShadowMap(FShadowMap* ShadowMap)
 	{
-		Charalotte::FDXShadowMap* RPtr = dynamic_cast<Charalotte::FDXShadowMap*>(ShadowMap);
+		FDXShadowMap* RPtr = dynamic_cast<FDXShadowMap*>(ShadowMap);
 
 	}
 }

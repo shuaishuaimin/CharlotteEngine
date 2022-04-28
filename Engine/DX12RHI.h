@@ -35,37 +35,38 @@ namespace Charalotte
 		DX12RHI();
 		virtual ~DX12RHI();
 
-		virtual void BuildMeshAndActorPrimitives(const Charalotte::FActorPrimitive& Actors,
-			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FTempRenderScene* RenderScenePtr) override;
+		virtual void BuildMeshAndActorPrimitives(const FActorPrimitive& Actors,
+			const std::unordered_map<std::string, FMeshPrimitive>& Meshs, FTempRenderScene* RenderScenePtr) override;
 
 		virtual void BuildSceneResourcesForRenderPlatform(FTempRenderScene* RenderScenePtr) override;
-		virtual void BuildRootSignature(Charalotte::E_PSOTYPE psoType) override;
+		virtual void BuildRootSignature(E_PSOTYPE psoType) override;
 		virtual void BuildShadowPSO() override;
 		virtual void BuildPSO() override;
 		virtual void BeginFrame() override;
 
 		virtual void CompileMaterial(FTempRenderScene* RenderScenePtr) override;
-		virtual void CreateTextureResource(Charalotte::FTexture* Texture) override;
-		virtual void CreateVBIBBuffer(Charalotte::FVBIBBuffer* VBIB) override;
-		virtual void CreateRenderMeshResource(Charalotte::FRenderMesh* RenderMesh) override;
-		virtual void CreateRenderMeshSrv(Charalotte::FMaterial* Mat, Charalotte::FRenderMesh* Mesh) override;
-		virtual std::shared_ptr<Charalotte::FPCRenderTarget> CreateRenderTarget() override;
-		virtual std::shared_ptr<Charalotte::FResource> CreateResource(Charalotte::FResourceAttributes ResourceA) override;
-		virtual std::shared_ptr<Charalotte::FRenderPSO> CreatePSO(Charalotte::FPSOAttributes, Charalotte::FShader*) override;
-		virtual std::shared_ptr<Charalotte::FRootForShader> CreateRoot(Charalotte::FShader*) override;
-		virtual std::shared_ptr<Charalotte::FShadowMap> CreateShadowMap() override;
-		virtual void ChangeResourceBarrier(Charalotte::FResource*, Charalotte::E_RESOURCE_STATE Orgin, Charalotte::E_RESOURCE_STATE Final, unsigned int NumBarriers) override;
+		virtual void CreateTextureResource(FTexture* Texture) override;
+		virtual void CreateVBIBBuffer(FVBIBBuffer* VBIB) override;
+		virtual void CreateRenderMeshResource(FRenderMesh* RenderMesh) override;
+		virtual void CreateRenderMeshSrv(FMaterial* Mat, FRenderMesh* Mesh) override;
+		virtual std::shared_ptr<FPCRenderTarget> CreateRenderTarget() override;
+		virtual std::shared_ptr<FResource> CreateResource(FResourceAttributes ResourceA) override;
+		virtual std::shared_ptr<FRenderPSO> CreatePSO(FPSOAttributes, FShader*) override;
+		virtual std::shared_ptr<FRootForShader> CreateRoot(FShader*) override;
+		virtual std::shared_ptr<FShadowMap> CreateShadowMap() override;
+		virtual std::shared_ptr<FRenderMesh> CreateRenderMesh() override;
+		virtual void ChangeResourceBarrier(FResource*, E_RESOURCE_STATE Orgin, E_RESOURCE_STATE Final, unsigned int NumBarriers) override;
 
 		virtual void InitShadowMap() override;
 		virtual bool InitRenderPlatform(FWindow* WindowPtr) override;
 
 		virtual void LoadTextureResource(const std::string& FileName, const std::string& FilePath, FTempRenderScene* RenderScenePtr) override;
 
-		virtual void DrawPrepare(Charalotte::E_PSOTYPE PSOType) override;
-		virtual void DrawMesh(const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData,
-			const Charalotte::ObjectConstants& Obj, FTempRenderScene* RenderScenePtr) override;
-		virtual void DrawEnd(Charalotte::E_PSOTYPE PSOType) override;
-		virtual void DrawMeshFinal(Charalotte::RenderUsefulData Data, Charalotte::FRenderMesh* Mesh) override;
+		virtual void DrawPrepare(E_PSOTYPE PSOType) override;
+		virtual void DrawMesh(const FActorInfo& Actor, RenderUsefulData* DrawData,
+			const ObjectConstants& Obj, FTempRenderScene* RenderScenePtr) override;
+		virtual void DrawEnd(E_PSOTYPE PSOType) override;
+		virtual void DrawMeshFinal(RenderUsefulData Data, FRenderMesh* Mesh) override;
 
 		virtual void ExecuteAndCloseCommandList() override;
 		virtual void EndFrame() override;
@@ -78,25 +79,25 @@ namespace Charalotte
 		virtual void OnResize() override;
 
 		virtual void SwapChain() override;
-		virtual void SetShader(std::shared_ptr<Charalotte::FShaderInfo> ShaderInput) override;
-		virtual void SetPipelineParamter(Charalotte::E_PSOTYPE PSOType,
-			const Charalotte::FActorInfo& Actor, Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr) override;
-		virtual void SetRenderTarget(Charalotte::FPCRenderTarget* RT) override;
-		virtual void SetPSOFinal(Charalotte::FRenderPSO* Pso) override;
-		virtual void SetHeap(Charalotte::HeapType HT) override;
-		virtual void SetRenderMeshHeap(Charalotte::FRenderMesh*) override;
+		virtual void SetShader(std::shared_ptr<FShaderInfo> ShaderInput) override;
+		virtual void SetPipelineParamter(E_PSOTYPE PSOType,
+			const FActorInfo& Actor, RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr) override;
+		virtual void SetRenderTarget(FPCRenderTarget* RT) override;
+		virtual void SetPSOFinal(FRenderPSO* Pso) override;
+		virtual void SetHeap(HeapType HT) override;
+		virtual void SetRenderMeshHeap(FRenderMesh*) override;
 		virtual void SetCurrentBufferHeap() override;
-		virtual void SetShadowMapHeap(Charalotte::FShadowMap*) override;
-		virtual void SetShaderElement(Charalotte::FShader*) override;
+		virtual void SetShadowMapHeap(FShadowMap*) override;
+		virtual void SetShaderElement(FShader*) override;
 		virtual void SetGraphicsRoot32BitConstants(unsigned int ParamIndex,
 			unsigned int NumOfByteValue, void* SrcData, unsigned int Offset32BitValue)override;
-		virtual void SetShadowMapForRT(Charalotte::FShadowMap*)override;
-		virtual void SetGraphicsRootDescriptorTable(unsigned int index, Charalotte::HeapType, int Offest, Charalotte::FRenderMesh*)override;
-		virtual void SetGraphicsRootConstantBufferView(unsigned int Index, Charalotte::FResource*, Charalotte::FRenderMesh*)override;
+		virtual void SetShadowMapForRT(FShadowMap*)override;
+		virtual void SetGraphicsRootDescriptorTable(unsigned int index, HeapType, int Offest, FRenderMesh*)override;
+		virtual void SetGraphicsRootConstantBufferView(unsigned int Index, FResource*, FRenderMesh*)override;
 		virtual void SetCurrentBufferRenderTarget()override;
-		virtual void SerRenderTargetOfShadowMap(Charalotte::FShadowMap*)override;
+		virtual void SerRenderTargetOfShadowMap(FShadowMap*)override;
 
-		virtual void UpdateRenderTarget(Charalotte::FPCRenderTarget* RT, Charalotte::FResourceAttributes RA) override;
+		virtual void UpdateRenderTarget(FPCRenderTarget* RT, FResourceAttributes RA) override;
 
 	protected:
 		// flush fence
@@ -114,23 +115,23 @@ namespace Charalotte
 		void LogAdapterOutputs(IDXGIAdapter* adapter);
 		void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
 		// pipeline
-		void BuildDXMeshPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive,
-			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FWinRenderScene* DXRenderScene);
+		void BuildDXMeshPrimitives(const FActorPrimitive& ActorPrimitive,
+			const std::unordered_map<std::string, FMeshPrimitive>& Meshs, FWinRenderScene* DXRenderScene);
 
 		void CompleteDXMeshPrimitives(FWinRenderScene* DXRenderScene);
-		void CalcVerticesAndIndices(const std::string& GeometryName, const Charalotte::FTransform& Transform,
-			const std::unordered_map<std::string, Charalotte::FMeshPrimitive>& Meshs, FWinRenderScene* DXRenderScene);
+		void CalcVerticesAndIndices(const std::string& GeometryName, const FTransform& Transform,
+			const std::unordered_map<std::string, FMeshPrimitive>& Meshs, FWinRenderScene* DXRenderScene);
 
-		void BuildDXActorPrimitives(const Charalotte::FActorPrimitive& ActorPrimitive, FWinRenderScene* DXRenderScene);
+		void BuildDXActorPrimitives(const FActorPrimitive& ActorPrimitive, FWinRenderScene* DXRenderScene);
 
 		// Build heaps
 		void BuildDescriptorHeapsAndTables(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& Heap);
 
 		void BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap,
-			std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>>& ObjectCb);
+			std::shared_ptr<UploadBuffer<ObjectConstants>>& ObjectCb);
 
 		void BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap,
-			Charalotte::FMaterial* Material, FWinRenderScene* DXRenderScene);
+			FMaterial* Material, FWinRenderScene* DXRenderScene);
 
 		void DebugDevice();
 
@@ -188,7 +189,7 @@ namespace Charalotte
 		UINT mCurrentFence = 0;
 
 		// pipeline
-		std::unique_ptr<Charalotte::FDXPSOs> PSOs;
+		std::unique_ptr<FDXPSOs> PSOs;
 
 		// set true to use 4X MSAA ,the default is false
 		bool m4xMsaaState = false; // 4X MSAA enabled;
@@ -206,14 +207,14 @@ namespace Charalotte
 
 	// parameters for self
 	private:
-		std::unordered_map<Charalotte::E_PSOTYPE, std::function<void()>> PsoPrepareFunction;
-		std::unordered_map<Charalotte::E_PSOTYPE, std::function<void()>> PsoEndFunctions;
-		std::unordered_map<Charalotte::E_PSOTYPE, std::function<void(const Charalotte::FActorInfo& Actor,
-			Charalotte::RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr)>> PsoSetParamterFunctions;
-		std::unique_ptr<Charalotte::FDXShadowMap> ShadowMap;
+		std::unordered_map<E_PSOTYPE, std::function<void()>> PsoPrepareFunction;
+		std::unordered_map<E_PSOTYPE, std::function<void()>> PsoEndFunctions;
+		std::unordered_map<E_PSOTYPE, std::function<void(const FActorInfo& Actor,
+			RenderUsefulData* DrawData, FTempRenderScene* RenderScenePtr)>> PsoSetParamterFunctions;
+		std::unique_ptr<FDXShadowMap> ShadowMap;
 		std::shared_ptr<FDevice> DevicePtr;
-		std::unique_ptr<Charalotte::FHeapManager> HeapMgr;
-		std::vector<std::shared_ptr<Charalotte::FPCRenderTarget>> RTs;
+		std::unique_ptr<FHeapManager> HeapMgr;
+		std::vector<std::shared_ptr<FPCRenderTarget>> RTs;
 	};
 
 

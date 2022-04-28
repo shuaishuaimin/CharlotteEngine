@@ -10,5 +10,5 @@ namespace Charalotte
 		float Height;
 		float MinDepth;
 		float MaxDepth;
-	}
+	};
 }

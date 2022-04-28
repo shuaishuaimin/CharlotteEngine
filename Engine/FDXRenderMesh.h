@@ -6,6 +6,7 @@
 #include "FRenderMesh.h"
 #ifdef RENDER_PLATFORM_DX12
 #include "DXPrimitives.h"
+#include "FHeapManager.h"
 #endif 
 
 
@@ -14,13 +15,30 @@ namespace Charalotte
 	class FDXRenderMesh : public FRenderMesh
 	{
 	public:
-		FDXRenderMesh()
+		FDXRenderMesh(FHeapManager* Ptr)
 		{
 			VBIB = nullptr;
 			Material = nullptr;
+			HeapMgrPtr = Ptr;
+			if (HeapMgrPtr != nullptr)
+			{
+				SrvHeapOffset = HeapMgrPtr->GetAvailableOffsetAndUseIt(HeapType::CBVSRVUAVHeap);
+				CbvHeapOffset = HeapMgrPtr->GetAvailableOffsetAndUseIt(HeapType::CBVSRVUAVHeap);
+			}
+			else
+			{
+				SrvHeapOffset = -1;
+				CbvHeapOffset = -1;
+			}
 		}
 
-		virtual ~FDXRenderMesh(){}
+		virtual ~FDXRenderMesh(){
+			if (HeapMgrPtr != nullptr)
+			{
+				HeapMgrPtr->ReleaseOffset(HeapType::CBVSRVUAVHeap, CbvHeapOffset);
+				HeapMgrPtr->ReleaseOffset(HeapType::CBVSRVUAVHeap, SrvHeapOffset);
+			}
+		}
 
 		inline void SetMaterial(FMaterial* Mat)
 		{
@@ -42,6 +60,16 @@ namespace Charalotte
 		inline void SetRenderMesh(const std::string& Name)
 		{
 			RenderMeshName = Name;
+		}
+
+		int GetSrvOffset()
+		{
+			return SrvHeapOffset;
+		}
+
+		int GetCbvOffset()
+		{
+			return CbvHeapOffset;   
 		}
 #ifdef RENDER_PLATFORM_DX12
 		inline void SetBoundingBox(FDXBoundingBox Bd)
@@ -71,10 +99,13 @@ namespace Charalotte
 #ifdef RENDER_PLATFORM_DX12
 		FDXBoundingBox DrawArg;
 		std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>> ObjectCB = nullptr;
+		int CbvHeapOffset;
+		int SrvHeapOffset;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CbvHeap = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> SrvHeap = nullptr;
 #endif
 		FTransform TransData;
 		FMaterial* Material; 
+		FHeapManager* HeapMgrPtr;
 	};
 }
