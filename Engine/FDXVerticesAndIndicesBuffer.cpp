@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include "FVerticesAndIndicesBuffer.h"
+#include "FDXVerticesAndIndicesBuffer.h"
 
 namespace Charalotte
 {
 #ifdef RENDER_PLATFORM_DX12
-	D3D12_VERTEX_BUFFER_VIEW FVerticesAndIndicesBuffer::VertexBufferView()const
+	D3D12_VERTEX_BUFFER_VIEW FDXVerticesAndIndicesBuffer::VertexBufferView()const
 	{
 		D3D12_VERTEX_BUFFER_VIEW vbv;
 		vbv.BufferLocation = VertexBufferGPU->GetGPUVirtualAddress();
@@ -14,7 +14,7 @@ namespace Charalotte
 		return vbv;
 	}
 
-	D3D12_INDEX_BUFFER_VIEW FVerticesAndIndicesBuffer::IndexBufferView()const
+	D3D12_INDEX_BUFFER_VIEW FDXVerticesAndIndicesBuffer::IndexBufferView()const
 	{
 		D3D12_INDEX_BUFFER_VIEW ibv;
 		ibv.BufferLocation = IndexBufferGPU->GetGPUVirtualAddress();
@@ -24,7 +24,7 @@ namespace Charalotte
 		return ibv;
 	}
 
-	void FVerticesAndIndicesBuffer::ClearBuffers()
+	void FDXVerticesAndIndicesBuffer::ClearBuffers()
 	{
 		VertexBufferCPU = nullptr;
 		IndexBufferCPU = nullptr;

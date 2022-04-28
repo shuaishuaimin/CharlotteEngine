@@ -3,8 +3,16 @@
 
 namespace Charalotte
 {
+#ifdef RENDER_PLATFORM_DX12
+	FDXResource::~FDXResource() {
+		for (const auto& Iter : Offsets)
+		{
+			HeapMgrPtr->ReleaseOffset(Iter.first, Iter.second);
+		}
+	}
 	void FDXResource::BuildResource(FResourceAttributes ResourceA, FHeapManager* HeapMgr)
 	{
+		HeapMgrPtr = HeapMgr;
 		switch (ResourceA.ResourceType)
 		{
 		case Charalotte::E_RESOURCE_TYPE::RESOURCE_DEP:
@@ -59,10 +67,11 @@ namespace Charalotte
 		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 		rtvDesc.Texture2D.MipSlice = 0;
 		rtvDesc.Texture2D.PlaneSlice = 0;
-
-		auto rtvHeandle = HeapMgr->GetCPUHandleByTypeAndOffest(Charalotte::HeapType::RTVHeap, ResourceA.RtO);
+		int RTVOffset = HeapMgr->GetAvailableOffsetAndUseIt(HeapType::RTVHeap);
+		auto rtvHeandle = HeapMgr->GetCPUHandleByTypeAndOffest(Charalotte::HeapType::RTVHeap, RTVOffset);
 		DevicePtr->CreateRenderTargetView(mResource.Get(), &rtvDesc, rtvHeandle);
-		
+		Offsets.insert({HeapType::RTVHeap, RTVOffset});
+	
 		//create srv view
 		D3D12_SHADER_RESOURCE_VIEW_DESC rtsrvDesc = {};
 		rtsrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -72,8 +81,10 @@ namespace Charalotte
 		rtsrvDesc.Texture2D.MipLevels = 1;
 		rtsrvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 		rtsrvDesc.Texture2D.PlaneSlice = 0;
-		auto SrvHandle = HeapMgr->GetCPUHandleByTypeAndOffest(Charalotte::HeapType::CBVSRVUAVHeap, ResourceA.SrO);
+		int SrOffset = HeapMgr->GetAvailableOffsetAndUseIt(HeapType::CBVSRVUAVHeap);
+		auto SrvHandle = HeapMgr->GetCPUHandleByTypeAndOffest(Charalotte::HeapType::CBVSRVUAVHeap, SrOffset);
 		DevicePtr->CreateShaderResourceView(mResource.Get(), &rtsrvDesc, SrvHandle);
+		Offsets.insert({HeapType::CBVSRVUAVHeap, SrOffset});
 	}
 	void FDXResource::BuildDsResource(FResourceAttributes ResourceA, FHeapManager* HeapMgr)
 	{
@@ -111,9 +122,10 @@ namespace Charalotte
 		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 		dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		dsvDesc.Texture2D.MipSlice = 0;
-
-		auto DsvHandle = HeapMgr->GetCPUHandleByTypeAndOffest(HeapType::DSVHeap, ResourceA.DsO);
+		int DsOffset = HeapMgr->GetAvailableOffsetAndUseIt(HeapType::DSVHeap);
+		auto DsvHandle = HeapMgr->GetCPUHandleByTypeAndOffest(HeapType::DSVHeap, DsOffset);
 		DevicePtr->CreateDepthStencilView(mResource.Get(), &dsvDesc, DsvHandle);
+		Offsets.insert({HeapType::DSVHeap, DsOffset});
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC dssrvDesc = {};
 		dssrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -123,9 +135,14 @@ namespace Charalotte
 		dssrvDesc.Texture2D.MipLevels = 1;
 		dssrvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 		dssrvDesc.Texture2D.PlaneSlice = 0;
-
-		auto DsSrvHandle = HeapMgr->GetCPUHandleByTypeAndOffest(HeapType::CBVSRVUAVHeap, ResourceA.SrO);
+		int DsSrOffset = HeapMgr->GetAvailableOffsetAndUseIt(HeapType::CBVSRVUAVHeap);
+		auto DsSrvHandle = HeapMgr->GetCPUHandleByTypeAndOffest(HeapType::CBVSRVUAVHeap, DsSrOffset);
 		DevicePtr->CreateShaderResourceView(mResource.Get(), &dssrvDesc, DsSrvHandle);
+		Offsets.insert({HeapType::CBVSRVUAVHeap, DsSrOffset});
 	}
+#else
+	
+#endif
+
 }
 

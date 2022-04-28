@@ -12,7 +12,7 @@
 #include "SRHIConstants.h "
 #include "SEShaderElements.h"
 #include "CharlotteEngine.h"
-#include "FRenderMesh.h"
+#include "FDXRenderMesh.h"
 #ifdef RENDER_PLATFORM_DX12
 #include "DX12RHI.h"
 #endif
@@ -352,16 +352,8 @@ namespace Charalotte
 
 	void FPCRenderer::TestCreateAndUseRT()
 	{
-		FResourceElement El;
-		El.DsDsvOffest = 0;
-		El.DsRtvOffest = 0;
-		El.RtDsvOffest = 0;
-		El.RtRtvOffest = 0;
 		std::shared_ptr<FPCRenderTarget> Rt = RHIPtr->CreateRenderTarget();
 		FResourceAttributes Attribute;
-		Attribute.DsO = 0;
-		Attribute.RtO = 0;
-		Attribute.SrO = 0;
 		Attribute.Height = 1280;
 		Attribute.Width = 1980;
 		Attribute.Format = E_GRAPHIC_FORMAT::FORMAT_R16G16B16A16_FLOAT;

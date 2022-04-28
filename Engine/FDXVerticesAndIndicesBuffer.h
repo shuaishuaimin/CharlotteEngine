@@ -1,5 +1,6 @@
 #pragma once
 #include "DDefines.h"
+#include "FVBIBBuffer.h"
 #ifdef RENDER_PLATFORM_DX12
 #include <windows.h>
 #include <wrl.h>
@@ -8,11 +9,11 @@
 
 namespace Charalotte
 {
-	class FVerticesAndIndicesBuffer
+	class FDXVerticesAndIndicesBuffer : public FVBIBBuffer
 	{
 	public:
-		FVerticesAndIndicesBuffer() {}
-		~FVerticesAndIndicesBuffer() {}
+		FDXVerticesAndIndicesBuffer() {}
+		virtual ~FDXVerticesAndIndicesBuffer() {}
 
 		using index_type_t = int16_t;
 

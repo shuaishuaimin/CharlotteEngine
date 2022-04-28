@@ -4,10 +4,11 @@
 #include "FMeshAsset.h"
 #include "FRHIManager.h"
 #include "CharlotteEngine.h"
-#include "FRenderMesh.h"
+
 //#include "FCoreShader.h"
 #ifdef RENDER_PLATFORM_DX12
 #include "FWinEventRegisterSystem.h"
+#include "FDXRenderMesh.h"
 #endif
 #include "FTexture.h"
 #include "FCoreShader.h"
@@ -91,8 +92,10 @@ namespace Charalotte
 			if (BufferResourceIter != BufferResources.end())
 			{
 				auto Rs = BufferResourceIter->second;
-				std::shared_ptr<Charalotte::FRenderMesh> RenderMesh = std::make_shared<Charalotte::FRenderMesh>();
+				
 #ifdef RENDER_PLATFORM_DX12
+				std::shared_ptr<FRenderMesh> RenderMeshIns = std::make_shared<FDXRenderMesh>();
+				FDXRenderMesh* RenderMesh = dynamic_cast<FDXRenderMesh*>(RenderMeshIns.get());
 				Charalotte::FDXBoundingBox submesh;
 				submesh.IndexCount = Rs->GetIndicesLength() ;
 				submesh.StartIndexLocation = 0;
@@ -111,8 +114,8 @@ namespace Charalotte
 				}
 				RenderMesh->SetTransformData(Actors.Transform);
 
-				RHIPtr->CreateRenderMeshResource(RenderMesh.get());
-				RenderMeshs.insert({ ActorMeshPrimitiveName , std::move(RenderMesh)});
+				RHIPtr->CreateRenderMeshResource(RenderMesh);
+				RenderMeshs.insert({ ActorMeshPrimitiveName , std::move(RenderMeshIns)});
 			}
 			else
 			{
@@ -178,7 +181,7 @@ namespace Charalotte
 			return;
 		}
 		
-		std::shared_ptr<Charalotte::FVerticesAndIndicesBuffer> VBIBBuffer = std::make_shared<Charalotte::FVerticesAndIndicesBuffer>();
+		std::shared_ptr<Charalotte::FDXVerticesAndIndicesBuffer> VBIBBuffer = std::make_shared<Charalotte::FDXVerticesAndIndicesBuffer>();
 		int VertexIndex = 0;
 		// use normal to vertex color
 		bool IsUseNormalToColor = false;

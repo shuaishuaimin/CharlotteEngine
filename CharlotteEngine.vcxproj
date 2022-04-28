@@ -145,7 +145,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Engine\AActor.h" />
+    <ClInclude Include="Engine\FEventRegisterSystem.h" />
+    <ClInclude Include="Engine\FRenderMesh.h" />
     <ClInclude Include="Engine\FRootForShader.h" />
+    <ClInclude Include="Engine\FVBIBBuffer.h" />
     <ClInclude Include="Engine\SDX12ShaderElement.h" />
     <ClInclude Include="Engine\EHeapType.h" />
     <ClInclude Include="Engine\FCoreShader.h" />
@@ -154,7 +157,7 @@
     <ClInclude Include="Engine\FDXResource.h" />
     <ClInclude Include="Engine\FDXRHIFunctionLibrary.h" />
     <ClInclude Include="Engine\FHeapManager.h" />
-    <ClInclude Include="Engine\FRenderMesh.h" />
+    <ClInclude Include="Engine\FDXRenderMesh.h" />
     <ClInclude Include="Engine\FRenderPSO.h" />
     <ClInclude Include="Engine\FRenderScene.h" />
     <ClInclude Include="Engine\FResource.h" />
@@ -164,7 +167,7 @@
     <ClInclude Include="Engine\FShader.h" />
     <ClInclude Include="Engine\FBaseLight.h" />
     <ClInclude Include="Engine\FTexture.h" />
-    <ClInclude Include="Engine\FVerticesAndIndicesBuffer.h" />
+    <ClInclude Include="Engine\FDXVerticesAndIndicesBuffer.h" />
     <ClInclude Include="Engine\SEResourceElement.h" />
     <ClInclude Include="Engine\SEShaderElements.h" />
     <ClInclude Include="Engine\SMaterialAttributes.h" />
@@ -222,7 +225,7 @@
     <ClCompile Include="Engine\FRHIManager.cpp" />
     <ClCompile Include="Engine\FScene.cpp" />
     <ClCompile Include="Engine\FShader.cpp" />
-    <ClCompile Include="Engine\FVerticesAndIndicesBuffer.cpp" />
+    <ClCompile Include="Engine\FDXVerticesAndIndicesBuffer.cpp" />
     <ClCompile Include="Engine\FWinRenderScene.cpp" />
     <ClCompile Include="Engine\GameInstance.cpp" />
     <ClCompile Include="Engine\GameLogic.cpp" />

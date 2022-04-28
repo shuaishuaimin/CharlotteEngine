@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include "STransformDef.h"
-#include "FVerticesAndIndicesBuffer.h"
+#include "FDXVerticesAndIndicesBuffer.h"
 #include "FShader.h"
 #include "FRenderPSO.h"
 
@@ -9,7 +9,7 @@ class RHI;
 namespace Charalotte
 {
 	class FTexture;
-	class FRenderMesh;
+	class FDXRenderMesh;
 	class FRenderScene
 	{
 	public:
@@ -40,7 +40,7 @@ namespace Charalotte
 		FRenderPSO* GetPsoPtr(E_PSOTYPE PsoType, const std::string& PsoName);
 	private:
 		std::unordered_map<std::string, std::shared_ptr<FRenderMesh>> RenderMeshs;
-		std::unordered_map<std::string, std::shared_ptr<FVerticesAndIndicesBuffer>> BufferResources;
+		std::unordered_map<std::string, std::shared_ptr<FDXVerticesAndIndicesBuffer>> BufferResources;
 		std::unordered_map<std::string, std::shared_ptr<FMaterial>> Materials;
 		std::unordered_map<std::string, std::shared_ptr<FTexture>> Textures;
 		std::unordered_map<std::string, std::shared_ptr<FShader>> Shaders;

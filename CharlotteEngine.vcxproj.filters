@@ -285,7 +285,7 @@
     <ClInclude Include="Engine\FTempRenderScene.h">
       <Filter>Header Files\Engine\Platform\Render\RenderScene</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FRenderMesh.h">
+    <ClInclude Include="Engine\FDXRenderMesh.h">
       <Filter>Header Files\Engine\Platform\Render\RenderMesh</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FRenderScene.h">
@@ -297,7 +297,7 @@
     <ClInclude Include="Engine\FRenderPSO.h">
       <Filter>Header Files\Engine\Public\Material</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FVerticesAndIndicesBuffer.h">
+    <ClInclude Include="Engine\FDXVerticesAndIndicesBuffer.h">
       <Filter>Header Files\Engine\Platform\Render\RenderMesh</Filter>
     </ClInclude>
     <ClInclude Include="Engine\FTexture.h">
@@ -335,6 +335,15 @@
     </ClInclude>
     <ClInclude Include="Engine\FRootForShader.h">
       <Filter>Header Files\Engine\Public\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FEventRegisterSystem.h">
+      <Filter>Header Files\Engine\Public\BaseClass</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FRenderMesh.h">
+      <Filter>Header Files\Engine\Platform\Render\RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\FVBIBBuffer.h">
+      <Filter>Header Files\Engine\Platform\Render\RenderMesh</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -410,7 +419,7 @@
     <ClCompile Include="Engine\FRenderScene.cpp">
       <Filter>Source Files\Engine\Render</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FVerticesAndIndicesBuffer.cpp">
+    <ClCompile Include="Engine\FDXVerticesAndIndicesBuffer.cpp">
       <Filter>Source Files\Engine\Render</Filter>
     </ClCompile>
     <ClCompile Include="Engine\FRHIManager.cpp">
