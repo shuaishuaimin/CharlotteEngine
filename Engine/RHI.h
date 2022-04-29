@@ -81,9 +81,6 @@ namespace Charalotte
 		virtual void SetRenderTarget(FPCRenderTarget* RT) = 0;
 		virtual void SetPSOFinal(FRenderPSO* Pso) = 0;
 		virtual void SetHeap(HeapType HT) = 0;
-		virtual void SetRenderMeshHeap(FRenderMesh*) = 0;
-		virtual void SetCurrentBufferHeap() = 0;
-		virtual void SetShadowMapHeap(FShadowMap*) = 0;
 		virtual void SetShaderElement(FShader*) = 0;
 		virtual void SetGraphicsRoot32BitConstants(unsigned int ParamIndex, unsigned int NumOfByteValue, void* SrcData, unsigned int Offset32BitValue) = 0;
 		virtual void SetShadowMapForRT(FShadowMap*) = 0;

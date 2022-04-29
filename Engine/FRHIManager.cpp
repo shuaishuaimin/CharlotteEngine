@@ -16,7 +16,7 @@ namespace Charalotte
 
 	FRHIManager::~FRHIManager()
 	{
-
+		RHIIns = nullptr;
 	}
 
 	RHI* FRHIManager::GetRHIPtr()

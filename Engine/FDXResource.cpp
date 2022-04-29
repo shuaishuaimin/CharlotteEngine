@@ -15,12 +15,12 @@ namespace Charalotte
 		HeapMgrPtr = HeapMgr;
 		switch (ResourceA.ResourceType)
 		{
-		case Charalotte::E_RESOURCE_TYPE::RESOURCE_DEP:
+		case E_RESOURCE_TYPE::RESOURCE_DEP:
 			BuildDsResource(ResourceA, HeapMgr);
 			break;
-		case Charalotte::E_RESOURCE_TYPE::RESOURCE_SHADER:
+		case E_RESOURCE_TYPE::RESOURCE_SHADER:
 			break;
-		case Charalotte::E_RESOURCE_TYPE::RESOURCE_RT:
+		case E_RESOURCE_TYPE::RESOURCE_RT:
 			BuildRTResource(ResourceA, HeapMgr);
 			break;
 		default:

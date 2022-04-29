@@ -41,6 +41,9 @@ namespace Charalotte
 			IsDeviceSucceed = false;
 		}
 		IsDeviceSucceed = false;
+		HeapMgr = nullptr;
+		ShadowMap->DestoryScene();
+		ShadowMap = nullptr;
 	}
 
 	void DX12RHI::LoadTextureResource(const std::string& FileName, const std::string& FilePath, FTempRenderScene* RenderScenePtr)
@@ -913,14 +916,14 @@ namespace Charalotte
 			{
 				return;
 			}
-			ID3D12DescriptorHeap* descriptorHeaps[] = { ShadowMap->GetSrvHeap().Get() };
-			mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+			SetHeap(HeapType::CBVSRVUAVHeap);
 			mCommandList->SetGraphicsRootSignature(ShadowPso.mRootSignature.Get());
 
-			mCommandList->ClearDepthStencilView(ShadowMap->GetDsvHeap()->GetCPUDescriptorHandleForHeapStart(),
+			auto DsvHeapStart = HeapMgr->GetCPUHandleByTypeAndOffest(HeapType::DSVHeap, ShadowMap->GetDsvOffset());
+
+			mCommandList->ClearDepthStencilView(DsvHeapStart,
 				D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
-			auto DsvHeapStart = ShadowMap->GetDsvHeap()->GetCPUDescriptorHandleForHeapStart();
 			mCommandList->OMSetRenderTargets(0, nullptr, false, &DsvHeapStart);
 
 			mCommandList->SetPipelineState(ShadowPso.mPSO.Get());
@@ -966,9 +969,9 @@ namespace Charalotte
 			mCommandList->SetGraphicsRootConstantBufferView(1, ActorInsPtr->ObjectCB->Resource()->GetGPUVirtualAddress());
 
 			mCommandList->SetGraphicsRootDescriptorTable(3, ActorInsPtr->SrvHeap->GetGPUDescriptorHandleForHeapStart());
-			ID3D12DescriptorHeap* ShadowdescriptorHeaps[] = { ShadowMap->GetSrvHeap().Get() };
-			mCommandList->SetDescriptorHeaps(_countof(ShadowdescriptorHeaps), ShadowdescriptorHeaps);
-			mCommandList->SetGraphicsRootDescriptorTable(4, ShadowMap->GetSrvHeap()->GetGPUDescriptorHandleForHeapStart());
+			
+			SetHeap(HeapType::CBVSRVUAVHeap);
+			mCommandList->SetGraphicsRootDescriptorTable(4, HeapMgr->GetGPUHandleByTypeAndOffest(HeapType::CBVSRVUAVHeap, ShadowMap->GetSrvOffset()));
 		} });
 
 		PsoSetParamterFunctions.insert({ Shadow, [this](const FActorInfo& Actor,
@@ -1225,11 +1228,12 @@ namespace Charalotte
 			return;
 		}
 		FDXShadowMap* DXShadowMap = dynamic_cast<FDXShadowMap*>(ShadowMap);
-		mCommandList->ClearDepthStencilView(DXShadowMap->GetDsvHeap()->GetCPUDescriptorHandleForHeapStart(),
+		auto DsvHeapHandle = HeapMgr->GetCPUHandleByTypeAndOffest(HeapType::DSVHeap, DXShadowMap->GetDsvOffset());
+		mCommandList->ClearDepthStencilView(DsvHeapHandle,
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
-		auto DsvHeapStart = DXShadowMap->GetDsvHeap()->GetCPUDescriptorHandleForHeapStart();
-		mCommandList->OMSetRenderTargets(0, nullptr, false, &DsvHeapStart);
+		
+		mCommandList->OMSetRenderTargets(0, nullptr, false, &DsvHeapHandle);
 	}
 	void DX12RHI::SetGraphicsRootDescriptorTable(unsigned int index, HeapType, int Offest, FRenderMesh* MeshPtr)
 	{
@@ -1262,23 +1266,6 @@ namespace Charalotte
 		auto& Heap = HeapMgr->Heap(HT);
 		ID3D12DescriptorHeap* descriptorHeaps[] = { Heap.Get() };
 		mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-	}
-
-	void DX12RHI::SetRenderMeshHeap(FRenderMesh* MeshPtr)
-	{
-		FDXRenderMesh* Mesh = dynamic_cast<FDXRenderMesh*>(MeshPtr);
-		ID3D12DescriptorHeap* descriptorHeaps[] = { Mesh->Srvh().Get() };
-		mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-	}
-	void DX12RHI::SetCurrentBufferHeap()
-	{
-
-	}
-	void DX12RHI::SetShadowMapHeap(FShadowMap* ShadowMap)
-	{
-		FDXShadowMap* ShadowMapPtr = dynamic_cast<FDXShadowMap*>(ShadowMap);
-		ID3D12DescriptorHeap* ShadowdescriptorHeaps[] = { ShadowMapPtr->GetSrvHeap().Get() };
-		mCommandList->SetDescriptorHeaps(_countof(ShadowdescriptorHeaps), ShadowdescriptorHeaps);
 	}
 
 	void DX12RHI::SetCurrentBufferRenderTarget()

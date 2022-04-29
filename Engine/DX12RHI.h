@@ -85,9 +85,6 @@ namespace Charalotte
 		virtual void SetRenderTarget(FPCRenderTarget* RT) override;
 		virtual void SetPSOFinal(FRenderPSO* Pso) override;
 		virtual void SetHeap(HeapType HT) override;
-		virtual void SetRenderMeshHeap(FRenderMesh*) override;
-		virtual void SetCurrentBufferHeap() override;
-		virtual void SetShadowMapHeap(FShadowMap*) override;
 		virtual void SetShaderElement(FShader*) override;
 		virtual void SetGraphicsRoot32BitConstants(unsigned int ParamIndex,
 			unsigned int NumOfByteValue, void* SrcData, unsigned int Offset32BitValue)override;

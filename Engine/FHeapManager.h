@@ -129,7 +129,11 @@ namespace Charalotte
 		}
 		void ReleaseOffset(HeapType Type, int Offset)
 		{
-			const auto& Iter = Heaps.find(Type);
+			if (Heaps.empty())
+			{
+				return;
+			}
+			const auto Iter = Heaps.find(Type);
 			if (Iter != Heaps.end())
 			{
 				Iter->second->AvailableOffsetsBeforeEnd.insert(Offset);
@@ -189,13 +193,23 @@ namespace Charalotte
 		void CreateHeap(ID3D12Device* Device, int ViewNum, HeapType Type)
 		{
 			std::shared_ptr<HeapSet> TempHeap = std::make_shared<HeapSet>();
-			D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
-			dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-			dsvHeapDesc.NodeMask = 0;
-			dsvHeapDesc.NumDescriptors = ViewNum;
-			dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE(Type);
+			D3D12_DESCRIPTOR_HEAP_DESC HeapDesc;
+			switch (Type)
+			{
+			case HeapType::CBVSRVUAVHeap:
+				HeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+				break;
+			case HeapType::DSVHeap:
+				HeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+				break;
+			case HeapType::RTVHeap:
+				HeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+			}
+			HeapDesc.NodeMask = 0;
+			HeapDesc.NumDescriptors = ViewNum;
+			HeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE(Type);
 			ThrowIfFailed(Device->CreateDescriptorHeap(
-				&dsvHeapDesc, IID_PPV_ARGS(TempHeap->Heap.GetAddressOf())));
+				&HeapDesc, IID_PPV_ARGS(TempHeap->Heap.GetAddressOf())));
 			TempHeap->CPUHandleStart = TempHeap->Heap->GetCPUDescriptorHandleForHeapStart();
 			TempHeap->GPUHandleStart = TempHeap->Heap->GetGPUDescriptorHandleForHeapStart();
 			TempHeap->DescriptorSize = GetSize(Type);

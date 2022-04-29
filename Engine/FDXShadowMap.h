@@ -17,7 +17,7 @@ namespace Charalotte
 	public:
 		FDXShadowMap(UINT width, UINT height, FDevice* Device, FHeapManager* HeapPtr);
 
-		~FDXShadowMap() = default;
+		virtual ~FDXShadowMap();
 
 		virtual FResource* GetResourcePtr()override
 		{
@@ -49,17 +49,19 @@ namespace Charalotte
 
 		ID3D12Resource* GetResource();
 
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& GetSrvHeap();
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& GetDsvHeap();
+		int GetSrvOffset(){ return SrvHeapOffset; }
+		int GetDsvOffset(){ return DsvHeapOffset; }
+
+		void DestoryScene()
+		{
+			HeapMgrPtr = nullptr;
+		}
+
 	protected:
-		void CreateHeap(ID3D12Device* device);
 		void CreateSRVAndDSV(ID3D12Device* device);
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> mShadowMap = nullptr;
 		FDevice* Device;
-
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mDsvHeap = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mSrvHeap = nullptr;
 
 		D3D12_DEPTH_STENCIL_VIEW_DESC mDsv;
 		D3D12_SHADER_RESOURCE_VIEW_DESC mSrv;
