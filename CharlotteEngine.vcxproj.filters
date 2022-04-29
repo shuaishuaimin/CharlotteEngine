@@ -434,6 +434,9 @@
     <ClCompile Include="Engine\FShader.cpp">
       <Filter>Source Files\Engine\Public\Material</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\FTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Engine\ShadowH.hlsli">

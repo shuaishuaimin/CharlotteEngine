@@ -226,6 +226,7 @@
     <ClCompile Include="Engine\FScene.cpp" />
     <ClCompile Include="Engine\FShader.cpp" />
     <ClCompile Include="Engine\FDXVerticesAndIndicesBuffer.cpp" />
+    <ClCompile Include="Engine\FTexture.cpp" />
     <ClCompile Include="Engine\FWinRenderScene.cpp" />
     <ClCompile Include="Engine\GameInstance.cpp" />
     <ClCompile Include="Engine\GameLogic.cpp" />

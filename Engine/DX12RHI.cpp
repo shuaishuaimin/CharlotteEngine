@@ -42,7 +42,7 @@ namespace Charalotte
 		}
 		IsDeviceSucceed = false;
 		HeapMgr = nullptr;
-		ShadowMap->DestoryScene();
+		ShadowMap->Destory();
 		ShadowMap = nullptr;
 	}
 
@@ -1013,6 +1013,8 @@ namespace Charalotte
 
 	}
 
+
+
 	void DX12RHI::SetRenderTarget(FPCRenderTarget* RT)
 	{
 
@@ -1042,19 +1044,25 @@ namespace Charalotte
 		srvDesc.Texture2D.MipLevels = TexResource->GetDesc().MipLevels;
 		srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-		D3D12_CPU_DESCRIPTOR_HANDLE CPUHandle = Mesh->Srvh()->GetCPUDescriptorHandleForHeapStart();
-
+		D3D12_CPU_DESCRIPTOR_HANDLE BaseColorCPUHandle = 
+				HeapMgr->GetCPUHandleByTypeAndOffest(HeapType::CBVSRVUAVHeap, Mat->GetAttributes()->BaseColor->GetOffset(HeapType::CBVSRVUAVHeap));
+		
+		D3D12_CPU_DESCRIPTOR_HANDLE NormalCPUHandle = 
+				HeapMgr->GetCPUHandleByTypeAndOffest(HeapType::CBVSRVUAVHeap, Mat->GetAttributes()->Normal->GetOffset(HeapType::CBVSRVUAVHeap));
 		md3dDevice->CreateShaderResourceView(
 			TexResource.Get(),
 			&srvDesc,
-			CPUHandle);
-		CPUHandle.ptr += mCbvSrvUavDescriptorSize;
+			BaseColorCPUHandle);
 		md3dDevice->CreateShaderResourceView(
 			NorResource.Get(),
 			&srvDesc,
-			CPUHandle);
+			NormalCPUHandle);
 	}
 
+	std::shared_ptr<FTexture> DX12RHI::CreateTexture(const std::string& FileName)
+	{
+		return std::make_shared<FTexture>(FileName, HeapMgr.get());
+	}
 	void DX12RHI::CreateTextureResource(FTexture* Texture)
 	{
 		ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
@@ -1095,12 +1103,33 @@ namespace Charalotte
 		VBIB->IBByteSize() = ibByteSize;
 	}
 
+	void DX12RHI::BuildConstantBuffersForRenderMesh(FDXRenderMesh* MeshPtr)
+	{
+		MeshPtr->OCB() = std::make_shared<UploadBuffer<ObjectConstants>>(md3dDevice.Get(), 1, true);
+
+		UINT objCBByteSize = FUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+
+		D3D12_GPU_VIRTUAL_ADDRESS cbAddress = MeshPtr->OCB()->Resource()->GetGPUVirtualAddress();
+		// Offset to the ith object constant buffer in the buffer.
+
+		// why we use 0??
+		int boxCBufIndex = 0;
+
+		cbAddress += boxCBufIndex * objCBByteSize;
+
+		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
+		cbvDesc.BufferLocation = cbAddress;
+		cbvDesc.SizeInBytes = FUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+
+		md3dDevice->CreateConstantBufferView(
+			&cbvDesc,
+			HeapMgr->GetCPUHandleByTypeAndOffest(HeapType::CBVSRVUAVHeap, MeshPtr->GetCbvOffset()));
+	}
+
 	void DX12RHI::CreateRenderMeshResource(FRenderMesh* RenderMeshPtr)
 	{
 		FDXRenderMesh* RenderMesh = dynamic_cast<FDXRenderMesh*>(RenderMeshPtr);
-		BuildDescriptorHeapsAndTables(RenderMesh->CbvH());
-		BuildDescriptorHeapsAndTables(RenderMesh->Srvh());
-		BulidConstantBuffers(RenderMesh->CbvH(), RenderMesh->OCB());
+		BuildConstantBuffersForRenderMesh(RenderMesh);
 	}
 
 	std::shared_ptr<FRenderPSO> DX12RHI::CreatePSO(FPSOAttributes PsoAtt, FShader* ShaderPtr)

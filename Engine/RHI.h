@@ -41,6 +41,7 @@ namespace Charalotte
 		virtual void BeginFrame() = 0;
 
 		virtual void CompileMaterial(FTempRenderScene* RenderScenePtr) = 0;
+		virtual std::shared_ptr<FTexture> CreateTexture(const std::string&) = 0;
 		virtual void CreateTextureResource(FTexture* Texture) = 0;
 		virtual void CreateVBIBBuffer(FVBIBBuffer* VBIB) = 0;
 		virtual void CreateRenderMeshResource(FRenderMesh* RenderMesh) = 0;

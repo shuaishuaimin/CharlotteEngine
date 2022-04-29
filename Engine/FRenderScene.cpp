@@ -51,7 +51,7 @@ namespace Charalotte
 		RHIPtr = FRHIManager::GetInstance().GetRHIPtr();
 		for (const auto& FileName : FileNames)
 		{
-			std::shared_ptr<FTexture> Tex = std::make_shared<FTexture>(FileName);
+			std::shared_ptr<FTexture> Tex = RHIPtr->CreateTexture(FileName);
 			RHIPtr->CreateTextureResource(Tex.get());
 			Textures.insert({ FileName, std::move(Tex) });
 		}

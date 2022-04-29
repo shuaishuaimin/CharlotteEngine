@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "DDefines.h"
+#include "EHeapType.h"
 #ifdef RENDER_PLATFORM_DX12
 #include "d3dx12.h"
 #include "wrl.h"
@@ -8,6 +9,7 @@
 
 namespace Charalotte
 {
+	class FHeapManager;
 	class FTexture
 	{
 	public:
@@ -15,39 +17,41 @@ namespace Charalotte
 		{
 
 		}
-
-		~FTexture() {}
-		std::string GetTexturePath()
-		{
-			return TexturePath;
-		}
-
-		void SetTexturePath(const std::string& Path)
-		{
-			TexturePath = Path;
-		}
-
 #ifdef RENDER_PLATFORM_DX12
-		inline Microsoft::WRL::ComPtr<ID3D12Resource>& GetResource()
+		FTexture(const std::string& Path, FHeapManager* Mgr);
+#else
+		FTexture(const std::string& Path) : TexturePath(Path)
 		{
-			return Resource;
-		}
-		inline Microsoft::WRL::ComPtr<ID3D12Resource>& GetUploadHeap()
-		{
-			return UploadHeap;
+			
 		}
 #endif
+		~FTexture();
+		std::string GetTexturePath();
+		
+		void SetTexturePath(const std::string& Path);
 
-		void ClearTexture()
+		int GetOffset(HeapType Type)
 		{
-#ifdef RENDER_PLATFORM_DX12
-			Resource = nullptr;
-			UploadHeap = nullptr;
-#endif
+			const auto& Iter = Offsets.find(Type);
+			if (Iter != Offsets.end())
+			{
+				return Iter->second;
+			}
+			else
+			{
+				return -1;
+			}
 		}
+#ifdef RENDER_PLATFORM_DX12
+		Microsoft::WRL::ComPtr<ID3D12Resource>& GetResource();
+
+		Microsoft::WRL::ComPtr<ID3D12Resource>& GetUploadHeap();
+#endif
+		void ClearTexture();
 
 	private:
 		std::string TexturePath;
+		std::unordered_map<HeapType, int> Offsets;
 #ifdef RENDER_PLATFORM_DX12
 		Microsoft::WRL::ComPtr<ID3D12Resource> Resource = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap = nullptr;

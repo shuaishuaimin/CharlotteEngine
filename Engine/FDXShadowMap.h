@@ -52,7 +52,7 @@ namespace Charalotte
 		int GetSrvOffset(){ return SrvHeapOffset; }
 		int GetDsvOffset(){ return DsvHeapOffset; }
 
-		void DestoryScene()
+		void Destory()
 		{
 			HeapMgrPtr = nullptr;
 		}

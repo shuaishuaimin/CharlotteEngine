@@ -22,12 +22,10 @@ namespace Charalotte
 			HeapMgrPtr = Ptr;
 			if (HeapMgrPtr != nullptr)
 			{
-				SrvHeapOffset = HeapMgrPtr->GetAvailableOffsetAndUseIt(HeapType::CBVSRVUAVHeap);
 				CbvHeapOffset = HeapMgrPtr->GetAvailableOffsetAndUseIt(HeapType::CBVSRVUAVHeap);
 			}
 			else
 			{
-				SrvHeapOffset = -1;
 				CbvHeapOffset = -1;
 			}
 		}
@@ -36,7 +34,6 @@ namespace Charalotte
 			if (HeapMgrPtr != nullptr)
 			{
 				HeapMgrPtr->ReleaseOffset(HeapType::CBVSRVUAVHeap, CbvHeapOffset);
-				HeapMgrPtr->ReleaseOffset(HeapType::CBVSRVUAVHeap, SrvHeapOffset);
 			}
 		}
 
@@ -60,11 +57,6 @@ namespace Charalotte
 		inline void SetRenderMesh(const std::string& Name)
 		{
 			RenderMeshName = Name;
-		}
-
-		int GetSrvOffset()
-		{
-			return SrvHeapOffset;
 		}
 
 		int GetCbvOffset()
@@ -100,7 +92,6 @@ namespace Charalotte
 		FDXBoundingBox DrawArg;
 		std::shared_ptr<UploadBuffer<Charalotte::ObjectConstants>> ObjectCB = nullptr;
 		int CbvHeapOffset;
-		int SrvHeapOffset;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CbvHeap = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> SrvHeap = nullptr;
 #endif

@@ -29,6 +29,7 @@
 
 namespace Charalotte
 {
+	class FDXRenderMesh;
 	class DX12RHI : public RHI
 	{
 	public:
@@ -45,6 +46,7 @@ namespace Charalotte
 		virtual void BeginFrame() override;
 
 		virtual void CompileMaterial(FTempRenderScene* RenderScenePtr) override;
+		virtual std::shared_ptr<FTexture> CreateTexture(const std::string&) override;
 		virtual void CreateTextureResource(FTexture* Texture) override;
 		virtual void CreateVBIBBuffer(FVBIBBuffer* VBIB) override;
 		virtual void CreateRenderMeshResource(FRenderMesh* RenderMesh) override;
@@ -127,6 +129,7 @@ namespace Charalotte
 		void BulidConstantBuffers(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& CbvHeap,
 			std::shared_ptr<UploadBuffer<ObjectConstants>>& ObjectCb);
 
+		void BuildConstantBuffersForRenderMesh(FDXRenderMesh*);
 		void BulidSRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& SrvHeap,
 			FMaterial* Material, FWinRenderScene* DXRenderScene);
 
